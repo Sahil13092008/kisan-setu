@@ -152,6 +152,8 @@
     {
       id: 'RAU',
       name: 'Rau APMC Krishi Mandi',
+      type: 'government',
+      operator: 'MP State Mandi Board',
       district: 'Indore',
       gates: 4,
       bays: 12,
@@ -159,11 +161,15 @@
       queueLength: 3,
       avgWaitMins: 32,
       todayProcuredMT: 480,
-      capacityPercent: 68
+      capacityPercent: 68,
+      priceOffset: 0,
+      badge: 'Govt APMC'
     },
     {
       id: 'INDORE_CHHAWANI',
       name: 'Indore Krishi Upaj Mandi (Chhawani)',
+      type: 'government',
+      operator: 'MP Mandi Board',
       district: 'Indore',
       gates: 8,
       bays: 24,
@@ -171,11 +177,49 @@
       queueLength: 8,
       avgWaitMins: 45,
       todayProcuredMT: 1240,
-      capacityPercent: 82
+      capacityPercent: 82,
+      priceOffset: 20,
+      badge: 'Govt APMC (High Volume)'
+    },
+    {
+      id: 'ITC_CHOUPAL',
+      name: 'ITC Choupal Saagar (Private Mandi)',
+      type: 'private',
+      operator: 'ITC Limited - Agri Business Division',
+      licenseNo: 'PVT-APMC-MP-2024-008',
+      district: 'Indore (Rau-Pithampur)',
+      gates: 2,
+      bays: 6,
+      currentServingToken: 'KS-ITC-022',
+      queueLength: 1,
+      avgWaitMins: 15,
+      todayProcuredMT: 390,
+      capacityPercent: 42,
+      priceOffset: 60,
+      badge: '🏢 Private Mandi (+₹60 Bonus)'
+    },
+    {
+      id: 'ADANI_AGRI_SILO',
+      name: 'Adani Agri Modern Silo & Private Yard',
+      type: 'private',
+      operator: 'Adani Agri Logistics Ltd.',
+      licenseNo: 'PVT-APMC-MP-2024-019',
+      district: 'Indore (Sanwer Road)',
+      gates: 3,
+      bays: 8,
+      currentServingToken: 'KS-ADN-015',
+      queueLength: 2,
+      avgWaitMins: 18,
+      todayProcuredMT: 680,
+      capacityPercent: 48,
+      priceOffset: 50,
+      badge: '🏢 Private Silo (+₹50 Bonus)'
     },
     {
       id: 'SANWER',
       name: 'Sanwer Procurement Center',
+      type: 'government',
+      operator: 'MP Mandi Board',
       district: 'Indore',
       gates: 3,
       bays: 8,
@@ -183,11 +227,15 @@
       queueLength: 2,
       avgWaitMins: 20,
       todayProcuredMT: 310,
-      capacityPercent: 44
+      capacityPercent: 44,
+      priceOffset: 0,
+      badge: 'Govt Procurement Center'
     },
     {
       id: 'DEPALPUR',
       name: 'Depalpur Krishak Kendra',
+      type: 'government',
+      operator: 'MP Mandi Board',
       district: 'Indore',
       gates: 2,
       bays: 6,
@@ -195,7 +243,9 @@
       queueLength: 2,
       avgWaitMins: 24,
       todayProcuredMT: 220,
-      capacityPercent: 50
+      capacityPercent: 50,
+      priceOffset: 0,
+      badge: 'Govt Krishak Kendra'
     }
   ];
 
@@ -347,6 +397,7 @@
   // --- APPLICATION STATE ---
   let state = {
     lang: 'en',
+    mandiFilter: 'all', // 'all' | 'government' | 'private'
     activeTab: 'farmer', // 'farmer', 'staff', 'ministry', 'sms', 'tech'
     aiAgent: {
       isOpen: false,
@@ -550,7 +601,9 @@
     const isBooking = q.includes('book') || q.includes('slot') || q.includes('बुक') || q.includes('स्लॉट') || q.includes('reserve') || q.includes('schedule') || q.includes('कर दो');
     if (isBooking) {
       let mandiId = 'RAU';
-      if (q.includes('indore') || q.includes('इंदौर') || q.includes('chhawani') || q.includes('छावनी')) mandiId = 'INDORE_CHHAWANI';
+      if (q.includes('itc') || q.includes('choupal') || (q.includes('private') && q.includes('rau'))) mandiId = 'ITC_CHOUPAL';
+      else if (q.includes('adani') || q.includes('silo')) mandiId = 'ADANI_AGRI_SILO';
+      else if (q.includes('indore') || q.includes('इंदौर') || q.includes('chhawani') || q.includes('छावनी')) mandiId = 'INDORE_CHHAWANI';
       else if (q.includes('sanwer') || q.includes('सांवेर')) mandiId = 'SANWER';
       else if (q.includes('depalpur') || q.includes('देपालपुर')) mandiId = 'DEPALPUR';
 
@@ -574,6 +627,29 @@
         slotTime: '08:00 AM - 11:00 AM',
         vehicleType: 'Tractor Trolley'
       });
+      return;
+    }
+
+    // 1.5 Private Mandi Specific Detection
+    if (q.includes('private') || q.includes('निजी') || q.includes('itc') || q.includes('adani') || q.includes('choupal') || q.includes('silo')) {
+      const resp = `🏢 **Government APMC vs Private Mandi Comparison**\n\n• **ITC Choupal Saagar (Private Mandi):** ₹2,460/Qtl (⚡ +₹60/Qtl Private Bonus • 15m Automated Unloading)\n• **Adani Agri Modern Silo (Private):** ₹2,450/Qtl (+₹50/Qtl Bonus • 18m Hydraulic Tipper)\n• **Rau APMC (Govt Mandi):** ₹2,400/Qtl (Govt MSP • 32m Yard Wait)\n\n💡 **Private Mandi Benefit:** Selling to **ITC Choupal Saagar** yields you **₹60/Qtl more** than government MSP with instant NEFT bank credit! Would you like me to book your slot at ITC Private Mandi?`;
+      state.aiAgent.messages.push({
+        id: 'msg-' + Date.now(),
+        sender: 'agent',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        text: resp,
+        actionCard: {
+          type: 'quick_actions',
+          buttons: [
+            { label: '⚡ Book ITC Private Mandi (₹2,460/Qtl)', mandiId: 'ITC_CHOUPAL', crop: 'Wheat', qty: 40 },
+            { label: '⚡ Book Adani Private Silo (₹2,450/Qtl)', mandiId: 'ADANI_AGRI_SILO', crop: 'Wheat', qty: 40 },
+            { label: '🏛️ Book Rau APMC (Govt MSP)', mandiId: 'RAU', crop: 'Wheat', qty: 40 }
+          ]
+        }
+      });
+      state.aiAgent.isThinking = false;
+      speakAiText('Private mandis like ITC Choupal Saagar are offering 2,460 rupees per quintal, which is 60 rupees above government MSP with 15 minutes fast-track unloading.');
+      render();
       return;
     }
 
@@ -831,6 +907,10 @@
         window.confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
       }
       showToast('Registration & e-KYC Verified! 🎉', 'UIDAI Aadhaar, Bhulekh Land Quota, and Bank Account authenticated. Now choose your Mandi.');
+      render();
+    },
+    setMandiFilter: (filter) => {
+      state.mandiFilter = filter;
       render();
     },
     selectBookingMandi: (mandiId) => {
@@ -1695,8 +1775,36 @@
                 1. Select Mandi Procurement Center / मंडी का चयन करें *
               </label>
 
+              <!-- MANDI TYPE FILTER BUTTONS -->
+              <div class="flex items-center gap-2 pb-1 overflow-x-auto no-scrollbar">
+                <button type="button" onclick="appHandlers.setMandiFilter('all')"
+                  class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    state.mandiFilter === 'all' 
+                      ? 'bg-emerald-800 text-white shadow-2xs' 
+                      : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                  }">
+                  All Procurement Centers (6)
+                </button>
+                <button type="button" onclick="appHandlers.setMandiFilter('government')"
+                  class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    state.mandiFilter === 'government' 
+                      ? 'bg-emerald-800 text-white shadow-2xs' 
+                      : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                  }">
+                  🏛️ Government APMC Mandis (4)
+                </button>
+                <button type="button" onclick="appHandlers.setMandiFilter('private')"
+                  class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    state.mandiFilter === 'private' 
+                      ? 'bg-amber-600 text-white shadow-2xs' 
+                      : 'bg-amber-50 text-amber-900 border border-amber-200 hover:bg-amber-100'
+                  }">
+                  🏢 Private Mandis & Silos (2)
+                </button>
+              </div>
+
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                ${state.mandis.map(m => `
+                ${state.mandis.filter(m => state.mandiFilter === 'all' || m.type === state.mandiFilter).map(m => `
                   <div onclick="appHandlers.selectBookingMandi('${m.id}')"
                     class="p-4 rounded-xl border-2 cursor-pointer transition-all ${
                       form.mandiId === m.id 
@@ -1707,9 +1815,14 @@
                       <div>
                         <div class="font-extrabold text-sm text-stone-900 flex items-center gap-1.5">
                           <span>${m.name.split('(')[0]}</span>
-                          ${form.mandiId === m.id ? '<span class="text-emerald-700 text-xs">✓ Selected</span>' : ''}
+                          ${form.mandiId === m.id ? '<span class="text-emerald-700 text-xs font-black">✓ Selected</span>' : ''}
                         </div>
-                        <div class="text-[11px] text-stone-500 mt-0.5">${m.district} District • ${m.gates} Active Gates</div>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                          <span class="px-1.5 py-0.2 rounded text-[9px] font-extrabold ${m.type === 'private' ? 'bg-amber-100 text-amber-950 border border-amber-300' : 'bg-emerald-100 text-emerald-950 border border-emerald-300'}">
+                            ${m.type === 'private' ? '🏢 Private Mandi' : '🏛️ Govt APMC'}
+                          </span>
+                          <span class="text-[11px] text-stone-500">${m.district} • ${m.gates} Gates</span>
+                        </div>
                       </div>
                       <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
                         m.capacityPercent > 75 ? 'bg-amber-100 text-amber-900' : 'bg-emerald-100 text-emerald-900'
@@ -1721,7 +1834,7 @@
                     <div class="grid grid-cols-2 gap-2 mt-3 pt-2.5 border-t border-stone-200/70 text-xs">
                       <div>
                         <span class="text-[10px] text-stone-400 block">Today's Rate:</span>
-                        <strong class="font-mono text-emerald-900 font-extrabold">₹${cropRate.total} / Qtl</strong>
+                        <strong class="font-mono text-emerald-900 font-extrabold">₹${cropRate.total + (m.priceOffset || 0)} / Qtl</strong><span class="text-[9px] font-bold text-amber-800 block">${m.type === "private" ? "+₹" + m.priceOffset + " Private Premium" : "Official MSP + Bonus"}</span>
                       </div>
                       <div>
                         <span class="text-[10px] text-stone-400 block">Queue Load:</span>
@@ -2783,6 +2896,14 @@
 
           <!-- QUICK SUGGESTED PROMPTS -->
           <div class="px-3 py-2 bg-stone-100/90 border-t border-stone-200 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
+            <button onclick="appHandlers.triggerAiPrompt('Compare Govt APMC vs Private Mandi prices')"
+              class="px-2.5 py-1 rounded-full bg-amber-50 border border-amber-300 text-amber-900 text-[11px] font-bold whitespace-nowrap hover:bg-amber-100 transition-colors shadow-2xs">
+              🏢 Compare Govt vs Private Mandis
+            </button>
+            <button onclick="appHandlers.triggerAiPrompt('Book slot for 40 quintals of Wheat at ITC Choupal Saagar private mandi')"
+              class="px-2.5 py-1 rounded-full bg-white border border-stone-300 text-stone-700 text-[11px] font-bold whitespace-nowrap hover:border-emerald-600 hover:text-emerald-800 transition-colors shadow-2xs">
+              ⚡ Book ITC Private Mandi
+            </button>
             <button onclick="appHandlers.triggerAiPrompt('Compare Wheat prices across all Mandis')"
               class="px-2.5 py-1 rounded-full bg-white border border-stone-300 text-stone-700 text-[11px] font-bold whitespace-nowrap hover:border-emerald-600 hover:text-emerald-800 transition-colors shadow-2xs">
               📊 Compare Wheat Prices
