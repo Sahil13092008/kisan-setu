@@ -258,6 +258,50 @@
 
   const INITIAL_TOKENS = [
     {
+      id: 'KS-ITC-022',
+      mandiId: 'ITC_CHOUPAL',
+      farmerId: 'FARMER-91',
+      farmerName: 'Mahesh Patidar',
+      phone: '+91 9425091823',
+      village: 'Pithampur Rural',
+      crop: 'Wheat',
+      variety: 'Sharbati Premium',
+      quantityQuintals: 50,
+      vehicle: 'Tractor Trolley (MP-09-CB-2201)',
+      slotDate: '26-Sep-2026',
+      slotTime: '09:00 AM - 11:00 AM',
+      assignedGate: 'Gate 1 (Automated Pit 1)',
+      status: 'at_weighbridge',
+      queuePosition: 0,
+      etaMins: 0,
+      quality: { moisture: 10.8, foreignMatter: 0.2, grade: 'Export Grade 1', dockPercent: 0 },
+      weight: { gross: 8200, tare: 3200, netKg: 5000, netQuintals: 50 },
+      payout: { mspRate: 2460, totalAmount: 123000, dbtStatus: 'Processed', utrNo: 'NEFT-ITC2026092671' },
+      createdAt: '08:45 AM'
+    },
+    {
+      id: 'KS-ADN-015',
+      mandiId: 'ADANI_AGRI_SILO',
+      farmerId: 'FARMER-92',
+      farmerName: 'Vikram Singh Dangi',
+      phone: '+91 9826019284',
+      village: 'Sanwer Kheda',
+      crop: 'Wheat',
+      variety: 'Lokwan Bold',
+      quantityQuintals: 65,
+      vehicle: 'Hydraulic Tipper (MP-09-HG-3301)',
+      slotDate: '26-Sep-2026',
+      slotTime: '10:00 AM - 12:00 PM',
+      assignedGate: 'Gate 2 (Tipper Bay 1)',
+      status: 'in_quality_check',
+      queuePosition: 1,
+      etaMins: 15,
+      quality: { moisture: 11.2, foreignMatter: 0.3, grade: 'FAQ Grade', dockPercent: 0 },
+      weight: null,
+      payout: null,
+      createdAt: '09:10 AM'
+    },
+    {
       id: 'KS-RAU-105',
       mandiId: 'RAU',
       farmerId: 'FARMER-00',
@@ -760,6 +804,14 @@
 
   // --- EVENT HANDLERS ---
   window.appHandlers = {
+    bookSpecificMandi: (mandiId) => {
+      state.activeTab = 'farmer';
+      state.bookingForm.mandiId = mandiId;
+      state.farmerAuth.currentStep = 'choose_mandi';
+      const m = state.mandis.find(x => x.id === mandiId);
+      showToast('Mandi Selected', 'Selected ' + (m ? m.name : mandiId) + '. You can now choose your delivery slot.');
+      render();
+    },
     toggleAiAgent: (open) => {
       state.aiAgent.isOpen = (typeof open === 'boolean') ? open : !state.aiAgent.isOpen;
       render();
@@ -1351,6 +1403,37 @@
           </div>
         </header>
 
+        <!-- LIVE RATES & PRIVATE MANDI HIGHLIGHT TICKER (VISIBLE ON ALL SCREENS) -->
+        <div class="bg-gradient-to-r from-amber-50 via-stone-50 to-emerald-50 border-b border-stone-200/90 py-2 px-3 sm:px-6 shadow-2xs">
+          <div class="max-w-7xl mx-auto flex items-center justify-between gap-3 text-xs">
+            <div class="flex items-center gap-2.5 overflow-x-auto whitespace-nowrap no-scrollbar py-0.5">
+              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-amber-600 text-white font-extrabold text-[10px] uppercase tracking-wider shadow-2xs shrink-0">
+                <span>⚡</span> Live Procurement Rates
+              </span>
+              <div class="inline-flex items-center gap-2 font-bold text-stone-800 text-[11px]">
+                <span class="text-amber-950 bg-amber-100/90 px-2 py-0.5 rounded border border-amber-300 flex items-center gap-1 shadow-2xs">
+                  <span>🏢</span> <strong>ITC Choupal Saagar (Private):</strong> <span class="font-mono text-emerald-800 font-extrabold">₹2,460/Qtl</span> <span class="text-emerald-700 font-black text-[10px]">(+₹60 Bonus • 15m Fast-Track)</span>
+                </span>
+                <span class="text-amber-950 bg-amber-100/90 px-2 py-0.5 rounded border border-amber-300 flex items-center gap-1 shadow-2xs">
+                  <span>🏢</span> <strong>Adani Agri Modern Silo (Private):</strong> <span class="font-mono text-emerald-800 font-extrabold">₹2,450/Qtl</span> <span class="text-emerald-700 font-black text-[10px]">(+₹50 Bonus • 18m Tipper)</span>
+                </span>
+                <span class="text-stone-700 bg-stone-100 px-2 py-0.5 rounded border border-stone-200 flex items-center gap-1">
+                  <span>🏛️</span> <strong>Rau APMC (Govt):</strong> <span class="font-mono text-stone-900 font-bold">₹2,400/Qtl</span> <span class="text-stone-500 font-normal text-[10px]">(Govt MSP)</span>
+                </span>
+                <span class="text-stone-700 bg-stone-100 px-2 py-0.5 rounded border border-stone-200 flex items-center gap-1">
+                  <span>🏛️</span> <strong>Indore Chhawani (Govt):</strong> <span class="font-mono text-stone-900 font-bold">₹2,420/Qtl</span>
+                </span>
+              </div>
+            </div>
+
+            <button onclick="appHandlers.setTab('farmer'); appHandlers.setFarmerStep('choose_mandi');"
+              class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shrink-0 shadow-2xs transition-colors">
+              <span>Compare & Book Slot</span>
+              <span>➔</span>
+            </button>
+          </div>
+        </div>
+
         <!-- NOTIFICATION TOAST -->
         ${state.notificationToast ? `
           <div class="fixed top-24 right-4 z-50 max-w-sm w-full bg-white rounded-xl shadow-xl border border-stone-200 p-4 animate-slide-in flex items-start gap-3">
@@ -1442,7 +1525,7 @@
             </button>
 
             <!-- STEP 2 TAB -->
-            <button onclick="${auth.isVerified ? "appHandlers.setFarmerStep('choose_mandi')" : "alert('Please complete and verify your registration in Step 1 first.')"}"
+            <button onclick="appHandlers.setFarmerStep('choose_mandi')"
               class="flex items-center gap-2 p-2 sm:p-3 rounded-xl text-left transition-all ${
                 auth.currentStep === 'choose_mandi' 
                   ? 'bg-emerald-50 border-2 border-emerald-600 text-emerald-950 font-black shadow-2xs' 
@@ -1455,9 +1538,9 @@
               </div>
               <div class="hidden sm:block">
                 <div class="text-xs font-bold leading-tight">Choose Mandi & Slot</div>
-                <div class="text-[10px] text-stone-500">Rates, Dates & Quota</div>
+                <div class="text-[10px] text-amber-700 font-bold">Govt & Private Mandis</div>
               </div>
-              <div class="sm:hidden text-xs font-bold">2. Book Slot</div>
+              <div class="sm:hidden text-xs font-bold">2. Mandis & Slot</div>
             </button>
 
             <!-- STEP 3 TAB -->
@@ -1542,6 +1625,71 @@
         </div>
 
         <!-- FORM CONTENT -->
+        
+        <!-- PROMINENT PROCUREMENT CHANNELS SHOWCASE (Govt APMC & Private Mandis) -->
+        <div class="m-5 sm:m-6 p-4 rounded-2xl bg-gradient-to-br from-amber-50 via-stone-50 to-emerald-50 border-2 border-amber-300 shadow-xs space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-amber-200/80 pb-2.5">
+            <div class="flex items-center gap-2">
+              <span class="text-xl">🏢</span>
+              <div>
+                <h3 class="font-black text-sm text-stone-900">Procurement Channels Available: Govt APMC & Private Mandis</h3>
+                <p class="text-[11px] text-stone-600">Sell at official Government MSP or choose licensed Private Mandis with extra bonus pricing.</p>
+              </div>
+            </div>
+            <button type="button" onclick="appHandlers.setFarmerStep('choose_mandi')"
+              class="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs shadow-2xs transition-all hover:scale-102 flex items-center gap-1.5">
+              <span>👉 Browse All Mandis & Private Rates (Step 2)</span>
+              <span>➔</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <!-- Option A: Private Mandis -->
+            <div class="p-3 bg-white rounded-xl border border-amber-300 shadow-2xs space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="px-2 py-0.5 rounded text-[10px] font-black bg-amber-100 text-amber-950 border border-amber-300">
+                  🏢 LICENSED PRIVATE MANDIS
+                </span>
+                <span class="font-mono text-emerald-800 font-black text-sm">₹2,460 / Qtl</span>
+              </div>
+              <div class="font-bold text-stone-900 text-xs">ITC Choupal Saagar & Adani Modern Silo</div>
+              <ul class="text-[11px] text-stone-600 space-y-0.5">
+                <li class="flex items-center gap-1 text-emerald-800 font-bold">
+                  <span>✓</span> <span>⚡ +₹60/Qtl Private Bonus over Govt MSP</span>
+                </li>
+                <li class="flex items-center gap-1">
+                  <span>✓</span> <span>15-Minute Automated Unloading (No Yard Jam)</span>
+                </li>
+                <li class="flex items-center gap-1">
+                  <span>✓</span> <span>Same-Day Direct NEFT / RTGS Bank Transfer</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Option B: Govt APMC -->
+            <div class="p-3 bg-white rounded-xl border border-stone-200 shadow-2xs space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-100 text-emerald-950 border border-emerald-300">
+                  🏛️ GOVERNMENT APMC YARDS
+                </span>
+                <span class="font-mono text-stone-900 font-bold text-sm">₹2,400 / Qtl</span>
+              </div>
+              <div class="font-bold text-stone-900 text-xs">Rau, Indore Chhawani, Sanwer, Depalpur</div>
+              <ul class="text-[11px] text-stone-600 space-y-0.5">
+                <li class="flex items-center gap-1">
+                  <span>✓</span> <span>100% Government MSP Guaranteed</span>
+                </li>
+                <li class="flex items-center gap-1">
+                  <span>✓</span> <span>Direct DBT Credit via PFMS (Aadhaar Seeding)</span>
+                </li>
+                <li class="flex items-center gap-1">
+                  <span>✓</span> <span>Open yard auction & physical lot inspection</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
         <form onsubmit="appHandlers.requestFarmerVerification(event)" class="p-5 sm:p-7 space-y-6">
           
           <!-- SECTION 1: PERSONAL & CONTACT DETAILS -->
@@ -1678,13 +1826,52 @@
             </div>
           </div>
 
+          
+          <!-- SECTION 5: PREFERRED PROCUREMENT CHANNEL -->
+          <div class="space-y-3">
+            <h4 class="text-xs font-black text-stone-900 uppercase tracking-wider flex items-center gap-1.5 border-b border-stone-200 pb-1.5">
+              <span>🏢</span> 5. Preferred Procurement Channel / खरीद केंद्र चयन (Government vs Private Mandi)
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div onclick="state.preferredMandiType = 'private'; state.mandiFilter = 'private'; render();"
+                class="p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
+                  state.preferredMandiType === 'private'
+                    ? 'border-amber-500 bg-amber-50/70 ring-2 ring-amber-400/20 shadow-xs'
+                    : 'border-stone-200 bg-white hover:border-stone-300'
+                }">
+                <div class="flex items-center justify-between">
+                  <span class="font-extrabold text-stone-900 flex items-center gap-1.5">
+                    <span>🏢</span> Private Mandi / Silo (ITC Choupal / Adani)
+                  </span>
+                  ${state.preferredMandiType === 'private' ? '<span class="text-amber-800 text-xs font-black">✓ Selected</span>' : ''}
+                </div>
+                <p class="text-[11px] text-stone-600 mt-1">Offers <strong>₹2,460/Qtl (+₹60 Bonus)</strong> with 15-minute fast-track unloading and direct NEFT settlement.</p>
+              </div>
+
+              <div onclick="state.preferredMandiType = 'government'; state.mandiFilter = 'government'; render();"
+                class="p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
+                  state.preferredMandiType === 'government'
+                    ? 'border-emerald-600 bg-emerald-50/70 ring-2 ring-emerald-500/20 shadow-xs'
+                    : 'border-stone-200 bg-white hover:border-stone-300'
+                }">
+                <div class="flex items-center justify-between">
+                  <span class="font-extrabold text-stone-900 flex items-center gap-1.5">
+                    <span>🏛️</span> Government APMC Mandi (Rau / Indore)
+                  </span>
+                  ${state.preferredMandiType === 'government' ? '<span class="text-emerald-700 text-xs font-black">✓ Selected</span>' : ''}
+                </div>
+                <p class="text-[11px] text-stone-600 mt-1">Standard Government MSP procurement at official state mandis with PFMS DBT bank credit.</p>
+              </div>
+            </div>
+          </div>
+
           <!-- VERIFY ACTION & OTP MODAL -->
           <div class="pt-4 border-t border-stone-100 flex items-center justify-between">
             <span class="text-xs text-stone-500">All fields verified with UIDAI & MP Bhulekh Portal</span>
             
             <button type="submit" ${auth.isAuthenticating ? 'disabled' : ''}
               class="px-6 py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs sm:text-sm shadow-md flex items-center gap-2 transition-all hover:scale-[1.02]">
-              <span>${auth.isAuthenticating ? 'Authenticating with UIDAI...' : 'Verify Details & Proceed to Mandi Selection ➔'}</span>
+              <span>${auth.isAuthenticating ? 'Authenticating with UIDAI...' : 'Verify Details & Proceed to Mandi Selection (Govt & Private) ➔'}</span>
             </button>
           </div>
         </form>
@@ -2804,6 +2991,163 @@
               <div class="text-stone-500">> Ready for high concurrency stress test. Click 'Run 10,000 Slot Booking Surge' above.</div>
             `}
           </div>
+        </div>
+      </div>
+    `;
+  }
+
+
+  // ==========================================
+  // VIEW: MANDIS & LIVE RATES DIRECTORY (GOVT + PRIVATE)
+  // ==========================================
+  function renderMandisDirectoryView() {
+    const cropRate = MSP_RATES['Wheat'];
+
+    return `
+      <div class="space-y-6 animate-fade-in">
+        <!-- HEADER -->
+        <div class="bg-gradient-to-r from-emerald-900 via-stone-900 to-teal-950 text-white p-6 rounded-2xl shadow-sm">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/15 text-amber-300 border border-white/20 mb-2">
+                <span>🏢 Government & Private Mandi Directory</span>
+              </div>
+              <h2 class="text-2xl sm:text-3xl font-black tracking-tight">Procurement Centers & Live Rates (Indore Division)</h2>
+              <p class="text-xs text-stone-300 mt-1">Compare official Government APMC yards and licensed Corporate Silos/Private Mandis for maximum farmer profit.</p>
+            </div>
+
+            <!-- Mandi Filter Buttons -->
+            <div class="flex items-center gap-2">
+              <button onclick="appHandlers.setMandiFilter('all')"
+                class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${state.mandiFilter === 'all' ? 'bg-white text-stone-900 shadow-xs' : 'bg-white/10 text-white hover:bg-white/20'}">
+                All Mandis (6)
+              </button>
+              <button onclick="appHandlers.setMandiFilter('private')"
+                class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${state.mandiFilter === 'private' ? 'bg-amber-500 text-stone-950 font-black shadow-xs' : 'bg-white/10 text-white hover:bg-white/20'}">
+                🏢 Private Mandis (2)
+              </button>
+              <button onclick="appHandlers.setMandiFilter('government')"
+                class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${state.mandiFilter === 'government' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-white/10 text-white hover:bg-white/20'}">
+                🏛️ Govt APMC (4)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMPARISON MATRIX: GOVT APMC VS PRIVATE MANDI -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 shadow-xs space-y-4">
+          <h3 class="text-sm font-black text-stone-900 uppercase tracking-wider flex items-center gap-2">
+            <span>⚖️</span> Comparative Analysis: Government APMC vs Licensed Private Mandi
+          </h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-stone-50 text-stone-700 font-bold border-b border-stone-200">
+                <tr>
+                  <th class="py-2.5 px-3">Evaluation Parameter</th>
+                  <th class="py-2.5 px-3 text-emerald-900 bg-emerald-50/50">🏛️ Government APMC Mandis</th>
+                  <th class="py-2.5 px-3 text-amber-950 bg-amber-50/50">🏢 Licensed Private Mandis & Silos</th>
+                  <th class="py-2.5 px-3">Farmer Benefit Summary</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-stone-100 font-medium">
+                <tr>
+                  <td class="py-3 px-3 font-bold text-stone-800">Wheat Procurement Rate</td>
+                  <td class="py-3 px-3 font-mono">₹2,400 / Qtl (Official MSP)</td>
+                  <td class="py-3 px-3 font-mono font-bold text-emerald-800 bg-amber-50/30">₹2,450 – ₹2,460 / Qtl (+₹50-₹60 Bonus)</td>
+                  <td class="py-3 px-3 text-emerald-700 font-bold">+₹2,400 extra profit per 40 Qtl trolley</td>
+                </tr>
+                <tr>
+                  <td class="py-3 px-3 font-bold text-stone-800">Avg. Unloading Time</td>
+                  <td class="py-3 px-3">32 – 45 Minutes (Yard Congestion)</td>
+                  <td class="py-3 px-3 font-bold text-amber-900 bg-amber-50/30">15 – 18 Minutes (Hydraulic Tipper)</td>
+                  <td class="py-3 px-3 text-stone-600">Save 25+ minutes per delivery trip</td>
+                </tr>
+                <tr>
+                  <td class="py-3 px-3 font-bold text-stone-800">Weighing Technology</td>
+                  <td class="py-3 px-3">Electronic / Manual beam scale</td>
+                  <td class="py-3 px-3 font-bold text-amber-900 bg-amber-50/30">Automated Computerized Gross/Tare Sensors</td>
+                  <td class="py-3 px-3 text-stone-600">Zero weight manipulation or rounding loss</td>
+                </tr>
+                <tr>
+                  <td class="py-3 px-3 font-bold text-stone-800">Payment Channel & Speed</td>
+                  <td class="py-3 px-3">PFMS Direct Benefit Transfer (24–48 hrs)</td>
+                  <td class="py-3 px-3 font-bold text-emerald-800 bg-amber-50/30">Instant Same-Day Corporate NEFT / RTGS</td>
+                  <td class="py-3 px-3 text-emerald-700 font-bold">Immediate bank credit on same day</td>
+                </tr>
+                <tr>
+                  <td class="py-3 px-3 font-bold text-stone-800">Legal Licensing</td>
+                  <td class="py-3 px-3">MP State Krishi Upaj Mandi Board</td>
+                  <td class="py-3 px-3 bg-amber-50/30">Section 31-A Private Mandi License (ITC / Adani)</td>
+                  <td class="py-3 px-3 text-stone-600">100% legal, regulated under state oversight</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- MANDIS CARDS GRID -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          ${state.mandis.filter(m => state.mandiFilter === 'all' || m.type === state.mandiFilter).map(m => `
+            <div class="bg-white rounded-2xl border-2 ${m.type === 'private' ? 'border-amber-300 shadow-xs ring-1 ring-amber-200' : 'border-stone-200'} p-5 space-y-4 flex flex-col justify-between transition-all hover:shadow-md">
+              <div class="space-y-3">
+                <div class="flex items-start justify-between gap-2">
+                  <div>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-extrabold ${m.type === 'private' ? 'bg-amber-100 text-amber-950 border border-amber-300' : 'bg-emerald-100 text-emerald-950 border border-emerald-300'}">
+                      ${m.type === 'private' ? '🏢 LICENSED PRIVATE MANDI' : '🏛️ GOVERNMENT APMC'}
+                    </span>
+                    <h4 class="font-black text-base text-stone-900 mt-1">${m.name}</h4>
+                    <p class="text-[11px] text-stone-500">${m.operator || 'MP Mandi Board'} • ${m.district}</p>
+                  </div>
+                  <span class="px-2 py-1 rounded-lg text-xs font-bold ${m.capacityPercent > 75 ? 'bg-amber-100 text-amber-900' : 'bg-emerald-100 text-emerald-900'} shrink-0">
+                    ~${m.avgWaitMins}m wait
+                  </span>
+                </div>
+
+                <div class="p-3 bg-stone-50 rounded-xl space-y-2 text-xs">
+                  <div class="flex justify-between items-center">
+                    <span class="text-stone-500">Wheat Today's Rate:</span>
+                    <strong class="font-mono text-emerald-900 text-sm font-extrabold">₹${cropRate.total + (m.priceOffset || 0)} / Qtl</strong>
+                  </div>
+                  ${m.type === 'private' ? `
+                    <div class="flex justify-between items-center text-amber-900 font-bold text-[11px]">
+                      <span>⚡ Private Corporate Bonus:</span>
+                      <span>+₹${m.priceOffset} / Qtl over MSP</span>
+                    </div>
+                  ` : ''}
+                  <div class="flex justify-between items-center text-stone-600">
+                    <span>Queue Load:</span>
+                    <span class="font-mono font-bold">${m.queueLength} Vehicles in line</span>
+                  </div>
+                  <div class="flex justify-between items-center text-stone-600">
+                    <span>License / Reg:</span>
+                    <span class="font-mono text-[11px]">${m.licenseNo || 'APMC-MP-IND-01'}</span>
+                  </div>
+                </div>
+
+                <!-- Highlights -->
+                <div class="space-y-1">
+                  <span class="text-[10px] font-extrabold uppercase tracking-wider text-stone-400">Key Features:</span>
+                  <ul class="text-[11px] text-stone-600 space-y-0.5">
+                    ${(m.highlights || [
+                      'Automated Gate Entry pass system',
+                      'Direct Bank Settlement to farmer account',
+                      'Real-time queue SMS notification alerts'
+                    ]).map(h => `<li class="flex items-center gap-1.5"><span>•</span><span>${h}</span></li>`).join('')}
+                  </ul>
+                </div>
+              </div>
+
+              <button onclick="appHandlers.bookSpecificMandi('${m.id}')"
+                class="w-full py-2.5 rounded-xl font-bold text-xs shadow-xs transition-colors flex items-center justify-center gap-1.5 ${
+                  m.type === 'private'
+                    ? 'bg-amber-600 hover:bg-amber-700 text-white'
+                    : 'bg-emerald-700 hover:bg-emerald-800 text-white'
+                }">
+                <span>⚡ Book Delivery Slot at this Mandi</span>
+                <span>➔</span>
+              </button>
+            </div>
+          `).join('')}
         </div>
       </div>
     `;
