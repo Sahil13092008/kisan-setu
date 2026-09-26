@@ -348,6 +348,31 @@
   let state = {
     lang: 'en',
     activeTab: 'farmer', // 'farmer', 'staff', 'ministry', 'sms', 'tech'
+    aiAgent: {
+      isOpen: false,
+      isMinimized: false,
+      inputQuery: '',
+      isThinking: false,
+      voiceEnabled: true,
+      messages: [
+        {
+          id: 'msg-welcome',
+          sender: 'agent',
+          timestamp: 'Just now',
+          text: 'Namaste! 🙏 I am **Kisan Sahayak AI (कृषि सहायक)**. I can help you **compare live Mandi prices**, analyze queue wait times, and **directly book your procurement slot** when commanded!\n\nTry asking me:\n• *"Compare Wheat prices across all Mandis"*\n• *"Book a slot for 40 quintals of Wheat at Rau Mandi"*\n• *"Which Mandi has the lowest waiting time right now?"*',
+          actionCard: {
+            type: 'compare_preview',
+            title: "Today's Mandi MSP & Rate Comparison",
+            mandis: [
+              { name: 'Rau APMC Mandi', crop: 'Wheat (गेहूं)', price: '₹2,400/Qtl', wait: '32 min', badge: 'Recommended', mandiId: 'RAU' },
+              { name: 'Indore Mandi (Chhawani)', crop: 'Wheat (गेहूं)', price: '₹2,420/Qtl', wait: '45 min', badge: 'High Rate', mandiId: 'INDORE_CHHAWANI' },
+              { name: 'Sanwer Procurement Hub', crop: 'Chana (चना)', price: '₹5,590/Qtl', wait: '20 min', badge: 'Fastest Entry', mandiId: 'SANWER' },
+              { name: 'Depalpur Krishak Kendra', crop: 'Mustard (सरसों)', price: '₹5,750/Qtl', wait: '24 min', badge: 'Open Bays', mandiId: 'DEPALPUR' }
+            ]
+          }
+        }
+      ]
+    },
     farmerAuth: {
       isLoggedIn: true,
       selectedFarmerId: 'FARMER-01',
@@ -403,6 +428,215 @@
     notificationToast: null
   };
 
+
+  // --- KISAN SAHAYAK AI AGENT ENGINE (Voice & Autonomous Slot Booking) ---
+  function speakAiText(text) {
+    if (!state.aiAgent.voiceEnabled || !window.speechSynthesis) return;
+    try {
+      window.speechSynthesis.cancel();
+      const clean = text.replace(/[*_#`]/g, '').replace(/\[.*?\]/g, '').replace(/₹/g, 'Rupees ');
+      const utter = new SpeechSynthesisUtterance(clean);
+      utter.rate = 1.0;
+      utter.pitch = 1.0;
+      window.speechSynthesis.speak(utter);
+    } catch (e) {}
+  }
+
+  function executeAiDirectBooking(params) {
+    const f = getActiveFarmer();
+    const crop = params.crop || 'Wheat';
+    const qty = Number(params.quantity) || 40;
+    const mandiObj = state.mandis.find(m => m.id === params.mandiId) || state.mandis[0];
+
+    // Check Bhulekh quota
+    if (f.cropQuota[crop] && qty > f.cropQuota[crop].remaining) {
+      const msg = `⚠️ **Quota Exceeded!** You requested **${qty} Quintals** of ${crop}, but your verified Bhulekh land quota has only **${f.cropQuota[crop].remaining} Quintals** remaining. Please adjust your quantity.`;
+      state.aiAgent.messages.push({
+        id: 'msg-' + Date.now(),
+        sender: 'agent',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        text: msg
+      });
+      state.aiAgent.isThinking = false;
+      speakAiText(`Quota exceeded. You have ${f.cropQuota[crop].remaining} quintals remaining.`);
+      render();
+      return;
+    }
+
+    // Allocate token & gate
+    const tokenNum = Math.floor(100 + Math.random() * 900);
+    const newTokenId = `KS-${mandiObj.id}-${tokenNum}`;
+    const assignedGate = `Gate ${(Math.floor(Math.random() * mandiObj.gates) + 1)} (Bay ${Math.floor(Math.random() * 8) + 1})`;
+
+    const newToken = {
+      id: newTokenId,
+      mandiId: mandiObj.id,
+      farmerId: f.id,
+      farmerName: f.name,
+      phone: f.phone,
+      village: f.village,
+      crop: crop,
+      variety: 'FAQ Standard',
+      quantityQuintals: qty,
+      vehicle: `${params.vehicleType || 'Tractor Trolley'} (MP-09-BZ-6712)`,
+      slotDate: params.slotDate || '27-Sep-2026',
+      slotTime: params.slotTime || '08:00 AM - 11:00 AM',
+      assignedGate: assignedGate,
+      status: 'scheduled',
+      queuePosition: mandiObj.queueLength + 1,
+      etaMins: (mandiObj.queueLength + 1) * 12,
+      quality: null,
+      weight: null,
+      payout: null,
+      createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
+    if (f.cropQuota[crop]) {
+      f.cropQuota[crop].remaining -= qty;
+      f.cropQuota[crop].used += qty;
+    }
+    f.activeTokenId = newTokenId;
+
+    state.tokens.push(newToken);
+    mandiObj.queueLength += 1;
+
+    sendSimulatedSms(
+      f.phone,
+      'AI SLOT BOOKED',
+      `[VM-KSITU] Token #${newTokenId} booked via Kisan Sahayak AI for ${crop} (${qty} Qtl) at ${mandiObj.name}. Slot: ${newToken.slotDate} ${newToken.slotTime}. Gate: ${newToken.assignedGate}.`
+    );
+
+    playChime('success');
+    if (window.confetti) {
+      window.confetti({ particleCount: 60, spread: 60, origin: { y: 0.6 } });
+    }
+
+    const confirmMsg = `✅ **Procurement Slot Successfully Booked via AI Command!**\n\nI have confirmed your delivery slot for **${qty} Quintals of ${crop}** at **${mandiObj.name}**.\n\n• **Token ID:** \`${newTokenId}\`\n• **Slot Time:** ${newToken.slotDate} (${newToken.slotTime})\n• **Assigned:** ${assignedGate}\n• **Estimated Wait:** ~${newToken.etaMins} mins\n\nA confirmation SMS has been dispatched to your mobile (${f.phone}).`;
+
+    state.aiAgent.messages.push({
+      id: 'msg-' + Date.now(),
+      sender: 'agent',
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      text: confirmMsg,
+      actionCard: {
+        type: 'booking_confirmed',
+        token: newToken,
+        mandiName: mandiObj.name
+      }
+    });
+
+    state.aiAgent.isThinking = false;
+    speakAiText(`Slot confirmed! Your token number is ${newTokenId} at ${mandiObj.name} for ${qty} quintals of ${crop}.`);
+    render();
+  }
+
+  function processAiAgentQuery(rawQuery) {
+    const q = rawQuery.toLowerCase();
+    const f = getActiveFarmer();
+
+    // 1. Direct Booking Detection
+    const isBooking = q.includes('book') || q.includes('slot') || q.includes('बुक') || q.includes('स्लॉट') || q.includes('reserve') || q.includes('schedule') || q.includes('कर दो');
+    if (isBooking) {
+      let mandiId = 'RAU';
+      if (q.includes('indore') || q.includes('इंदौर') || q.includes('chhawani') || q.includes('छावनी')) mandiId = 'INDORE_CHHAWANI';
+      else if (q.includes('sanwer') || q.includes('सांवेर')) mandiId = 'SANWER';
+      else if (q.includes('depalpur') || q.includes('देपालपुर')) mandiId = 'DEPALPUR';
+
+      let crop = 'Wheat';
+      if (q.includes('soybean') || q.includes('सोयाबीन')) crop = 'Soybean';
+      else if (q.includes('chana') || q.includes('चना')) crop = 'Chana';
+      else if (q.includes('mustard') || q.includes('सरसों')) crop = 'Mustard';
+
+      let qty = 40;
+      const numMatch = q.match(/(\d+)\s*(qtl|quintal|quintals|क्विंटल|kilo)?/i);
+      if (numMatch && numMatch[1]) {
+        const parsed = parseInt(numMatch[1], 10);
+        if (parsed > 0 && parsed <= 300) qty = parsed;
+      }
+
+      executeAiDirectBooking({
+        mandiId,
+        crop,
+        quantity: qty,
+        slotDate: '27-Sep-2026',
+        slotTime: '08:00 AM - 11:00 AM',
+        vehicleType: 'Tractor Trolley'
+      });
+      return;
+    }
+
+    // 2. Price / Rate Comparison Detection
+    const isCompare = q.includes('compare') || q.includes('price') || q.includes('rate') || q.includes('bhav') || q.includes('भाव') || q.includes('कीमत') || q.includes('तुलना') || q.includes('रेट');
+    if (isCompare) {
+      let crop = 'Wheat';
+      if (q.includes('soybean') || q.includes('सोयाबीन')) crop = 'Soybean';
+      else if (q.includes('chana') || q.includes('चना')) crop = 'Chana';
+      else if (q.includes('mustard') || q.includes('सरसों')) crop = 'Mustard';
+
+      const rates = [
+        { mandiId: 'RAU', name: 'Rau APMC Mandi', dist: '6 km', price: crop === 'Wheat' ? '₹2,400' : crop === 'Soybean' ? '₹4,992' : '₹5,590', bonus: '+₹125 State Bonus', wait: '32m wait', badge: 'Recommended', highlight: true },
+        { mandiId: 'INDORE_CHHAWANI', name: 'Indore Mandi (Chhawani)', dist: '14 km', price: crop === 'Wheat' ? '₹2,420' : crop === 'Soybean' ? '₹5,010' : '₹5,620', bonus: '+₹145 APMC Premium', wait: '45m wait', badge: 'Highest Price', highlight: false },
+        { mandiId: 'SANWER', name: 'Sanwer Procurement Center', dist: '22 km', price: crop === 'Wheat' ? '₹2,400' : crop === 'Soybean' ? '₹4,992' : '₹5,590', bonus: '+₹125 State Bonus', wait: '20m wait', badge: 'Lowest Wait', highlight: false },
+        { mandiId: 'DEPALPUR', name: 'Depalpur Krishak Kendra', dist: '28 km', price: crop === 'Wheat' ? '₹2,400' : crop === 'Soybean' ? '₹4,992' : '₹5,750', bonus: '+₹100 Bonus', wait: '24m wait', badge: 'Fastest Weighbridge', highlight: false }
+      ];
+
+      const respText = `📊 **Mandi Price & Slot Comparison for ${crop}**\n\nHere is the real-time rate comparison across nearby procurement centers in Indore division:\n\n• **Rau APMC Mandi:** ${rates[0].price}/Qtl (Closest: 6 km • 32 min wait)\n• **Indore Chhawani:** ${rates[1].price}/Qtl (Highest rate • 45 min wait)\n• **Sanwer Center:** ${rates[2].price}/Qtl (Fastest: 20 min wait)\n\n💡 *Recommendation:* **Rau Mandi** provides the best net return considering travel fuel and waiting time. Would you like me to book your slot at Rau Mandi?`;
+
+      state.aiAgent.messages.push({
+        id: 'msg-' + Date.now(),
+        sender: 'agent',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        text: respText,
+        actionCard: {
+          type: 'compare_table',
+          crop: crop,
+          rates: rates
+        }
+      });
+      state.aiAgent.isThinking = false;
+      speakAiText(`For ${crop}, Indore Mandi is paying ${rates[1].price} and Rau Mandi is paying ${rates[0].price} per quintal with shorter waiting time.`);
+      render();
+      return;
+    }
+
+    // 3. Waiting Time / Crowd Detection
+    const isWait = q.includes('wait') || q.includes('time') || q.includes('crowd') || q.includes('rush') || q.includes('queue') || q.includes('भीड़') || q.includes('इंतज़ार') || q.includes('समय') || q.includes('fast');
+    if (isWait) {
+      const respText = `⏱️ **Live Mandi Queue & Congestion Analysis**\n\nCurrent yard queue conditions across Indore division:\n\n1. 🟢 **Sanwer Procurement Center:** ~20 mins wait (2 trucks in queue)\n2. 🟢 **Depalpur Center:** ~24 mins wait (2 trucks in queue)\n3. 🟡 **Rau APMC Mandi:** ~32 mins wait (3 trucks in queue)\n4. 🟠 **Indore Chhawani:** ~45 mins wait (8 trucks in queue)\n\n⚡ **Tip:** If you need the fastest turnaround, Sanwer or Rau early morning slots (08:00 AM) have minimal delay. Say *"Book slot at Rau"* to reserve immediately!`;
+
+      state.aiAgent.messages.push({
+        id: 'msg-' + Date.now(),
+        sender: 'agent',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        text: respText,
+        actionCard: {
+          type: 'quick_actions',
+          buttons: [
+            { label: '⚡ Book Rau Mandi (08:00 AM)', mandiId: 'RAU', crop: 'Wheat', qty: 40 },
+            { label: '⚡ Book Sanwer (Fastest)', mandiId: 'SANWER', crop: 'Wheat', qty: 40 }
+          ]
+        }
+      });
+      state.aiAgent.isThinking = false;
+      speakAiText('Sanwer Center currently has the lowest waiting time of 20 minutes, followed by Rau Mandi at 32 minutes.');
+      render();
+      return;
+    }
+
+    // 4. Default / Knowledge Response
+    const defaultText = `Namaste ${f.name} ji! 🙏 I can assist you with:\n\n1. **Price Comparison:** *"Compare Wheat prices across all Mandis"*\n2. **Direct Booking:** *"Book slot for 50 quintals Wheat at Rau Mandi"*\n3. **Queue Status:** *"Which Mandi has lowest waiting time?"*\n4. **Moisture Norms:** Fair Average Quality (FAQ) standard requires moisture $\le 12.0\%$.\n\nWhat would you like me to do?`;
+
+    state.aiAgent.messages.push({
+      id: 'msg-' + Date.now(),
+      sender: 'agent',
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      text: defaultText
+    });
+    state.aiAgent.isThinking = false;
+    speakAiText(`I can help you compare prices across mandis or book a slot directly. What would you like to do?`);
+    render();
+  }
+
   // --- HELPERS ---
   function showToast(title, message, type = 'success') {
     state.notificationToast = { title, message, type, id: Date.now() };
@@ -438,6 +672,62 @@
 
   // --- EVENT HANDLERS ---
   window.appHandlers = {
+    toggleAiAgent: (open) => {
+      state.aiAgent.isOpen = (typeof open === 'boolean') ? open : !state.aiAgent.isOpen;
+      render();
+      if (state.aiAgent.isOpen) {
+        setTimeout(() => {
+          const el = document.getElementById('ai-chat-messages');
+          if (el) el.scrollTop = el.scrollHeight;
+          const inputEl = document.getElementById('ai-query-input');
+          if (inputEl) inputEl.focus();
+        }, 100);
+      }
+    },
+    toggleAiVoice: () => {
+      state.aiAgent.voiceEnabled = !state.aiAgent.voiceEnabled;
+      showToast('AI Voice', state.aiAgent.voiceEnabled ? 'Voice feedback enabled 🔊' : 'Voice feedback muted 🔇', 'info');
+      render();
+    },
+    sendAiMessage: (queryText) => {
+      const inputEl = document.getElementById('ai-query-input');
+      const q = (queryText || (inputEl ? inputEl.value : '') || state.aiAgent.inputQuery || '').trim();
+      if (!q) return;
+
+      state.aiAgent.messages.push({
+        id: 'msg-' + Date.now(),
+        sender: 'user',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        text: q
+      });
+      state.aiAgent.inputQuery = '';
+      if (inputEl) inputEl.value = '';
+      state.aiAgent.isThinking = true;
+      render();
+
+      setTimeout(() => {
+        const el = document.getElementById('ai-chat-messages');
+        if (el) el.scrollTop = el.scrollHeight;
+      }, 50);
+
+      setTimeout(() => {
+        processAiAgentQuery(q);
+      }, 700);
+    },
+    triggerAiPrompt: (promptText) => {
+      window.appHandlers.sendAiMessage(promptText);
+    },
+    bookViaAi: (mandiId, crop, quantity) => {
+      executeAiDirectBooking({
+        mandiId: mandiId || 'RAU',
+        crop: crop || 'Wheat',
+        quantity: quantity || 40,
+        slotDate: '27-Sep-2026',
+        slotTime: '08:00 AM - 11:00 AM',
+        vehicleType: 'Tractor Trolley'
+      });
+    },
+
     setLang: (lang) => {
       state.lang = lang;
       render();
@@ -906,6 +1196,23 @@
         <main class="max-w-7xl mx-auto px-3 sm:px-6 py-6 animate-fade-in">
           ${renderActiveView()}
         </main>
+
+        <!-- FLOATING AI AGENT BUTTON (FAB) -->
+        <button onclick="appHandlers.toggleAiAgent()"
+          class="fixed bottom-5 right-5 z-40 flex items-center gap-2.5 px-4 py-3 rounded-full bg-gradient-to-r from-emerald-700 via-emerald-800 to-teal-900 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 border-2 border-emerald-400/40 group">
+          <span class="w-3 h-3 rounded-full bg-emerald-400 animate-ping shrink-0"></span>
+          <span class="text-lg shrink-0">🤖</span>
+          <div class="text-left">
+            <div class="text-xs font-black tracking-tight leading-tight flex items-center gap-1.5">
+              <span>Kisan Sahayak AI</span>
+              <span class="text-[9px] font-bold bg-amber-400 text-amber-950 px-1.5 py-0.2 rounded-full uppercase">Agent</span>
+            </div>
+            <div class="text-[10px] text-emerald-200">Compare Prices & Book Slot</div>
+          </div>
+        </button>
+
+        <!-- AI ASSISTANT MODAL / DRAWER -->
+        ${state.aiAgent.isOpen ? renderAiAssistantModal() : ''}
       </div>
     `;
   }
@@ -1083,6 +1390,27 @@
                 </div>
                 <p class="text-[10px] text-stone-500">Remaining Quota: <strong class="text-emerald-800">${f.cropQuota.Wheat.remaining} Quintals</strong></p>
               </div>
+            </div>
+
+
+            <!-- AI ASSISTANT BANNER WIDGET -->
+            <div onclick="appHandlers.toggleAiAgent(true)"
+              class="p-3.5 rounded-xl bg-gradient-to-r from-emerald-800 via-emerald-900 to-teal-950 text-white flex items-center justify-between cursor-pointer hover:shadow-md transition-all shadow-xs border border-emerald-700/50 group">
+              <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center text-lg border border-white/20 shrink-0 group-hover:scale-110 transition-transform">
+                  🤖
+                </div>
+                <div>
+                  <div class="text-xs font-black flex items-center gap-1.5">
+                    <span>Kisan Sahayak AI Agent</span>
+                    <span class="text-[9px] bg-amber-400 text-amber-950 px-1.5 py-0.2 rounded-full font-bold uppercase">Live</span>
+                  </div>
+                  <p class="text-[10px] text-emerald-200">Compare Mandi Prices & Book Slots with 1 command</p>
+                </div>
+              </div>
+              <span class="text-xs font-bold text-emerald-300 group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                <span>Ask AI</span> ➔
+              </span>
             </div>
 
             <!-- Book Slot Action Button -->
@@ -2020,3 +2348,220 @@
     render();
   }
 })();
+
+
+  // --- KISAN SAHAYAK AI ASSISTANT MODAL UI ---
+  function renderAiAssistantModal() {
+    const agent = state.aiAgent;
+    const f = getActiveFarmer();
+
+    return `
+      <div class="fixed inset-0 z-50 bg-stone-900/50 backdrop-blur-xs flex items-end sm:items-center justify-center sm:justify-end sm:p-6 p-0 animate-fade-in">
+        <div class="bg-white rounded-t-3xl sm:rounded-2xl border border-stone-200 shadow-2xl w-full max-w-lg h-[85vh] sm:h-[620px] flex flex-col overflow-hidden animate-slide-up">
+          
+          <!-- AI MODAL HEADER -->
+          <div class="bg-gradient-to-r from-emerald-800 via-emerald-900 to-teal-950 text-white p-4 flex items-center justify-between shrink-0 shadow-xs">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-xl shadow-xs">
+                🤖
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 class="font-black text-sm sm:text-base tracking-tight">Kisan Sahayak AI</h3>
+                  <span class="text-[10px] font-bold bg-emerald-500/30 text-emerald-200 border border-emerald-400/30 px-2 py-0.2 rounded-full">
+                    कृषि सहायक • Online
+                  </span>
+                </div>
+                <p class="text-[11px] text-emerald-200/90">Compare Mandi Rates & Instant Slot Booking</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-1.5">
+              <!-- Voice Toggle -->
+              <button onclick="appHandlers.toggleAiVoice()"
+                class="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-xs text-white transition-colors"
+                title="${agent.voiceEnabled ? 'Mute Voice' : 'Enable Voice'}">
+                ${agent.voiceEnabled ? '🔊' : '🔇'}
+              </button>
+
+              <!-- Close Button -->
+              <button onclick="appHandlers.toggleAiAgent(false)"
+                class="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-xs text-white font-bold transition-colors">
+                ✕
+              </button>
+            </div>
+          </div>
+
+          <!-- MESSAGES CONTAINER -->
+          <div id="ai-chat-messages" class="flex-1 p-4 overflow-y-auto space-y-4 bg-stone-50/70">
+            ${agent.messages.map(m => `
+              <div class="flex gap-2.5 ${m.sender === 'user' ? 'justify-end' : 'justify-start'}">
+                ${m.sender === 'agent' ? `
+                  <div class="w-7 h-7 rounded-lg bg-emerald-700 text-white flex items-center justify-center text-xs shrink-0 shadow-2xs font-bold">
+                    🤖
+                  </div>
+                ` : ''}
+                
+                <div class="max-w-[85%] space-y-2">
+                  <!-- Message Bubble -->
+                  <div class="p-3.5 rounded-2xl text-xs leading-relaxed shadow-2xs ${
+                    m.sender === 'user' 
+                      ? 'bg-emerald-700 text-white rounded-tr-xs' 
+                      : 'bg-white text-stone-800 border border-stone-200 rounded-tl-xs'
+                  }">
+                    ${m.text.replace(/\n/g, '<br>')}
+                  </div>
+
+                  <!-- Optional Action Cards -->
+                  ${m.actionCard ? renderAiActionCard(m.actionCard) : ''}
+
+                  <span class="text-[10px] text-stone-400 block px-1 ${m.sender === 'user' ? 'text-right' : 'text-left'}">
+                    ${m.timestamp}
+                  </span>
+                </div>
+              </div>
+            `).join('')}
+
+            <!-- Thinking Indicator -->
+            ${agent.isThinking ? `
+              <div class="flex items-center gap-2 text-stone-500 text-xs pl-9">
+                <div class="flex items-center gap-1 bg-white border border-stone-200 px-3 py-2 rounded-full shadow-2xs">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 typing-dot-1"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 typing-dot-2"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 typing-dot-3"></span>
+                  <span class="text-[11px] font-bold text-stone-600 ml-1">Analyzing Mandis & Quota...</span>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+
+          <!-- QUICK SUGGESTED PROMPTS -->
+          <div class="px-3 py-2 bg-stone-100/90 border-t border-stone-200 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
+            <button onclick="appHandlers.triggerAiPrompt('Compare Wheat prices across all Mandis')"
+              class="px-2.5 py-1 rounded-full bg-white border border-stone-300 text-stone-700 text-[11px] font-bold whitespace-nowrap hover:border-emerald-600 hover:text-emerald-800 transition-colors shadow-2xs">
+              📊 Compare Wheat Prices
+            </button>
+            <button onclick="appHandlers.triggerAiPrompt('Book slot for 40 quintals of Wheat at Rau Mandi tomorrow')"
+              class="px-2.5 py-1 rounded-full bg-white border border-stone-300 text-stone-700 text-[11px] font-bold whitespace-nowrap hover:border-emerald-600 hover:text-emerald-800 transition-colors shadow-2xs">
+              ⚡ Book 40 Qtl at Rau Mandi
+            </button>
+            <button onclick="appHandlers.triggerAiPrompt('Which Mandi has the lowest waiting time right now?')"
+              class="px-2.5 py-1 rounded-full bg-white border border-stone-300 text-stone-700 text-[11px] font-bold whitespace-nowrap hover:border-emerald-600 hover:text-emerald-800 transition-colors shadow-2xs">
+              ⏱️ Lowest Waiting Time
+            </button>
+            <button onclick="appHandlers.triggerAiPrompt('राऊ मंडी में गेहूं का 50 क्विंटल स्लॉट बुक करो')"
+              class="px-2.5 py-1 rounded-full bg-white border border-stone-300 text-stone-700 text-[11px] font-bold whitespace-nowrap hover:border-emerald-600 hover:text-emerald-800 transition-colors shadow-2xs">
+              🇮🇳 हिंदी: स्लॉट बुक करो
+            </button>
+          </div>
+
+          <!-- INPUT FORM -->
+          <form onsubmit="event.preventDefault(); appHandlers.sendAiMessage();" class="p-3 bg-white border-t border-stone-200 flex items-center gap-2 shrink-0">
+            <input id="ai-query-input" type="text"
+              placeholder="Ask to compare prices or say 'Book slot at Rau Mandi'..."
+              class="flex-1 px-3.5 py-2.5 rounded-xl border border-stone-300 text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-stone-50 focus:bg-white transition-all font-medium">
+            
+            <button type="submit"
+              class="p-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs shadow-xs transition-colors shrink-0 flex items-center justify-center">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m5 12 14-7-7 14-2-5-5-2Z"/></svg>
+            </button>
+          </form>
+        </div>
+      </div>
+    `;
+  }
+
+  // Renders Rich Action Cards inside AI Chat
+  function renderAiActionCard(card) {
+    if (card.type === 'compare_preview' || card.type === 'compare_table') {
+      const items = card.mandis || card.rates || [];
+      return `
+        <div class="bg-white rounded-xl border border-stone-200 p-3 space-y-2 shadow-xs">
+          <div class="text-[11px] font-extrabold text-stone-800 uppercase tracking-wider flex items-center justify-between border-b border-stone-100 pb-1.5">
+            <span>${card.title || 'Mandi Comparison Matrix'}</span>
+            <span class="text-[10px] text-emerald-700 font-bold">Live MSP Rates</span>
+          </div>
+          <div class="space-y-1.5">
+            ${items.map(m => `
+              <div class="p-2 rounded-lg bg-stone-50 border border-stone-200/80 flex items-center justify-between text-xs">
+                <div>
+                  <div class="font-bold text-stone-900 flex items-center gap-1.5">
+                    <span>${m.name.split('(')[0]}</span>
+                    <span class="text-[9px] px-1.5 py-0.2 rounded font-bold ${m.badge === 'Recommended' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                      ${m.badge}
+                    </span>
+                  </div>
+                  <div class="text-[10px] text-stone-500">${m.crop || card.crop || 'Wheat'} • ${m.wait || m.dist}</div>
+                </div>
+                <div class="text-right">
+                  <span class="font-mono font-extrabold text-stone-900 text-xs block">${m.price}</span>
+                  <button onclick="appHandlers.bookViaAi('${m.mandiId}', '${card.crop || 'Wheat'}', 40)"
+                    class="mt-1 px-2 py-0.5 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-[10px] shadow-2xs transition-colors">
+                    ⚡ Book Slot
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    if (card.type === 'booking_confirmed') {
+      const tok = card.token;
+      return `
+        <div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl border-2 border-emerald-500/80 p-3.5 space-y-2.5 shadow-sm text-xs">
+          <div class="flex items-center justify-between border-b border-emerald-200/80 pb-2">
+            <div class="flex items-center gap-2">
+              <span class="text-xl">🎫</span>
+              <div>
+                <span class="font-mono font-black text-sm text-emerald-950 block">${tok.id}</span>
+                <span class="text-[10px] text-emerald-700 font-bold">Verified Gate Entry Token</span>
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white">CONFIRMED</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-[11px]">
+            <div>
+              <span class="text-stone-500 block">Center:</span>
+              <strong class="text-stone-900">${card.mandiName.split('(')[0]}</strong>
+            </div>
+            <div>
+              <span class="text-stone-500 block">Quantity:</span>
+              <strong class="text-stone-900">${tok.quantityQuintals} Quintals (${tok.crop})</strong>
+            </div>
+            <div>
+              <span class="text-stone-500 block">Slot Window:</span>
+              <strong class="text-stone-900">${tok.slotTime}</strong>
+            </div>
+            <div>
+              <span class="text-stone-500 block">Assigned Gate:</span>
+              <strong class="text-stone-900">${tok.assignedGate}</strong>
+            </div>
+          </div>
+
+          <button onclick="appHandlers.toggleAiAgent(false); appHandlers.setTab('farmer');"
+            class="w-full py-2 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs rounded-lg shadow-xs transition-colors flex items-center justify-center gap-1.5">
+            <span>👉</span>
+            <span>View Active Gate Pass in Farmer Dashboard</span>
+          </button>
+        </div>
+      `;
+    }
+
+    if (card.type === 'quick_actions') {
+      return `
+        <div class="flex flex-wrap gap-1.5 pt-1">
+          ${card.buttons.map(b => `
+            <button onclick="appHandlers.bookViaAi('${b.mandiId}', '${b.crop}', ${b.qty})"
+              class="px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-2xs transition-colors">
+              ${b.label}
+            </button>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    return '';
+  }
