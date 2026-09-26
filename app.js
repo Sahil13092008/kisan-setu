@@ -374,15 +374,26 @@
       ]
     },
     farmerAuth: {
-      isLoggedIn: true,
+      isVerified: false, // Starts as false so user completes Registration Dashboard first
+      currentStep: 'register', // 'register' | 'choose_mandi' | 'active_pass'
       selectedFarmerId: 'FARMER-01',
-      loginType: 'aadhaar', // 'aadhaar' or 'phone'
-      aadhaarInput: '123456787821',
-      phoneInput: '9876543210',
       otpSent: false,
-      otpInput: '',
+      otpInput: '782194',
       demoOtp: '782194',
-      isAuthenticating: false
+      isAuthenticating: false,
+      // Registration & Bank Form Data
+      name: 'Ramesh Kumar',
+      village: 'Rau Village, Indore',
+      phone: '+91 9876543210',
+      aadhaar: '1234 5678 7821',
+      bankName: 'State Bank of India (SBI)',
+      bankAcc: '308941204091',
+      ifsc: 'SBIN0030128',
+      dbtStatus: 'NPCI Aadhaar Seeded (Active)',
+      khasraNo: '214/1-क',
+      landArea: '4.2 Hectares (10.4 Acres)',
+      quotaWheat: 180,
+      quotaRemaining: 128
     },
     bookingForm: {
       isOpen: false,
@@ -496,6 +507,7 @@
       f.cropQuota[crop].used += qty;
     }
     f.activeTokenId = newTokenId;
+    state.farmerAuth.currentStep = "active_pass";
 
     state.tokens.push(newToken);
     mandiObj.queueLength += 1;
@@ -747,6 +759,85 @@
       showToast('Data Reset', 'Prototype demo data has been restored to default state.');
       render();
     },
+    setFarmerStep: (step) => {
+      state.farmerAuth.currentStep = step;
+      render();
+    },
+    prefillFarmerRegistration: (farmerId) => {
+      const f = state.farmers.find(x => x.id === farmerId) || state.farmers[0];
+      state.farmerAuth.selectedFarmerId = f.id;
+      state.farmerAuth.name = f.name;
+      state.farmerAuth.village = f.village;
+      state.farmerAuth.phone = f.phone;
+      state.farmerAuth.aadhaar = f.aadhaar.replace(/(\d{4})/g, '$1 ').trim();
+      state.farmerAuth.bankName = f.bankAcc.split(' ')[0] === 'SBI' ? 'State Bank of India (SBI)' : f.bankAcc.split(' ')[0] === 'BOI' ? 'Bank of India (BOI)' : 'Punjab National Bank (PNB)';
+      state.farmerAuth.bankAcc = f.id === 'FARMER-01' ? '308941204091' : f.id === 'FARMER-02' ? '552109841128' : '110298418872';
+      state.farmerAuth.ifsc = f.id === 'FARMER-01' ? 'SBIN0030128' : f.id === 'FARMER-02' ? 'BKID0005521' : 'PUNB0011029';
+      state.farmerAuth.khasraNo = f.khasraNo;
+      state.farmerAuth.landArea = f.landArea;
+      state.farmerAuth.quotaWheat = f.cropQuota.Wheat.total;
+      state.farmerAuth.quotaRemaining = f.cropQuota.Wheat.remaining;
+      state.farmerAuth.otpSent = false;
+      showToast('Form Pre-filled', `Loaded details for ${f.name} (${f.village.split(',')[0]})`);
+      render();
+    },
+    clearRegistrationForm: () => {
+      state.farmerAuth.name = '';
+      state.farmerAuth.village = '';
+      state.farmerAuth.phone = '+91 ';
+      state.farmerAuth.aadhaar = '';
+      state.farmerAuth.bankName = '';
+      state.farmerAuth.bankAcc = '';
+      state.farmerAuth.ifsc = '';
+      state.farmerAuth.khasraNo = '';
+      state.farmerAuth.landArea = '';
+      state.farmerAuth.otpSent = false;
+      render();
+    },
+    requestFarmerVerification: (e) => {
+      if (e) e.preventDefault();
+      const auth = state.farmerAuth;
+      if (!auth.name || !auth.village || !auth.aadhaar || !auth.bankAcc || !auth.ifsc) {
+        alert('Please fill in Name, Village, Aadhaar, Bank Account, and IFSC code to proceed.');
+        return;
+      }
+      auth.isAuthenticating = true;
+      render();
+      setTimeout(() => {
+        auth.isAuthenticating = false;
+        auth.otpSent = true;
+        auth.otpInput = '782194';
+        sendSimulatedSms(auth.phone, 'UIDAI OTP', `[VM-UIDAI] 782194 is your Aadhaar OTP for Kisan Setu farmer registration & bank DBT authentication. Valid for 10 mins.`);
+        render();
+      }, 600);
+    },
+    verifyFarmerOtp: (e) => {
+      if (e) e.preventDefault();
+      const auth = state.farmerAuth;
+      auth.otpSent = false;
+      auth.isVerified = true;
+      auth.currentStep = 'choose_mandi';
+      
+      // Update active farmer object
+      const f = getActiveFarmer();
+      f.name = auth.name;
+      f.village = auth.village;
+      f.phone = auth.phone;
+      f.khasraNo = auth.khasraNo || f.khasraNo;
+      f.landArea = auth.landArea || f.landArea;
+
+      playChime('success');
+      if (window.confetti) {
+        window.confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
+      }
+      showToast('Registration & e-KYC Verified! 🎉', 'UIDAI Aadhaar, Bhulekh Land Quota, and Bank Account authenticated. Now choose your Mandi.');
+      render();
+    },
+    selectBookingMandi: (mandiId) => {
+      state.bookingForm.mandiId = mandiId;
+      render();
+    },
+
     selectDemoFarmer: (farmerId) => {
       const f = state.farmers.find(x => x.id === farmerId);
       if (f) {
@@ -838,6 +929,7 @@
         f.cropQuota[crop].remaining -= qty;
         f.cropQuota[crop].used += qty;
         f.activeTokenId = newTokenId;
+    state.farmerAuth.currentStep = "active_pass";
 
         state.tokens.push(newToken);
         mandiObj.queueLength += 1;
@@ -1239,232 +1331,494 @@
   // ==========================================
   function renderFarmerView() {
     const t = i18n[state.lang];
+    const auth = state.farmerAuth;
     const f = getActiveFarmer();
     const token = state.tokens.find(tok => tok.id === f.activeTokenId);
+    const selectedMandi = state.mandis.find(m => m.id === state.bookingForm.mandiId) || state.mandis[0];
 
-    // If not logged in, show Auth / UIDAI screen from Slide 3
-    if (!state.farmerAuth.isLoggedIn) {
-      return `
-        <div class="max-w-md mx-auto p-5 sm:p-7 bg-white rounded-2xl border border-stone-200 shadow-sm space-y-6">
-          <div class="text-center space-y-2">
-            <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto text-3xl font-bold shadow-xs">
-              🌾
-            </div>
-            <div>
-              <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 mb-1">
-                <span>🔒 SIH Prototype • Simulated Aadhaar e-KYC</span>
-              </div>
-              <h2 class="text-xl font-bold text-stone-900 tracking-tight">${t.loginTitle}</h2>
-              <p class="text-xs text-stone-500 max-w-xs mx-auto">${t.loginSub}</p>
-            </div>
-          </div>
-
-          <!-- Quick Demo 1-Click Judge Accounts -->
-          <div class="bg-stone-50 p-3.5 rounded-xl border border-stone-200/80 space-y-2">
-            <div class="flex items-center justify-between text-[11px] font-bold text-stone-700">
-              <span class="flex items-center gap-1">${Icons.badgeCheck} ${t.judgeDemoTitle}</span>
-              <span class="text-[10px] text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">1-Click</span>
-            </div>
-            <div class="grid grid-cols-1 gap-2">
-              ${state.farmers.map(farmer => `
-                <button type="button" onclick="appHandlers.selectDemoFarmer('${farmer.id}')"
-                  class="flex items-center justify-between p-2.5 rounded-lg bg-white border border-stone-200 hover:border-emerald-500 hover:bg-emerald-50/50 text-left transition-all text-xs group shadow-2xs">
-                  <div>
-                    <span class="font-bold text-stone-900 group-hover:text-emerald-800">${farmer.name}</span>
-                    <span class="text-stone-400 text-[11px] ml-1">(${farmer.village.split(',')[0]})</span>
-                    <span class="text-[10px] text-emerald-700 font-mono ml-2 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">Aadhaar: ${farmer.aadhaarDisplay}</span>
-                  </div>
-                  <span class="text-[11px] font-mono text-stone-600 font-semibold">${farmer.phone}</span>
-                </button>
-              `).join('')}
-            </div>
-          </div>
-
-          <!-- Aadhaar Form -->
-          <form onsubmit="appHandlers.requestAadhaarOtp(event)" class="space-y-4">
-            <div>
-              <label class="block text-xs font-bold text-stone-800 mb-1 flex items-center justify-between">
-                <span>12-Digit Aadhaar Number / आधार नंबर</span>
-                <span class="text-stone-400 font-mono text-[10px]">UIDAI Verified</span>
-              </label>
-              <input type="text" maxlength="14" required
-                value="${state.farmerAuth.aadhaarInput}"
-                oninput="state.farmerAuth.aadhaarInput = this.value"
-                placeholder="1234 5678 9012"
-                class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-base font-mono font-bold tracking-widest text-emerald-950 focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
-            </div>
-
-            ${state.farmerAuth.otpSent ? `
-              <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 space-y-2">
-                <div class="flex items-center justify-between text-xs font-bold text-amber-900">
-                  <span>Enter 6-Digit OTP</span>
-                  <span class="font-mono text-[11px] bg-amber-200/70 px-2 py-0.5 rounded text-amber-900">Demo OTP: 782194</span>
-                </div>
-                <input type="text" maxlength="6" value="${state.farmerAuth.otpInput}"
-                  class="w-full text-center tracking-widest font-mono text-xl py-2 bg-white rounded-lg border border-amber-300 font-bold text-stone-800">
-                <button type="button" onclick="appHandlers.submitOtpVerify(event)"
-                  class="w-full py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs shadow-xs transition-colors">
-                  ${t.verifyOtp}
-                </button>
-              </div>
-            ` : `
-              <button type="submit" ${state.farmerAuth.isAuthenticating ? 'disabled' : ''}
-                class="w-full py-2.5 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm shadow-xs flex items-center justify-center gap-2 transition-colors">
-                ${state.farmerAuth.isAuthenticating ? 'Verifying with UIDAI...' : t.sendOtp}
-                ${Icons.arrowRight}
-              </button>
-            `}
-          </form>
-        </div>
-      `;
-    }
-
-    // Authenticated Farmer Home View
     return `
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- LEFT: FARMER PROFILE & BHULEKH LAND RECORD SYNC -->
-        <div class="space-y-5">
-          <!-- Profile Card -->
-          <div class="bg-white rounded-2xl border border-stone-200 p-5 shadow-xs space-y-4">
-            <div class="flex items-start justify-between">
-              <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-600 to-emerald-800 text-white flex items-center justify-center font-bold text-xl shadow-xs">
-                  👨‍🌾
-                </div>
-                <div>
-                  <h3 class="font-extrabold text-base text-stone-900">${f.name}</h3>
-                  <p class="text-xs text-stone-500 font-medium">${f.village}</p>
-                </div>
+      <div class="max-w-4xl mx-auto space-y-6">
+        
+        <!-- STEPPER HEADER NAVIGATION -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-3 sm:p-4 shadow-xs">
+          <div class="grid grid-cols-3 gap-2">
+            <!-- STEP 1 TAB -->
+            <button onclick="appHandlers.setFarmerStep('register')"
+              class="flex items-center gap-2 p-2 sm:p-3 rounded-xl text-left transition-all ${
+                auth.currentStep === 'register' 
+                  ? 'bg-emerald-50 border-2 border-emerald-600 text-emerald-950 font-black shadow-2xs' 
+                  : 'bg-stone-50 border border-stone-200 text-stone-600 hover:bg-stone-100'
+              }">
+              <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                auth.isVerified ? 'bg-emerald-600 text-white' : auth.currentStep === 'register' ? 'bg-emerald-700 text-white' : 'bg-stone-300 text-stone-700'
+              }">
+                ${auth.isVerified ? '✓' : '1'}
               </div>
-              <button onclick="appHandlers.logoutFarmer()" class="text-xs text-stone-400 hover:text-stone-700 underline font-medium">
-                Switch User
-              </button>
-            </div>
+              <div class="hidden sm:block">
+                <div class="text-xs font-bold leading-tight">Farmer Registration</div>
+                <div class="text-[10px] text-stone-500">Aadhaar & Bank Details</div>
+              </div>
+              <div class="sm:hidden text-xs font-bold">1. Registration</div>
+            </button>
 
-            <!-- Aadhaar & Bank Details -->
-            <div class="bg-stone-50 rounded-xl p-3 border border-stone-200/80 space-y-1.5 text-xs">
-              <div class="flex justify-between">
-                <span class="text-stone-500">Aadhaar (UIDAI):</span>
-                <span class="font-mono font-bold text-stone-800">${f.aadhaarDisplay} ✅</span>
+            <!-- STEP 2 TAB -->
+            <button onclick="${auth.isVerified ? "appHandlers.setFarmerStep('choose_mandi')" : "alert('Please complete and verify your registration in Step 1 first.')"}"
+              class="flex items-center gap-2 p-2 sm:p-3 rounded-xl text-left transition-all ${
+                auth.currentStep === 'choose_mandi' 
+                  ? 'bg-emerald-50 border-2 border-emerald-600 text-emerald-950 font-black shadow-2xs' 
+                  : auth.isVerified ? 'bg-stone-50 border border-stone-200 text-stone-700 hover:bg-stone-100' : 'bg-stone-100/50 border border-dashed border-stone-300 text-stone-400 cursor-not-allowed'
+              }">
+              <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                token ? 'bg-emerald-600 text-white' : auth.currentStep === 'choose_mandi' ? 'bg-emerald-700 text-white' : 'bg-stone-300 text-stone-700'
+              }">
+                ${token ? '✓' : '2'}
               </div>
-              <div class="flex justify-between">
-                <span class="text-stone-500">Mobile Phone:</span>
-                <span class="font-mono font-semibold text-stone-800">${f.phone}</span>
+              <div class="hidden sm:block">
+                <div class="text-xs font-bold leading-tight">Choose Mandi & Slot</div>
+                <div class="text-[10px] text-stone-500">Rates, Dates & Quota</div>
               </div>
-              <div class="flex justify-between">
-                <span class="text-stone-500">DBT Bank Account:</span>
-                <span class="font-mono font-semibold text-emerald-800">${f.bankAcc}</span>
-              </div>
-            </div>
+              <div class="sm:hidden text-xs font-bold">2. Book Slot</div>
+            </button>
 
-            <!-- Bhulekh Land Record Widget (Slide 2 & 3 Solution) -->
-            <div class="bg-gradient-to-br from-emerald-50 to-teal-50/50 rounded-xl p-3.5 border border-emerald-200/80 space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="flex items-center gap-1.5 text-xs font-extrabold text-emerald-900">
-                  ${Icons.shield} Bhulekh Land Record
-                </span>
-                <span class="text-[10px] font-bold bg-emerald-600 text-white px-2 py-0.5 rounded-full">
-                  Govt. Sync Active
-                </span>
+            <!-- STEP 3 TAB -->
+            <button onclick="${token ? "appHandlers.setFarmerStep('active_pass')" : "alert('No active gate pass yet. Complete Mandi slot booking in Step 2 to generate your pass.')"}"
+              class="flex items-center gap-2 p-2 sm:p-3 rounded-xl text-left transition-all ${
+                auth.currentStep === 'active_pass' 
+                  ? 'bg-emerald-50 border-2 border-emerald-600 text-emerald-950 font-black shadow-2xs' 
+                  : token ? 'bg-stone-50 border border-stone-200 text-stone-700 hover:bg-stone-100' : 'bg-stone-100/50 border border-dashed border-stone-300 text-stone-400 cursor-not-allowed'
+              }">
+              <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                auth.currentStep === 'active_pass' ? 'bg-emerald-700 text-white' : token ? 'bg-emerald-600 text-white' : 'bg-stone-300 text-stone-700'
+              }">
+                3
               </div>
-              <div class="text-xs text-stone-700 space-y-1 pt-1">
-                <div class="flex justify-between">
-                  <span class="text-stone-500">Khasra Number:</span>
-                  <span class="font-mono font-bold text-stone-900">${f.khasraNo}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-stone-500">Total Land Holding:</span>
-                  <span class="font-bold text-stone-900">${f.landArea}</span>
-                </div>
+              <div class="hidden sm:block">
+                <div class="text-xs font-bold leading-tight">Digital Gate Pass</div>
+                <div class="text-[10px] text-stone-500">Live Queue & QR Pass</div>
               </div>
-
-              <!-- Crop Quota Progress -->
-              <div class="pt-2 border-t border-emerald-200/60 space-y-2">
-                <div class="text-[11px] font-bold text-emerald-950 flex justify-between">
-                  <span>Procurement Quota (Wheat)</span>
-                  <span class="font-mono">${f.cropQuota.Wheat.used} / ${f.cropQuota.Wheat.total} Qtl</span>
-                </div>
-                <div class="w-full bg-emerald-200/70 h-2 rounded-full overflow-hidden">
-                  <div class="bg-emerald-700 h-full rounded-full transition-all duration-500"
-                    style="width: ${(f.cropQuota.Wheat.used / f.cropQuota.Wheat.total) * 100}%"></div>
-                </div>
-                <p class="text-[10px] text-stone-500">Remaining Quota: <strong class="text-emerald-800">${f.cropQuota.Wheat.remaining} Quintals</strong></p>
-              </div>
-            </div>
-
-
-            <!-- AI ASSISTANT BANNER WIDGET -->
-            <div onclick="appHandlers.toggleAiAgent(true)"
-              class="p-3.5 rounded-xl bg-gradient-to-r from-emerald-800 via-emerald-900 to-teal-950 text-white flex items-center justify-between cursor-pointer hover:shadow-md transition-all shadow-xs border border-emerald-700/50 group">
-              <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center text-lg border border-white/20 shrink-0 group-hover:scale-110 transition-transform">
-                  🤖
-                </div>
-                <div>
-                  <div class="text-xs font-black flex items-center gap-1.5">
-                    <span>Kisan Sahayak AI Agent</span>
-                    <span class="text-[9px] bg-amber-400 text-amber-950 px-1.5 py-0.2 rounded-full font-bold uppercase">Live</span>
-                  </div>
-                  <p class="text-[10px] text-emerald-200">Compare Mandi Prices & Book Slots with 1 command</p>
-                </div>
-              </div>
-              <span class="text-xs font-bold text-emerald-300 group-hover:translate-x-1 transition-transform flex items-center gap-1">
-                <span>Ask AI</span> ➔
-              </span>
-            </div>
-
-            <!-- Book Slot Action Button -->
-            <button onclick="appHandlers.toggleBookingForm(true)"
-              class="w-full py-3 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs sm:text-sm shadow-sm flex items-center justify-center gap-2 transition-all">
-              <span>📅</span>
-              <span>${t.bookSlotBtn}</span>
+              <div class="sm:hidden text-xs font-bold">3. Gate Pass</div>
             </button>
           </div>
+        </div>
 
-          <!-- Quick Mandi Directory & Live Wait Times -->
-          <div class="bg-white rounded-2xl border border-stone-200 p-4 shadow-xs space-y-3">
-            <h4 class="text-xs font-extrabold text-stone-900 uppercase tracking-wider flex items-center gap-1.5">
-              ${Icons.building} Live Mandi Congestion Indicator
-            </h4>
-            <div class="space-y-2">
-              ${state.mandis.map(m => `
-                <div class="p-2.5 rounded-xl border border-stone-200/80 bg-stone-50 flex items-center justify-between text-xs">
-                  <div>
-                    <div class="font-bold text-stone-900">${m.name.split('(')[0]}</div>
-                    <div class="text-[10px] text-stone-500">${m.gates} Gates • Serving: <span class="font-mono font-bold text-emerald-800">${m.currentServingToken}</span></div>
-                  </div>
-                  <div class="text-right">
-                    <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold ${m.capacityPercent > 75 ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-emerald-100 text-emerald-900 border border-emerald-300'}">
-                      ~${m.avgWaitMins}m wait
-                    </span>
-                    <div class="text-[10px] text-stone-400 mt-0.5">${m.queueLength} in queue</div>
-                  </div>
+        <!-- VIEW SWITCH BASED ON STEP -->
+        ${
+          auth.currentStep === 'register' 
+            ? renderRegistrationDashboard() 
+            : auth.currentStep === 'choose_mandi' 
+            ? renderMandiSelectionAndBookingDashboard() 
+            : renderFarmerTokenPipeline(token || state.tokens[0])
+        }
+
+      </div>
+    `;
+  }
+
+  // --- SUB-VIEW 1: FARMER REGISTRATION DASHBOARD ---
+  function renderRegistrationDashboard() {
+    const auth = state.farmerAuth;
+
+    return `
+      <div class="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden animate-fade-in">
+        <!-- HEADER BANNER -->
+        <div class="bg-gradient-to-r from-emerald-800 via-emerald-900 to-teal-950 text-white p-5 sm:p-6">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+              <div class="w-12 h-12 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-2xl shadow-xs">
+                👨‍🌾
+              </div>
+              <div>
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/15 text-emerald-100 border border-white/20 mb-1">
+                  <span>🔒 Step 1 of 3 • Government e-KYC Verification</span>
                 </div>
-              `).join('')}
+                <h2 class="text-xl sm:text-2xl font-black tracking-tight">Farmer Registration & Bank DBT Dashboard</h2>
+                <p class="text-xs text-emerald-200/90 mt-0.5">Enter farmer profile, Aadhaar, and Bank Account details for MSP procurement.</p>
+              </div>
+            </div>
+
+            <!-- Pre-fill 1-Click Judge Buttons -->
+            <div class="bg-white/10 p-2.5 rounded-xl border border-white/20 text-xs text-right">
+              <span class="block text-[10px] font-bold uppercase tracking-wider text-emerald-200 mb-1.5">⚡ Judge 1-Click Quick Fill:</span>
+              <div class="flex flex-wrap gap-1.5 justify-end">
+                <button type="button" onclick="appHandlers.prefillFarmerRegistration('FARMER-01')"
+                  class="px-2.5 py-1 rounded-lg bg-white text-emerald-900 hover:bg-emerald-50 text-[11px] font-bold shadow-2xs transition-colors">
+                  Ramesh Kumar (Rau)
+                </button>
+                <button type="button" onclick="appHandlers.prefillFarmerRegistration('FARMER-02')"
+                  class="px-2.5 py-1 rounded-lg bg-white text-emerald-900 hover:bg-emerald-50 text-[11px] font-bold shadow-2xs transition-colors">
+                  Suresh Patel (Rangwasa)
+                </button>
+                <button type="button" onclick="appHandlers.prefillFarmerRegistration('FARMER-03')"
+                  class="px-2.5 py-1 rounded-lg bg-white text-emerald-900 hover:bg-emerald-50 text-[11px] font-bold shadow-2xs transition-colors">
+                  Rajesh Verma (Sanwer)
+                </button>
+                <button type="button" onclick="appHandlers.clearRegistrationForm()"
+                  class="px-2 py-1 rounded-lg bg-white/20 hover:bg-white/30 text-white text-[11px] font-bold transition-colors">
+                  Clear
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- RIGHT (2 COLS): ACTIVE TOKEN & LIVE PROCUREMENT PIPELINE -->
-        <div class="lg:col-span-2 space-y-5">
-          ${token ? renderFarmerTokenPipeline(token) : `
-            <div class="bg-white rounded-2xl border border-dashed border-stone-300 p-10 text-center space-y-3">
-              <div class="w-16 h-16 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center mx-auto text-3xl">
-                🎫
+        <!-- FORM CONTENT -->
+        <form onsubmit="appHandlers.requestFarmerVerification(event)" class="p-5 sm:p-7 space-y-6">
+          
+          <!-- SECTION 1: PERSONAL & CONTACT DETAILS -->
+          <div class="space-y-3">
+            <h4 class="text-xs font-black text-stone-900 uppercase tracking-wider flex items-center gap-1.5 border-b border-stone-200 pb-1.5">
+              <span>👤</span> 1. Personal & Contact Information (किसान की व्यक्तिगत जानकारी)
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div>
+                <label class="block font-bold text-stone-700 mb-1">Full Name / किसान का पूरा नाम *</label>
+                <input type="text" required value="${auth.name}"
+                  oninput="state.farmerAuth.name = this.value"
+                  placeholder="e.g. Ramesh Kumar"
+                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-bold text-stone-900 focus:ring-2 focus:ring-emerald-500 bg-white">
               </div>
-              <h3 class="font-extrabold text-lg text-stone-800">No Active Gate Token</h3>
-              <p class="text-xs text-stone-500 max-w-sm mx-auto">
-                You currently do not have an active procurement slot booked. Click the button below to schedule your delivery slot.
-              </p>
-              <button onclick="appHandlers.toggleBookingForm(true)"
-                class="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-xs transition-colors">
-                Book Delivery Slot Now
+
+              <div>
+                <label class="block font-bold text-stone-700 mb-1">Village & District / गाँव व जिला *</label>
+                <input type="text" required value="${auth.village}"
+                  oninput="state.farmerAuth.village = this.value"
+                  placeholder="e.g. Rau Village, Indore"
+                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-bold text-stone-900 focus:ring-2 focus:ring-emerald-500 bg-white">
+              </div>
+
+              <div>
+                <label class="block font-bold text-stone-700 mb-1">Mobile Number (For OTP & SMS alerts) *</label>
+                <input type="text" required value="${auth.phone}"
+                  oninput="state.farmerAuth.phone = this.value"
+                  placeholder="+91 9876543210"
+                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-mono font-bold text-stone-900 focus:ring-2 focus:ring-emerald-500 bg-white">
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 2: IDENTITY & AADHAAR e-KYC -->
+          <div class="space-y-3">
+            <h4 class="text-xs font-black text-stone-900 uppercase tracking-wider flex items-center gap-1.5 border-b border-stone-200 pb-1.5">
+              <span>🔒</span> 2. UIDAI Aadhaar Verification (आधार सत्यापन)
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              <div>
+                <label class="block font-bold text-stone-700 mb-1 flex justify-between">
+                  <span>12-Digit Aadhaar Number *</span>
+                  <span class="text-emerald-700 font-mono text-[10px]">UIDAI Integrated</span>
+                </label>
+                <input type="text" maxlength="14" required value="${auth.aadhaar}"
+                  oninput="state.farmerAuth.aadhaar = this.value"
+                  placeholder="1234 5678 9012"
+                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-mono font-black text-sm tracking-widest text-emerald-950 focus:ring-2 focus:ring-emerald-500 bg-white">
+                <span class="text-[10px] text-stone-500 mt-1 block">Aadhaar will be validated via simulated OTP verification</span>
+              </div>
+
+              <div class="p-3 bg-emerald-50/70 rounded-xl border border-emerald-200 space-y-1 text-xs">
+                <div class="font-bold text-emerald-900 flex items-center gap-1.5">
+                  <span>🛡️</span> Aadhaar e-KYC Guarantee
+                </div>
+                <p class="text-[11px] text-emerald-800 leading-relaxed">
+                  Direct Aadhaar seeding ensures transparent MSP payment transfers without middlemen or identity duplication.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 3: BANK ACCOUNT DETAILS (FOR DBT PAYMENT CREDIT) -->
+          <div class="space-y-3">
+            <h4 class="text-xs font-black text-stone-900 uppercase tracking-wider flex items-center gap-1.5 border-b border-stone-200 pb-1.5">
+              <span>🏦</span> 3. Bank Account Details for MSP Direct Benefit Transfer (बैंक खाता विवरण)
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div>
+                <label class="block font-bold text-stone-700 mb-1">Bank Name / बैंक का नाम *</label>
+                <input type="text" required value="${auth.bankName}"
+                  oninput="state.farmerAuth.bankName = this.value"
+                  placeholder="e.g. State Bank of India (SBI)"
+                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-bold text-stone-900 focus:ring-2 focus:ring-emerald-500 bg-white">
+              </div>
+
+              <div>
+                <label class="block font-bold text-stone-700 mb-1">Account Number / खाता संख्या *</label>
+                <input type="text" required value="${auth.bankAcc}"
+                  oninput="state.farmerAuth.bankAcc = this.value"
+                  placeholder="e.g. 308941204091"
+                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-mono font-bold text-stone-900 focus:ring-2 focus:ring-emerald-500 bg-white">
+              </div>
+
+              <div>
+                <label class="block font-bold text-stone-700 mb-1">IFSC Code / आईएफएससी कोड *</label>
+                <input type="text" required value="${auth.ifsc}"
+                  oninput="state.farmerAuth.ifsc = this.value"
+                  placeholder="e.g. SBIN0030128"
+                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-mono font-bold uppercase text-stone-900 focus:ring-2 focus:ring-emerald-500 bg-white">
+              </div>
+            </div>
+
+            <!-- DBT Seeding Badge -->
+            <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between text-xs">
+              <div class="flex items-center gap-2">
+                <span class="text-emerald-600 font-bold text-base">✓</span>
+                <span class="text-stone-700 font-semibold">NPCI Aadhaar Payment Bridge: <strong class="text-emerald-800">${auth.dbtStatus}</strong></span>
+              </div>
+              <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">T+0 DBT Active</span>
+            </div>
+          </div>
+
+          <!-- SECTION 4: BHULEKH LAND RECORDS (BHULEKH SYNC) -->
+          <div class="space-y-3">
+            <h4 class="text-xs font-black text-stone-900 uppercase tracking-wider flex items-center gap-1.5 border-b border-stone-200 pb-1.5">
+              <span>📜</span> 4. Bhulekh Land Records & Quota (भूलेख भूमि रिकॉर्ड)
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div>
+                <label class="block font-bold text-stone-700 mb-1">Khasra Number (खसरा संख्या) *</label>
+                <input type="text" value="${auth.khasraNo}"
+                  oninput="state.farmerAuth.khasraNo = this.value"
+                  placeholder="214/1-क"
+                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-mono font-bold text-stone-900 focus:ring-2 focus:ring-emerald-500 bg-white">
+              </div>
+
+              <div>
+                <label class="block font-bold text-stone-700 mb-1">Land Holding (भूमि का क्षेत्रफल) *</label>
+                <input type="text" value="${auth.landArea}"
+                  oninput="state.farmerAuth.landArea = this.value"
+                  placeholder="4.2 Hectares"
+                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-bold text-stone-900 focus:ring-2 focus:ring-emerald-500 bg-white">
+              </div>
+
+              <div>
+                <label class="block font-bold text-stone-700 mb-1">Permissible Wheat Quota</label>
+                <div class="px-3 py-2 rounded-xl border border-emerald-300 bg-emerald-50/60 font-mono font-black text-emerald-900 flex justify-between items-center">
+                  <span>${auth.quotaWheat} Quintals</span>
+                  <span class="text-[10px] text-emerald-700 font-bold">Bhulekh Verified</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VERIFY ACTION & OTP MODAL -->
+          <div class="pt-4 border-t border-stone-100 flex items-center justify-between">
+            <span class="text-xs text-stone-500">All fields verified with UIDAI & MP Bhulekh Portal</span>
+            
+            <button type="submit" ${auth.isAuthenticating ? 'disabled' : ''}
+              class="px-6 py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs sm:text-sm shadow-md flex items-center gap-2 transition-all hover:scale-[1.02]">
+              <span>${auth.isAuthenticating ? 'Authenticating with UIDAI...' : 'Verify Details & Proceed to Mandi Selection ➔'}</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- OTP SIMULATION MODAL -->
+        ${auth.otpSent ? `
+          <div class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl border border-stone-200 shadow-2xl max-w-sm w-full p-6 space-y-4 animate-slide-up text-center">
+              <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-900 flex items-center justify-center mx-auto text-2xl font-bold">
+                📱
+              </div>
+              <div>
+                <h3 class="font-extrabold text-base text-stone-900">Enter UIDAI Aadhaar OTP</h3>
+                <p class="text-xs text-stone-500 mt-1">OTP sent to mobile ending in <strong class="text-stone-800">${auth.phone.slice(-4)}</strong></p>
+                <span class="inline-block mt-1 px-2.5 py-0.5 bg-amber-100 text-amber-900 font-mono font-bold text-xs rounded-full">
+                  Demo OTP: 782194
+                </span>
+              </div>
+
+              <input type="text" maxlength="6" value="${auth.otpInput}"
+                oninput="state.farmerAuth.otpInput = this.value"
+                class="w-full text-center tracking-widest font-mono text-2xl py-2.5 bg-stone-50 rounded-xl border-2 border-emerald-600 font-black text-stone-900 outline-none">
+
+              <div class="flex gap-2">
+                <button type="button" onclick="state.farmerAuth.otpSent = false; render();"
+                  class="flex-1 py-2.5 rounded-xl border border-stone-200 text-stone-600 font-bold text-xs">
+                  Cancel
+                </button>
+                <button type="button" onclick="appHandlers.verifyFarmerOtp(event)"
+                  class="flex-1 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-xs">
+                  Verify & Continue ➔
+                </button>
+              </div>
+            </div>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  // --- SUB-VIEW 2: CHOOSE MANDI & BOOK PROCUREMENT SLOT ---
+  function renderMandiSelectionAndBookingDashboard() {
+    const auth = state.farmerAuth;
+    const form = state.bookingForm;
+    const selectedMandi = state.mandis.find(m => m.id === form.mandiId) || state.mandis[0];
+    const cropRate = MSP_RATES[form.crop] || MSP_RATES['Wheat'];
+    const totalEstPayout = (Number(form.quantity) || 40) * cropRate.total;
+
+    return `
+      <div class="space-y-6 animate-fade-in">
+        
+        <!-- VERIFIED FARMER SUMMARY PILL -->
+        <div class="bg-emerald-900 text-white p-4 rounded-2xl shadow-xs flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-emerald-800 border border-emerald-700 flex items-center justify-center font-bold text-lg">
+              ✓
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-extrabold text-sm sm:text-base">${auth.name}</span>
+                <span class="px-2 py-0.2 rounded text-[10px] font-bold bg-emerald-500/30 text-emerald-200 border border-emerald-400/30">e-KYC Verified</span>
+              </div>
+              <p class="text-xs text-emerald-200">${auth.village} • Aadhaar: ${auth.aadhaar.slice(0, 4)} •••• ${auth.aadhaar.slice(-4)} • ${auth.bankName} (A/C •••• ${auth.bankAcc.slice(-4)})</p>
+            </div>
+          </div>
+
+          <button onclick="appHandlers.setFarmerStep('register')"
+            class="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-bold border border-white/20 transition-colors">
+            ✏️ Edit Registration Details
+          </button>
+        </div>
+
+        <!-- MAIN BOOKING CONTAINER -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-5 sm:p-7 shadow-sm space-y-6">
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 mb-1">
+              <span>🌾 Step 2 of 3 • Slot Scheduling</span>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-black text-stone-900 tracking-tight">Choose Mandi & Schedule Delivery Slot</h2>
+            <p class="text-xs text-stone-500 mt-0.5">Select your preferred Mandi procurement center based on live price and waiting time.</p>
+          </div>
+
+          <form onsubmit="appHandlers.handleBookingSubmit(event)" class="space-y-6">
+            
+            <!-- STEP 2A: SELECT MANDI (INTERACTIVE CARDS GRID) -->
+            <div class="space-y-3">
+              <label class="block text-xs font-black text-stone-900 uppercase tracking-wider">
+                1. Select Mandi Procurement Center / मंडी का चयन करें *
+              </label>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                ${state.mandis.map(m => `
+                  <div onclick="appHandlers.selectBookingMandi('${m.id}')"
+                    class="p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                      form.mandiId === m.id 
+                        ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-500/20' 
+                        : 'border-stone-200 bg-stone-50/60 hover:bg-white hover:border-stone-300'
+                    }">
+                    <div class="flex items-start justify-between">
+                      <div>
+                        <div class="font-extrabold text-sm text-stone-900 flex items-center gap-1.5">
+                          <span>${m.name.split('(')[0]}</span>
+                          ${form.mandiId === m.id ? '<span class="text-emerald-700 text-xs">✓ Selected</span>' : ''}
+                        </div>
+                        <div class="text-[11px] text-stone-500 mt-0.5">${m.district} District • ${m.gates} Active Gates</div>
+                      </div>
+                      <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
+                        m.capacityPercent > 75 ? 'bg-amber-100 text-amber-900' : 'bg-emerald-100 text-emerald-900'
+                      }">
+                        ~${m.avgWaitMins}m wait
+                      </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 mt-3 pt-2.5 border-t border-stone-200/70 text-xs">
+                      <div>
+                        <span class="text-[10px] text-stone-400 block">Today's Rate:</span>
+                        <strong class="font-mono text-emerald-900 font-extrabold">₹${cropRate.total} / Qtl</strong>
+                      </div>
+                      <div>
+                        <span class="text-[10px] text-stone-400 block">Queue Load:</span>
+                        <strong class="text-stone-800 font-bold">${m.queueLength} Vehicles</strong>
+                      </div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- STEP 2B: SELECT CROP & QUANTITY -->
+            <div class="space-y-3">
+              <label class="block text-xs font-black text-stone-900 uppercase tracking-wider">
+                2. Crop & Quantity / उपज व मात्रा *
+              </label>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div>
+                  <label class="block font-bold text-stone-700 mb-1">Crop Type / फसल</label>
+                  <select class="w-full px-3 py-2.5 rounded-xl border border-stone-300 font-bold text-stone-900 bg-white"
+                    onchange="state.bookingForm.crop = this.value; render();">
+                    <option value="Wheat" ${form.crop === 'Wheat' ? 'selected' : ''}>Wheat (गेहूं) - MSP ₹2,400</option>
+                    <option value="Soybean" ${form.crop === 'Soybean' ? 'selected' : ''}>Soybean (सोयाबीन) - MSP ₹4,992</option>
+                    <option value="Chana" ${form.crop === 'Chana' ? 'selected' : ''}>Chana (चना) - MSP ₹5,590</option>
+                    <option value="Mustard" ${form.crop === 'Mustard' ? 'selected' : ''}>Mustard (सरसों) - MSP ₹5,750</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block font-bold text-stone-700 mb-1 flex justify-between">
+                    <span>Quantity (Quintals / क्विंटल) *</span>
+                    <span class="text-stone-400 text-[10px]">Quota: ${auth.quotaRemaining} Qtl</span>
+                  </label>
+                  <input type="number" min="1" max="${auth.quotaRemaining || 150}" value="${form.quantity}" required
+                    oninput="state.bookingForm.quantity = this.value; render();"
+                    class="w-full px-3 py-2.5 rounded-xl border border-stone-300 font-mono font-black text-stone-900 bg-white">
+                </div>
+
+                <!-- Live Calculated Payout Card -->
+                <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200">
+                  <span class="text-[10px] text-emerald-800 uppercase font-bold block">Estimated MSP Payout</span>
+                  <div class="font-mono text-xl font-black text-emerald-950 mt-0.5">
+                    ₹${totalEstPayout.toLocaleString('en-IN')}
+                  </div>
+                  <span class="text-[10px] text-emerald-700 block">Direct DBT to ${auth.bankName.split(' ')[0]} A/C</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 2C: DATE, TIME & VEHICLE -->
+            <div class="space-y-3">
+              <label class="block text-xs font-black text-stone-900 uppercase tracking-wider">
+                3. Date, Time Slot & Transport / दिनांक व वाहन *
+              </label>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                <div>
+                  <label class="block font-bold text-stone-700 mb-1">Delivery Date</label>
+                  <input type="date" value="${form.slotDate}" required
+                    onchange="state.bookingForm.slotDate = this.value"
+                    class="w-full px-3 py-2 rounded-xl border border-stone-300 font-bold text-stone-900 bg-white">
+                </div>
+
+                <div>
+                  <label class="block font-bold text-stone-700 mb-1">Time Window (3-Hour Slot)</label>
+                  <select class="w-full px-3 py-2 rounded-xl border border-stone-300 font-bold text-stone-900 bg-white"
+                    onchange="state.bookingForm.slotTime = this.value">
+                    <option value="08:00 AM - 11:00 AM">08:00 AM - 11:00 AM (🟢 Low Traffic)</option>
+                    <option value="11:00 AM - 02:00 PM">11:00 AM - 02:00 PM (🟡 Moderate)</option>
+                    <option value="02:00 PM - 05:00 PM">02:00 PM - 05:00 PM (🟢 Low Traffic)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block font-bold text-stone-700 mb-1">Vehicle Registration #</label>
+                  <input type="text" value="${form.vehicleNumber}" required
+                    oninput="state.bookingForm.vehicleNumber = this.value"
+                    placeholder="MP-09-BZ-6712"
+                    class="w-full px-3 py-2 rounded-xl border border-stone-300 font-mono font-bold text-stone-900 bg-white">
+                </div>
+              </div>
+            </div>
+
+            <!-- CONFIRM BUTTON -->
+            <div class="pt-4 border-t border-stone-100 flex items-center justify-between">
+              <button type="button" onclick="appHandlers.setFarmerStep('register')"
+                class="px-4 py-2.5 rounded-xl border border-stone-200 text-stone-700 font-bold text-xs hover:bg-stone-50">
+                ← Back to Registration Details
+              </button>
+
+              <button type="submit" ${form.isSubmitting ? 'disabled' : ''}
+                class="px-7 py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs sm:text-sm shadow-md flex items-center gap-2 transition-all hover:scale-[1.02]">
+                <span>${form.isSubmitting ? 'Generating Token...' : 'Confirm Slot & Generate Digital Gate Pass ➔'}</span>
               </button>
             </div>
-          `}
-
-          <!-- BOOKING MODAL -->
-          ${state.bookingForm.isOpen ? renderBookingModal() : ''}
+          </form>
         </div>
       </div>
     `;
