@@ -148,13 +148,16 @@
     }
   ];
 
-  const INITIAL_MANDIS = [
+      const INITIAL_MANDIS = [
     {
       id: 'RAU',
       name: 'Rau APMC Krishi Mandi',
       type: 'government',
       operator: 'MP State Mandi Board',
-      district: 'Indore',
+      licenseNo: 'APMC-MP-RAU-001',
+      district: 'Indore (Rau)',
+      distanceKm: 3.5,
+      travelTimeMins: 12,
       gates: 4,
       bays: 12,
       currentServingToken: 'KS-RAU-105',
@@ -163,23 +166,15 @@
       todayProcuredMT: 480,
       capacityPercent: 68,
       priceOffset: 0,
-      badge: 'Govt APMC'
-    },
-    {
-      id: 'INDORE_CHHAWANI',
-      name: 'Indore Krishi Upaj Mandi (Chhawani)',
-      type: 'government',
-      operator: 'MP Mandi Board',
-      district: 'Indore',
-      gates: 8,
-      bays: 24,
-      currentServingToken: 'KS-IND-320',
-      queueLength: 8,
-      avgWaitMins: 45,
-      todayProcuredMT: 1240,
-      capacityPercent: 82,
-      priceOffset: 20,
-      badge: 'Govt APMC (High Volume)'
+      badge: 'Govt APMC Yard',
+      unloadingType: 'Manual Beam & Platform Scale',
+      paymentMode: 'Direct DBT via PFMS (24-48 hrs)',
+      turnaroundMins: 45,
+      highlights: [
+        '🏛️ 100% Government MSP Guaranteed',
+        '🏛️ Traditional APMC Yard Weighing',
+        '🏛️ Direct DBT via PFMS / Aadhaar Bridge'
+      ]
     },
     {
       id: 'ITC_CHOUPAL',
@@ -187,7 +182,9 @@
       type: 'private',
       operator: 'ITC Limited - Agri Business Division',
       licenseNo: 'PVT-APMC-MP-2024-008',
-      district: 'Indore (Rau-Pithampur)',
+      district: 'Indore (Rau-Pithampur Bypass)',
+      distanceKm: 6.8,
+      travelTimeMins: 15,
       gates: 2,
       bays: 6,
       currentServingToken: 'KS-ITC-022',
@@ -196,7 +193,17 @@
       todayProcuredMT: 390,
       capacityPercent: 42,
       priceOffset: 60,
-      badge: '🏢 Private Mandi (+₹60 Bonus)'
+      badge: '🏢 Private Mandi (+₹60 Bonus)',
+      unloadingType: '15-Min Automated Dump Pit & Electronic Sensors',
+      paymentMode: 'Instant Same-Day Corporate NEFT / RTGS (Within 2 Hrs)',
+      turnaroundMins: 20,
+      highlights: [
+        '⚡ +₹60/Qtl Private Bonus over Govt MSP',
+        '⚡ 15-Minute Automated Dump Yard & Weighbridge',
+        '⚡ Direct Same-Day Bank NEFT / RTGS Transfer',
+        '⚡ ISO 9001:2015 Moisture & Quality Lab',
+        '⚡ Farmer Rest Lounge & Free Soil Testing'
+      ]
     },
     {
       id: 'ADANI_AGRI_SILO',
@@ -204,7 +211,9 @@
       type: 'private',
       operator: 'Adani Agri Logistics Ltd.',
       licenseNo: 'PVT-APMC-MP-2024-019',
-      district: 'Indore (Sanwer Road)',
+      district: 'Indore (Sanwer Road Industrial Area)',
+      distanceKm: 14.2,
+      travelTimeMins: 25,
       gates: 3,
       bays: 8,
       currentServingToken: 'KS-ADN-015',
@@ -213,14 +222,53 @@
       todayProcuredMT: 680,
       capacityPercent: 48,
       priceOffset: 50,
-      badge: '🏢 Private Silo (+₹50 Bonus)'
+      badge: '🏢 Private Silo (+₹50 Bonus)',
+      unloadingType: 'Hydraulic Tipper Ramp & Vacuum Grain Conveyor',
+      paymentMode: 'Instant Same-Day Corporate NEFT / RTGS (Within 2 Hrs)',
+      turnaroundMins: 24,
+      highlights: [
+        '⚡ +₹50/Qtl Private Bonus over Govt MSP',
+        '⚡ Hydraulic Tipper Unloading (18 mins)',
+        '⚡ Steel Silo Grain Storage Protection',
+        '⚡ Instant Corporate Payment Settlement'
+      ]
+    },
+    {
+      id: 'INDORE_CHHAWANI',
+      name: 'Indore Krishi Upaj Mandi (Chhawani)',
+      type: 'government',
+      operator: 'MP Mandi Board',
+      licenseNo: 'APMC-MP-IND-002',
+      district: 'Indore (Chhawani)',
+      distanceKm: 11.5,
+      travelTimeMins: 28,
+      gates: 8,
+      bays: 24,
+      currentServingToken: 'KS-IND-320',
+      queueLength: 8,
+      avgWaitMins: 45,
+      todayProcuredMT: 1240,
+      capacityPercent: 82,
+      priceOffset: 20,
+      badge: 'Govt APMC (High Volume)',
+      unloadingType: 'Electronic Weighbridge & Auction Shed',
+      paymentMode: 'Direct DBT via PFMS (24-48 hrs)',
+      turnaroundMins: 60,
+      highlights: [
+        '🏛️ High Liquidity Commercial Trading Hub',
+        '🏛️ Premium +₹20/Qtl for Clean Lot Auctions',
+        '🏛️ 24 Operational Unloading Bays'
+      ]
     },
     {
       id: 'SANWER',
       name: 'Sanwer Procurement Center',
       type: 'government',
       operator: 'MP Mandi Board',
-      district: 'Indore',
+      licenseNo: 'APMC-MP-SNW-004',
+      district: 'Indore (Sanwer)',
+      distanceKm: 28.0,
+      travelTimeMins: 42,
       gates: 3,
       bays: 8,
       currentServingToken: 'KS-SNW-040',
@@ -229,14 +277,25 @@
       todayProcuredMT: 310,
       capacityPercent: 44,
       priceOffset: 0,
-      badge: 'Govt Procurement Center'
+      badge: 'Govt Procurement Center',
+      unloadingType: 'Yard Unloading Platform',
+      paymentMode: 'Direct DBT via PFMS (24-48 hrs)',
+      turnaroundMins: 35,
+      highlights: [
+        '🏛️ Dedicated Wheat Procurement Station',
+        '🏛️ Direct MSP Credit via Bank Seeding',
+        '🏛️ Low Congestion Village Proximity'
+      ]
     },
     {
       id: 'DEPALPUR',
       name: 'Depalpur Krishak Kendra',
       type: 'government',
       operator: 'MP Mandi Board',
-      district: 'Indore',
+      licenseNo: 'APMC-MP-DPL-005',
+      district: 'Indore (Depalpur)',
+      distanceKm: 34.5,
+      travelTimeMins: 50,
       gates: 2,
       bays: 6,
       currentServingToken: 'KS-DPL-015',
@@ -245,7 +304,15 @@
       todayProcuredMT: 220,
       capacityPercent: 50,
       priceOffset: 0,
-      badge: 'Govt Krishak Kendra'
+      badge: 'Govt Krishak Kendra',
+      unloadingType: 'Covered Shed Unloading',
+      paymentMode: 'Direct DBT via PFMS (24-48 hrs)',
+      turnaroundMins: 40,
+      highlights: [
+        '🏛️ Rural Farmer Support Center',
+        '🏛️ Government Procurement Guarantee',
+        '🏛️ Free Grain Moisture Testing'
+      ]
     }
   ];
 
@@ -569,14 +636,27 @@
       return;
     }
 
+    // Calculate exact pricing and timing for chosen mandi
+    const cropRate = MSP_RATES[crop] || MSP_RATES['Wheat'];
+    const effectiveRate = cropRate.total + (mandiObj.priceOffset || 0);
+    const totalEstAmount = qty * effectiveRate;
+    const yardWaitMins = mandiObj.avgWaitMins || 20;
+    const etaMins = yardWaitMins + (mandiObj.queueLength * 8);
+
     // Allocate token & gate
     const tokenNum = Math.floor(100 + Math.random() * 900);
     const newTokenId = `KS-${mandiObj.id}-${tokenNum}`;
-    const assignedGate = `Gate ${(Math.floor(Math.random() * mandiObj.gates) + 1)} (Bay ${Math.floor(Math.random() * 8) + 1})`;
+    const assignedGate = mandiObj.type === 'private'
+      ? `Gate 1 (Automated Pit ${Math.floor(Math.random() * (mandiObj.bays || 4)) + 1})`
+      : `Gate ${(Math.floor(Math.random() * mandiObj.gates) + 1)} (Bay ${Math.floor(Math.random() * (mandiObj.bays || 6)) + 1})`;
 
     const newToken = {
       id: newTokenId,
       mandiId: mandiObj.id,
+      mandiName: mandiObj.name,
+      mandiType: mandiObj.type,
+      mandiOperator: mandiObj.operator,
+      mandiLicense: mandiObj.licenseNo || 'APMC-MP-IND-01',
       farmerId: f.id,
       farmerName: f.name,
       phone: f.phone,
@@ -590,7 +670,15 @@
       assignedGate: assignedGate,
       status: 'scheduled',
       queuePosition: mandiObj.queueLength + 1,
-      etaMins: (mandiObj.queueLength + 1) * 12,
+      pricePerQtl: effectiveRate,
+      bonusPerQtl: mandiObj.priceOffset || 0,
+      totalEstAmount: totalEstAmount,
+      etaMins: etaMins,
+      avgWaitMins: yardWaitMins,
+      distanceKm: mandiObj.distanceKm || 6.8,
+      travelTimeMins: mandiObj.travelTimeMins || 16,
+      paymentMode: mandiObj.paymentMode || 'Direct DBT via PFMS',
+      currentServingToken: mandiObj.currentServingToken,
       quality: null,
       weight: null,
       payout: null,
@@ -1030,13 +1118,26 @@
         form.isSubmitting = false;
         form.isOpen = false;
 
-        const tokenNum = Math.floor(100 + Math.random() * 900);
         const mandiObj = state.mandis.find(m => m.id === form.mandiId) || state.mandis[0];
+        const cropRate = MSP_RATES[form.crop] || MSP_RATES['Wheat'];
+        const effectiveRate = cropRate.total + (mandiObj.priceOffset || 0);
+        const totalEstAmount = qty * effectiveRate;
+        const yardWaitMins = mandiObj.avgWaitMins || 20;
+        const etaMins = yardWaitMins + (mandiObj.queueLength * 8);
+
+        const tokenNum = Math.floor(100 + Math.random() * 900);
         const newTokenId = `KS-${mandiObj.id}-${tokenNum}`;
+        const assignedGate = mandiObj.type === 'private'
+          ? `Gate 1 (Automated Pit ${Math.floor(Math.random() * (mandiObj.bays || 4)) + 1})`
+          : `Gate ${(Math.floor(Math.random() * mandiObj.gates) + 1)} (Bay ${Math.floor(Math.random() * (mandiObj.bays || 6)) + 1})`;
 
         const newToken = {
           id: newTokenId,
           mandiId: mandiObj.id,
+          mandiName: mandiObj.name,
+          mandiType: mandiObj.type,
+          mandiOperator: mandiObj.operator,
+          mandiLicense: mandiObj.licenseNo || 'APMC-MP-IND-01',
           farmerId: f.id,
           farmerName: f.name,
           phone: f.phone,
@@ -1047,10 +1148,18 @@
           vehicle: `${form.vehicleType} (${form.vehicleNumber})`,
           slotDate: form.slotDate,
           slotTime: form.slotTime,
-          assignedGate: `Gate ${(Math.floor(Math.random() * mandiObj.gates) + 1)} (Bay ${Math.floor(Math.random() * 8) + 1})`,
+          assignedGate: assignedGate,
           status: 'scheduled',
           queuePosition: mandiObj.queueLength + 1,
-          etaMins: (mandiObj.queueLength + 1) * 12,
+          pricePerQtl: effectiveRate,
+          bonusPerQtl: mandiObj.priceOffset || 0,
+          totalEstAmount: totalEstAmount,
+          etaMins: etaMins,
+          avgWaitMins: yardWaitMins,
+          distanceKm: mandiObj.distanceKm || 6.8,
+          travelTimeMins: mandiObj.travelTimeMins || 16,
+          paymentMode: mandiObj.paymentMode || 'Direct DBT via PFMS',
+          currentServingToken: mandiObj.currentServingToken,
           quality: null,
           weight: null,
           payout: null,
@@ -1068,8 +1177,8 @@
 
         sendSimulatedSms(
           f.phone,
-          'SLOT BOOKED',
-          `[VM-KSITU] Token #${newTokenId} booked for ${crop} (${qty} Qtl) at ${mandiObj.name}. Slot: ${form.slotDate} ${form.slotTime}. Gate: ${newToken.assignedGate}.`
+          'SLOT CONFIRMED',
+          `[VM-KSITU] Token #${newTokenId} confirmed for ${crop} (${qty} Qtl) at ${mandiObj.name}. Rate: Rs ${effectiveRate}/Qtl (Est: Rs ${totalEstAmount.toLocaleString('en-IN')}). Wait: ~${yardWaitMins}m. Gate: ${newToken.assignedGate}. Payment: ${mandiObj.paymentMode}.`
         );
 
         showToast('Slot Confirmed!', `Token #${newTokenId} generated with live queue tracking.`);
@@ -1079,24 +1188,29 @@
     toggleTransit: (tokenId) => {
       const tok = state.tokens.find(t => t.id === tokenId);
       if (!tok) return;
+      const targetMandi = state.mandis.find(m => m.id === tok.mandiId) || getActiveMandi();
+      const dist = tok.distanceKm || targetMandi.distanceKm || 6.4;
+      const eta = tok.etaMins || targetMandi.travelTimeMins || 20;
+      const gate = tok.assignedGate || targetMandi.gate || 'Gate 2';
 
       if (tok.status === 'scheduled') {
         tok.status = 'in_transit';
-        tok.distanceKm = 6.4;
+        tok.distanceKm = dist;
+        tok.etaMins = eta;
         sendSimulatedSms(
           tok.phone,
           'IN TRANSIT',
-          `[VM-KSITU] Transit started for Token #${tok.id}. Mandi control room notified. Live arrival ETA: 20 mins. Gate 2 allocated.`
+          `[VM-KSITU] Transit started for Token #${tok.id} to ${targetMandi.name}. Mandi control room notified. Live arrival ETA: ${eta} mins (${dist} km). ${gate} allocated.`
         );
-        showToast('Transit Started', 'Mandi control room updated with live vehicle transit telemetry.');
+        showToast('Transit Started', `${targetMandi.name} control room updated with live vehicle transit telemetry (${dist} km, ETA: ${eta} mins).`);
       } else if (tok.status === 'in_transit') {
         tok.status = 'at_gate';
         sendSimulatedSms(
           tok.phone,
           'ARRIVED AT GATE',
-          `[VM-KSITU] Vehicle arrived at Mandi Entry. Present QR Code at Gate Scanner for digital boom barrier entry.`
+          `[VM-KSITU] Vehicle arrived at ${targetMandi.name} (${gate}). Present QR Code at Gate Scanner for digital boom barrier entry.`
         );
-        showToast('Arrived at Gate', 'Please scan digital gate pass at entry checkpoint.');
+        showToast('Arrived at Gate', `Please scan digital gate pass at ${targetMandi.name} ${gate}.`);
       }
       render();
     },
@@ -1187,26 +1301,30 @@
       const netQtl = Math.round((netKg / 100) * 10) / 10;
 
       const cropRate = MSP_RATES[tok.crop] || MSP_RATES['Wheat'];
-      const finalRate = cropRate.total - (tok.quality?.dockPercent || 0);
+      const m = state.mandis.find(x => x.id === tok.mandiId) || state.mandis[0];
+      const mandiBonus = m.priceOffset || 0;
+      const finalRate = cropRate.total + mandiBonus - (tok.quality?.dockPercent || 0);
       const totalPayout = Math.round(netQtl * finalRate);
 
-      const utrNo = 'PFMS' + Date.now().toString().slice(-8);
+      const utrNo = (m.type === 'private' ? 'NEFT-' + m.id + '-' : 'PFMS-') + Date.now().toString().slice(-8);
+      const dbtStatus = m.type === 'private' ? 'Disbursed (Instant Corporate NEFT)' : 'Disbursed (Aadhaar PFMS)';
 
       tok.weight = { gross, tare, netKg, netQuintals: netQtl };
       tok.payout = {
         mspRate: finalRate,
         baseRate: cropRate.msp,
         bonus: cropRate.bonus,
+        mandiBonus: mandiBonus,
         dock: tok.quality?.dockPercent || 0,
         totalAmount: totalPayout,
-        dbtStatus: 'Disbursed (Aadhaar PFMS)',
+        dbtStatus: dbtStatus,
+        paymentMode: m.paymentMode || 'Direct Bank Credit',
         utrNo,
         disbursedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       tok.status = 'completed';
 
       // Update Mandi Stats
-      const m = state.mandis.find(x => x.id === tok.mandiId);
       if (m) {
         m.todayProcuredMT += Math.round(netQtl / 10);
       }
@@ -1918,7 +2036,19 @@
     const form = state.bookingForm;
     const selectedMandi = state.mandis.find(m => m.id === form.mandiId) || state.mandis[0];
     const cropRate = MSP_RATES[form.crop] || MSP_RATES['Wheat'];
-    const totalEstPayout = (Number(form.quantity) || 40) * cropRate.total;
+    const baseRate = cropRate.total;
+    const mandiOffset = selectedMandi.priceOffset || 0;
+    const effectiveRate = baseRate + mandiOffset;
+    const qty = Math.max(1, Number(form.quantity) || 40);
+    const totalEstPayout = qty * effectiveRate;
+    const basePayout = qty * baseRate;
+    const bonusPayout = qty * mandiOffset;
+    const yardWaitMins = selectedMandi.avgWaitMins || 20;
+    const distanceKm = selectedMandi.distanceKm || 6.8;
+    const travelTimeMins = selectedMandi.travelTimeMins || 16;
+    const totalTurnaroundMins = selectedMandi.turnaroundMins || (yardWaitMins + (selectedMandi.type === 'private' ? 12 : 25));
+    const paymentMode = selectedMandi.paymentMode || (selectedMandi.type === 'private' ? 'Instant Same-Day Corporate NEFT' : 'Direct DBT via PFMS');
+    const unloadingType = selectedMandi.unloadingType || (selectedMandi.type === 'private' ? '15-Min Automated Dump Pit' : 'Yard Weighbridge');
 
     return `
       <div class="space-y-6 animate-fade-in">
@@ -1951,7 +2081,7 @@
               <span>🌾 Step 2 of 3 • Slot Scheduling</span>
             </div>
             <h2 class="text-xl sm:text-2xl font-black text-stone-900 tracking-tight">Choose Mandi & Schedule Delivery Slot</h2>
-            <p class="text-xs text-stone-500 mt-0.5">Select your preferred Mandi procurement center based on live price and waiting time.</p>
+            <p class="text-xs text-stone-500 mt-0.5">Select your preferred Mandi procurement center. Price, waiting time, and transit calculate dynamically for your choice.</p>
           </div>
 
           <form onsubmit="appHandlers.handleBookingSubmit(event)" class="space-y-6">
@@ -1990,25 +2120,26 @@
                 </button>
               </div>
 
+              <!-- MANDI CARDS (CLICK TO CHOOSE) -->
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 ${state.mandis.filter(m => state.mandiFilter === 'all' || m.type === state.mandiFilter).map(m => `
                   <div onclick="appHandlers.selectBookingMandi('${m.id}')"
                     class="p-4 rounded-xl border-2 cursor-pointer transition-all ${
                       form.mandiId === m.id 
-                        ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-500/20' 
+                        ? (m.type === 'private' ? 'border-amber-500 bg-amber-50/70 shadow-sm ring-2 ring-amber-400/30' : 'border-emerald-600 bg-emerald-50/70 shadow-sm ring-2 ring-emerald-500/30')
                         : 'border-stone-200 bg-stone-50/60 hover:bg-white hover:border-stone-300'
                     }">
                     <div class="flex items-start justify-between">
                       <div>
                         <div class="font-extrabold text-sm text-stone-900 flex items-center gap-1.5">
                           <span>${m.name.split('(')[0]}</span>
-                          ${form.mandiId === m.id ? '<span class="text-emerald-700 text-xs font-black">✓ Selected</span>' : ''}
+                          ${form.mandiId === m.id ? '<span class="' + (m.type === 'private' ? 'text-amber-800' : 'text-emerald-700') + ' text-xs font-black">✓ Selected</span>' : ''}
                         </div>
                         <div class="flex items-center gap-1.5 mt-0.5">
                           <span class="px-1.5 py-0.2 rounded text-[9px] font-extrabold ${m.type === 'private' ? 'bg-amber-100 text-amber-950 border border-amber-300' : 'bg-emerald-100 text-emerald-950 border border-emerald-300'}">
                             ${m.type === 'private' ? '🏢 Private Mandi' : '🏛️ Govt APMC'}
                           </span>
-                          <span class="text-[11px] text-stone-500">${m.district} • ${m.gates} Gates</span>
+                          <span class="text-[11px] text-stone-500">${m.district} • ${m.distanceKm || '6.8'} km</span>
                         </div>
                       </div>
                       <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
@@ -2021,15 +2152,113 @@
                     <div class="grid grid-cols-2 gap-2 mt-3 pt-2.5 border-t border-stone-200/70 text-xs">
                       <div>
                         <span class="text-[10px] text-stone-400 block">Today's Rate:</span>
-                        <strong class="font-mono text-emerald-900 font-extrabold">₹${cropRate.total + (m.priceOffset || 0)} / Qtl</strong><span class="text-[9px] font-bold text-amber-800 block">${m.type === "private" ? "+₹" + m.priceOffset + " Private Premium" : "Official MSP + Bonus"}</span>
+                        <strong class="font-mono text-emerald-900 font-extrabold text-sm">₹${cropRate.total + (m.priceOffset || 0)} / Qtl</strong>
+                        <span class="text-[9px] font-bold ${m.type === 'private' ? 'text-amber-800' : 'text-stone-500'} block">
+                          ${m.type === 'private' ? '+₹' + m.priceOffset + ' Private Premium' : (m.priceOffset > 0 ? '+₹' + m.priceOffset + ' Volume Premium' : 'Official Govt MSP')}
+                        </span>
                       </div>
                       <div>
-                        <span class="text-[10px] text-stone-400 block">Queue Load:</span>
-                        <strong class="text-stone-800 font-bold">${m.queueLength} Vehicles</strong>
+                        <span class="text-[10px] text-stone-400 block">Live Queue:</span>
+                        <strong class="text-stone-800 font-bold">${m.queueLength} Vehicles ahead</strong>
+                        <span class="text-[9px] text-stone-500 block">~${m.travelTimeMins || '15'}m driving ETA</span>
                       </div>
                     </div>
                   </div>
                 `).join('')}
+              </div>
+            </div>
+
+            <!-- DYNAMIC MANDI ESTIMATION & VALUATION DASHBOARD (CHANGES AS PER CHOSEN MANDI) -->
+            <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-br ${selectedMandi.type === 'private' ? 'from-amber-50 via-stone-50 to-emerald-50 border-2 border-amber-400 shadow-sm' : 'from-emerald-50 via-stone-50 to-teal-50 border-2 border-emerald-400 shadow-sm'} space-y-4 animate-fade-in">
+              <div class="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200/80 pb-3">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-10 h-10 rounded-xl ${selectedMandi.type === 'private' ? 'bg-amber-500 text-stone-950 font-black' : 'bg-emerald-700 text-white font-black'} flex items-center justify-center text-xl shadow-2xs">
+                    ${selectedMandi.type === 'private' ? '🏢' : '🏛️'}
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="font-black text-sm sm:text-base text-stone-900">${selectedMandi.name}</span>
+                      <span class="px-2 py-0.2 rounded text-[10px] font-black ${selectedMandi.type === 'private' ? 'bg-amber-100 text-amber-950 border border-amber-300' : 'bg-emerald-100 text-emerald-950 border border-emerald-300'}">
+                        ${selectedMandi.type === 'private' ? '🏢 Licensed Private Mandi' : '🏛️ Govt APMC'}
+                      </span>
+                    </div>
+                    <p class="text-[11px] text-stone-600">${selectedMandi.operator} • Lic: <span class="font-mono font-bold">${selectedMandi.licenseNo || 'APMC-MP-IND-01'}</span></p>
+                  </div>
+                </div>
+
+                <div class="text-right">
+                  <span class="text-[10px] uppercase font-bold text-stone-400 block">Selected Procurement Hub</span>
+                  <span class="font-mono font-extrabold text-xs text-emerald-800 bg-white px-2.5 py-0.5 rounded border border-emerald-300 shadow-2xs inline-block mt-0.5">
+                    Live Queue: ${selectedMandi.queueLength} Trucks Ahead
+                  </span>
+                </div>
+              </div>
+
+              <!-- 4 KEY REAL-TIME COMPUTED METRICS -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                <!-- Metric 1: Effective Price per Qtl -->
+                <div class="p-3 bg-white rounded-xl border border-stone-200 shadow-2xs space-y-0.5">
+                  <span class="text-[10px] uppercase font-extrabold text-stone-400 block">Effective Rate</span>
+                  <div class="font-mono text-lg font-black text-emerald-950">
+                    ₹${effectiveRate}
+                    <span class="text-[11px] font-bold text-stone-500">/ Qtl</span>
+                  </div>
+                  <div class="text-[10px] text-stone-500">
+                    Base: ₹${baseRate} ${mandiOffset > 0 ? `<span class="text-emerald-700 font-bold">(+₹${mandiOffset} Bonus)</span>` : ''}
+                  </div>
+                </div>
+
+                <!-- Metric 2: Total Estimated Payout -->
+                <div class="p-3 bg-white rounded-xl border border-stone-200 shadow-2xs space-y-0.5">
+                  <span class="text-[10px] uppercase font-extrabold text-stone-400 block">Total Est. Payout</span>
+                  <div class="font-mono text-lg font-black text-emerald-900">
+                    ₹${totalEstPayout.toLocaleString('en-IN')}
+                  </div>
+                  <div class="text-[10px] ${bonusPayout > 0 ? 'text-amber-800 font-bold' : 'text-stone-500'}">
+                    ${bonusPayout > 0 ? `+₹${bonusPayout.toLocaleString('en-IN')} extra bonus!` : 'Standard Govt MSP'}
+                  </div>
+                </div>
+
+                <!-- Metric 3: Yard Wait & Turnaround Time -->
+                <div class="p-3 bg-white rounded-xl border border-stone-200 shadow-2xs space-y-0.5">
+                  <span class="text-[10px] uppercase font-extrabold text-stone-400 block">Est. Yard Wait</span>
+                  <div class="font-mono text-lg font-black ${yardWaitMins <= 20 ? 'text-emerald-700' : 'text-amber-700'}">
+                    ~${yardWaitMins} Mins
+                  </div>
+                  <div class="text-[10px] text-stone-500">
+                    Turnaround: ~${totalTurnaroundMins} mins
+                  </div>
+                </div>
+
+                <!-- Metric 4: Transit Distance & Driving ETA -->
+                <div class="p-3 bg-white rounded-xl border border-stone-200 shadow-2xs space-y-0.5">
+                  <span class="text-[10px] uppercase font-extrabold text-stone-400 block">Transit Distance</span>
+                  <div class="font-mono text-lg font-black text-stone-800">
+                    ${distanceKm} km
+                  </div>
+                  <div class="text-[10px] text-stone-500">
+                    Driving ETA: ~${travelTimeMins} mins
+                  </div>
+                </div>
+              </div>
+
+              <!-- OPERATIONAL DETAILS ACCORDING TO CHOSEN MANDI -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-1">
+                <div class="flex items-center gap-2 p-2.5 bg-white/80 rounded-xl border border-stone-200/80">
+                  <span class="text-base">🏦</span>
+                  <div>
+                    <span class="text-[10px] text-stone-400 block font-bold uppercase">Payment Settlement Mode:</span>
+                    <span class="font-bold text-stone-800">${paymentMode}</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-2 p-2.5 bg-white/80 rounded-xl border border-stone-200/80">
+                  <span class="text-base">🚜</span>
+                  <div>
+                    <span class="text-[10px] text-stone-400 block font-bold uppercase">Unloading & Weighing Setup:</span>
+                    <span class="font-bold text-stone-800">${unloadingType}</span>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -2044,10 +2273,10 @@
                   <label class="block font-bold text-stone-700 mb-1">Crop Type / फसल</label>
                   <select class="w-full px-3 py-2.5 rounded-xl border border-stone-300 font-bold text-stone-900 bg-white"
                     onchange="state.bookingForm.crop = this.value; render();">
-                    <option value="Wheat" ${form.crop === 'Wheat' ? 'selected' : ''}>Wheat (गेहूं) - MSP ₹2,400</option>
-                    <option value="Soybean" ${form.crop === 'Soybean' ? 'selected' : ''}>Soybean (सोयाबीन) - MSP ₹4,992</option>
-                    <option value="Chana" ${form.crop === 'Chana' ? 'selected' : ''}>Chana (चना) - MSP ₹5,590</option>
-                    <option value="Mustard" ${form.crop === 'Mustard' ? 'selected' : ''}>Mustard (सरसों) - MSP ₹5,750</option>
+                    <option value="Wheat" ${form.crop === 'Wheat' ? 'selected' : ''}>Wheat (गेहूं) - Base MSP ₹2,400</option>
+                    <option value="Soybean" ${form.crop === 'Soybean' ? 'selected' : ''}>Soybean (सोयाबीन) - Base MSP ₹4,992</option>
+                    <option value="Chana" ${form.crop === 'Chana' ? 'selected' : ''}>Chana (चना) - Base MSP ₹5,590</option>
+                    <option value="Mustard" ${form.crop === 'Mustard' ? 'selected' : ''}>Mustard (सरसों) - Base MSP ₹5,750</option>
                   </select>
                 </div>
 
@@ -2061,13 +2290,22 @@
                     class="w-full px-3 py-2.5 rounded-xl border border-stone-300 font-mono font-black text-stone-900 bg-white">
                 </div>
 
-                <!-- Live Calculated Payout Card -->
-                <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200">
-                  <span class="text-[10px] text-emerald-800 uppercase font-bold block">Estimated MSP Payout</span>
+                <!-- Live Calculated Payout Card (with Chosen Mandi Rate) -->
+                <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-300 space-y-1">
+                  <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-emerald-800 uppercase font-extrabold block">Estimated Settlement Payout</span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-emerald-200 text-emerald-900 font-mono">@ ₹${effectiveRate}/Qtl</span>
+                  </div>
                   <div class="font-mono text-xl font-black text-emerald-950 mt-0.5">
                     ₹${totalEstPayout.toLocaleString('en-IN')}
                   </div>
-                  <span class="text-[10px] text-emerald-700 block">Direct DBT to ${auth.bankName.split(' ')[0]} A/C</span>
+                  <div class="text-[10px] text-stone-600 flex justify-between pt-0.5 border-t border-emerald-200/60">
+                    <span>Base MSP: ₹${(qty * baseRate).toLocaleString('en-IN')}</span>
+                    <span class="font-bold ${mandiOffset > 0 ? 'text-amber-800' : 'text-stone-500'}">
+                      ${mandiOffset > 0 ? `+₹${(qty * mandiOffset).toLocaleString('en-IN')} (${selectedMandi.name.split(' ')[0]} Bonus)` : 'Govt MSP'}
+                    </span>
+                  </div>
+                  <span class="text-[10px] text-emerald-700 block font-medium">Channel: ${paymentMode}</span>
                 </div>
               </div>
             </div>
@@ -2087,11 +2325,14 @@
                 </div>
 
                 <div>
-                  <label class="block font-bold text-stone-700 mb-1">Time Window (3-Hour Slot)</label>
+                  <label class="block font-bold text-stone-700 mb-1 flex justify-between">
+                    <span>Time Window (3-Hour Slot)</span>
+                    <span class="text-stone-500 text-[10px]">Transit: ~${travelTimeMins}m</span>
+                  </label>
                   <select class="w-full px-3 py-2 rounded-xl border border-stone-300 font-bold text-stone-900 bg-white"
                     onchange="state.bookingForm.slotTime = this.value">
-                    <option value="08:00 AM - 11:00 AM">08:00 AM - 11:00 AM (🟢 Low Traffic)</option>
-                    <option value="11:00 AM - 02:00 PM">11:00 AM - 02:00 PM (🟡 Moderate)</option>
+                    <option value="08:00 AM - 11:00 AM">08:00 AM - 11:00 AM (🟢 Low Traffic • ~${yardWaitMins}m wait)</option>
+                    <option value="11:00 AM - 02:00 PM">11:00 AM - 02:00 PM (🟡 Moderate Traffic)</option>
                     <option value="02:00 PM - 05:00 PM">02:00 PM - 05:00 PM (🟢 Low Traffic)</option>
                   </select>
                 </div>
@@ -2106,7 +2347,7 @@
               </div>
             </div>
 
-            <!-- CONFIRM BUTTON -->
+            <!-- CONFIRM BUTTON WITH REAL-TIME VALUATION -->
             <div class="pt-4 border-t border-stone-100 flex items-center justify-between">
               <button type="button" onclick="appHandlers.setFarmerStep('register')"
                 class="px-4 py-2.5 rounded-xl border border-stone-200 text-stone-700 font-bold text-xs hover:bg-stone-50">
@@ -2115,7 +2356,7 @@
 
               <button type="submit" ${form.isSubmitting ? 'disabled' : ''}
                 class="px-7 py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs sm:text-sm shadow-md flex items-center gap-2 transition-all hover:scale-[1.02]">
-                <span>${form.isSubmitting ? 'Generating Token...' : 'Confirm Slot & Generate Digital Gate Pass ➔'}</span>
+                <span>${form.isSubmitting ? 'Generating Token...' : `Confirm Slot for ${selectedMandi.name.split('(')[0]} (Est. ₹${totalEstPayout.toLocaleString('en-IN')}) ➔`}</span>
               </button>
             </div>
           </form>
@@ -2126,6 +2367,11 @@
 
   // Farmer's Live Token & Gate Pass with transit tracking
   function renderFarmerTokenPipeline(token) {
+    const mandi = state.mandis.find(m => m.id === token.mandiId) || state.mandis[0];
+    const cropRate = MSP_RATES[token.crop] || MSP_RATES['Wheat'];
+    const effectiveRate = token.pricePerQtl || (cropRate.total + (mandi.priceOffset || 0));
+    const totalEstValuation = token.totalEstAmount || (token.quantityQuintals * effectiveRate);
+
     const isCompleted = token.status === 'completed';
     const isTransit = token.status === 'in_transit';
     const isAtGate = token.status === 'at_gate';
@@ -2140,10 +2386,17 @@
           <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
               <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white/15 text-emerald-100 border border-white/20 mb-1">
-                <span>🎫 Digital Mandi Gate Pass • e-NAM</span>
+                <span>🎫 Digital Gate Pass • ${mandi.type === 'private' ? '🏢 Licensed Private Mandi' : '🏛️ Government APMC'}</span>
               </div>
               <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight font-mono">${token.id}</h2>
-              <p class="text-xs text-emerald-200 mt-0.5">${token.crop} (${token.variety}) • ${token.quantityQuintals} Quintals</p>
+              <p class="text-xs text-emerald-200 mt-0.5">${token.crop} (${token.variety}) • ${token.quantityQuintals} Quintals • <strong>${mandi.name}</strong></p>
+              <div class="text-[11px] text-emerald-100/90 mt-1 flex flex-wrap gap-2">
+                <span>Operator: ${mandi.operator}</span>
+                <span>•</span>
+                <span>Lic: ${mandi.licenseNo || 'APMC-MP-IND-01'}</span>
+                <span>•</span>
+                <span class="font-mono font-bold text-amber-300">Rate: ₹${effectiveRate}/Qtl (Est. ₹${totalEstValuation.toLocaleString('en-IN')})</span>
+              </div>
             </div>
 
             <!-- QR Code Simulation -->
@@ -2166,7 +2419,7 @@
             </div>
             <div class="p-3 bg-stone-50 rounded-xl border border-stone-200">
               <div class="text-[10px] uppercase font-bold text-stone-400">Current Serving</div>
-              <div class="text-xs sm:text-sm font-mono font-bold text-emerald-800 mt-0.5">KS-RAU-105</div>
+              <div class="text-xs sm:text-sm font-mono font-bold text-emerald-800 mt-0.5">${mandi.currentServingToken}</div>
             </div>
             <div class="p-3 bg-stone-50 rounded-xl border border-stone-200">
               <div class="text-[10px] uppercase font-bold text-stone-400">Vehicles Ahead</div>
@@ -2258,8 +2511,8 @@
 
             ${isTransit ? `
               <div class="p-2.5 bg-amber-50 rounded-lg border border-amber-200 text-xs text-amber-950 flex items-center justify-between">
-                <span>📍 GPS Simulation: <strong>4.8 km</strong> from Rau Mandi • Speed: <strong>28 km/h</strong></span>
-                <span class="font-bold">ETA: 18 Mins</span>
+                <span>📍 GPS Simulation: <strong>${mandi.distanceKm} km</strong> from ${mandi.name} • Speed: <strong>28 km/h</strong></span>
+                <span class="font-bold">ETA: ${mandi.travelTimeMins} Mins</span>
               </div>
             ` : ''}
           </div>
@@ -2272,7 +2525,7 @@
                   <span class="text-2xl">🎉</span>
                   <div>
                     <h4 class="font-bold text-sm text-emerald-950">Procurement e-Receipt & Payment Credit</h4>
-                    <p class="text-[11px] text-emerald-700">Govt. Direct Benefit Transfer (DBT)</p>
+                    <p class="text-[11px] text-emerald-700">${mandi.paymentMode || 'Govt. Direct Benefit Transfer (DBT)'}</p>
                   </div>
                 </div>
                 <div class="text-right">
@@ -2341,14 +2594,57 @@
             <div>
               <label class="block text-xs font-bold text-stone-700 mb-1">Select Procurement Center (Mandi)</label>
               <select class="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs font-semibold text-stone-900 bg-white"
-                onchange="state.bookingForm.mandiId = this.value">
+                onchange="state.bookingForm.mandiId = this.value; render();">
                 ${state.mandis.map(m => `
                   <option value="${m.id}" ${form.mandiId === m.id ? 'selected' : ''}>
-                    ${m.name} (${m.avgWaitMins} min wait • ${m.capacityPercent}% capacity)
+                    ${m.name} (${m.type === 'Private Mandi' ? '🏢 Private' : '🏛️ Govt'} • ${m.priceOffset > 0 ? '+₹' + m.priceOffset + '/Qtl' : 'MSP'} • ${m.avgWaitMins}m wait • ${m.distanceKm || 6.4} km)
                   </option>
                 `).join('')}
               </select>
             </div>
+
+            <!-- Dynamic Chosen Mandi Live Calculation & Highlights -->
+            ${(() => {
+              const selM = state.mandis.find(m => m.id === (form.mandiId || state.selectedMandiId)) || state.mandis[0];
+              const baseMsp = form.crop === 'Soybean' ? 4992 : form.crop === 'Chana' ? 5590 : 2400;
+              const rate = baseMsp + (selM.priceOffset || 0);
+              const q = parseFloat(form.quantity) || 45;
+              const totalPayout = rate * q;
+              return `
+                <div class="p-3 rounded-xl border ${selM.type === 'Private Mandi' ? 'bg-amber-50/70 border-amber-200' : 'bg-emerald-50/70 border-emerald-200'} text-xs space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-stone-800 flex items-center gap-1.5">
+                      <span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${selM.type === 'Private Mandi' ? 'bg-amber-200 text-amber-900' : 'bg-emerald-200 text-emerald-900'}">${selM.type}</span>
+                      ${selM.name}
+                    </span>
+                    <span class="font-mono font-black text-stone-900 bg-white px-2 py-0.5 rounded-lg border border-stone-200 shadow-2xs">
+                      Est. ₹${totalPayout.toLocaleString('en-IN')}
+                    </span>
+                  </div>
+                  <div class="grid grid-cols-3 gap-2 pt-1 border-t border-stone-200/60 text-[11px]">
+                    <div>
+                      <span class="text-stone-400 block text-[10px]">Effective Rate</span>
+                      <strong class="text-emerald-700 font-mono">₹${rate.toLocaleString('en-IN')}/Qtl</strong>
+                      ${selM.priceOffset > 0 ? `<span class="text-[9px] text-amber-700 block font-semibold">(+₹${selM.priceOffset} Bonus)</span>` : ''}
+                    </div>
+                    <div>
+                      <span class="text-stone-400 block text-[10px]">Yard Wait</span>
+                      <strong class="text-stone-800">~${selM.avgWaitMins} Mins</strong>
+                      <span class="text-[9px] text-stone-500 block">Total: ~${selM.turnaroundMins || 45}m</span>
+                    </div>
+                    <div>
+                      <span class="text-stone-400 block text-[10px]">Distance & ETA</span>
+                      <strong class="text-stone-800">${selM.distanceKm || 6.4} km</strong>
+                      <span class="text-[9px] text-stone-500 block">~${selM.travelTimeMins || 20}m transit</span>
+                    </div>
+                  </div>
+                  <div class="text-[10px] text-stone-600 flex items-center justify-between pt-1">
+                    <span>💳 Payment: <strong class="text-stone-800">${selM.paymentMode || 'Instant DBT'}</strong></span>
+                    <span class="text-stone-500">Unloading: <strong>${selM.unloadingType || 'Automatic'}</strong></span>
+                  </div>
+                </div>
+              `;
+            })()}
 
             <!-- Crop & Quantity -->
             <div class="grid grid-cols-2 gap-3">
@@ -2647,7 +2943,9 @@
               const tare = Number(state.mandiStaff.tareWeight);
               const netKg = Math.max(0, gross - tare);
               const netQtl = Math.round((netKg / 100) * 10) / 10;
-              const rate = MSP_RATES[tok.crop]?.total || 2400;
+              const m = state.mandis.find(x => x.id === tok.mandiId) || state.mandis[0];
+              const baseMsp = MSP_RATES[tok.crop]?.total || 2400;
+              const rate = baseMsp + (m.priceOffset || 0);
               const payout = Math.round(netQtl * rate);
 
               return `
