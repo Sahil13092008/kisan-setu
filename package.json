@@ -1,0 +1,20 @@
+{
+  "name": "kisan-setu-prototype",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Kisan Setu - Smart Procurement Scheduling & Tracking Platform (SIH26032, Team BuildBeyond 96572)",
+  "scripts": {
+    "start": "node serve.js",
+    "serve": "node serve.js"
+  },
+  "keywords": [
+    "sih2026",
+    "kisan-setu",
+    "procurement",
+    "mandi",
+    "queue-management",
+    "smart-automation"
+  ],
+  "author": "Team BuildBeyond",
+  "license": "MIT"
+}
