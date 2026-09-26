@@ -2342,15 +2342,7 @@
     `;
   }
 
-  // Initial render when script loads
-  document.addEventListener('DOMContentLoaded', render);
-  if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    render();
-  }
-})();
-
-
-  // --- KISAN SAHAYAK AI ASSISTANT MODAL UI ---
+// --- KISAN SAHAYAK AI ASSISTANT MODAL UI ---
   function renderAiAssistantModal() {
     const agent = state.aiAgent;
     const f = getActiveFarmer();
@@ -2565,3 +2557,10 @@
 
     return '';
   }
+
+// Initial render when script loads
+  document.addEventListener('DOMContentLoaded', render);
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    render();
+  }
+})();
