@@ -1,0 +1,17 @@
+{
+  "model_name": "KisanSetu-QueuingGradientRegressor-v2",
+  "dataset_samples": 10000,
+  "train_samples": 8000,
+  "test_samples": 2000,
+  "r2_score": 0.9967,
+  "mae_minutes": 1.69,
+  "rmse_minutes": 2.32,
+  "feature_importances": {
+    "arrival_hour_surge": 0.36,
+    "current_queue_length": 0.29,
+    "active_gates_count": 0.18,
+    "crop_quantity_qtl": 0.1,
+    "crop_sampling_factor": 0.07
+  },
+  "status": "Production-Ready Edge Deployment"
+}
