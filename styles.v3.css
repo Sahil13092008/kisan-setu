@@ -1,4 +1,14 @@
-/* Kisan Setu - Custom Styles & Animations */
+/* Kisan Setu - Light Red + Golden Theme Styles & Animations */
+:root {
+  --primary-red: #be123c;
+  --primary-rose: #e11d48;
+  --light-rose: #fff1f2;
+  --accent-gold: #f59e0b;
+  --warm-gold: #fbbf24;
+  --deep-gold: #b45309;
+  --gold-bg: #fffbeb;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
@@ -7,6 +17,26 @@
 @keyframes pulseGlow {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.85; transform: scale(1.02); }
+}
+
+@keyframes pulseGoldGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.45);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 16px 4px rgba(245, 158, 11, 0.25);
+    transform: scale(1.015);
+  }
+}
+
+@keyframes pulseRoseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 12px 3px rgba(225, 29, 72, 0.2);
+  }
 }
 
 @keyframes slideInRight {
@@ -45,6 +75,14 @@
   animation: pulseGlow 2s infinite ease-in-out;
 }
 
+.pulse-gold {
+  animation: pulseGoldGlow 2.2s infinite ease-in-out;
+}
+
+.pulse-rose {
+  animation: pulseRoseGlow 2s infinite ease-in-out;
+}
+
 .ripple-effect {
   animation: ripple 1.8s infinite ease-out;
 }
@@ -61,20 +99,35 @@
   animation: bounceDot 1.4s infinite ease-in-out both;
 }
 
-/* Custom scrollbars */
+/* User-friendly card lift effect */
+.card-hover-lift {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card-hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -4px rgba(190, 18, 60, 0.08), 0 4px 8px -2px rgba(245, 158, 11, 0.06);
+}
+
+/* Custom scrollbars themed to Light Red & Gold */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #f8fafc;
+  background: #fff5f5;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #fca5a5;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #f87171;
+}
+
+/* Subtle focus enhancement for accessibility */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(244, 63, 94, 0.25);
 }
 
 /* Print styles for digital gate pass */

@@ -703,7 +703,7 @@
 
     playChime('success');
     if (window.confetti) {
-      window.confetti({ particleCount: 60, spread: 60, origin: { y: 0.6 } });
+      window.confetti({ particleCount: 60, spread: 60, origin: { y: 0.6 }, colors: ['#e11d48', '#f59e0b', '#fbbf24', '#be123c', '#d97706', '#ffe4e6'] });
     }
 
     const confirmMsg = `✅ **Procurement Slot Successfully Booked via AI Command!**\n\nI have confirmed your delivery slot for **${qty} Quintals of ${crop}** at **${mandiObj.name}**.\n\n• **Token ID:** \`${newTokenId}\`\n• **Slot Time:** ${newToken.slotDate} (${newToken.slotTime})\n• **Assigned:** ${assignedGate}\n• **Estimated Wait:** ~${newToken.etaMins} mins\n\nA confirmation SMS has been dispatched to your mobile (${f.phone}).`;
@@ -1044,7 +1044,7 @@
 
       playChime('success');
       if (window.confetti) {
-        window.confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
+        window.confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 }, colors: ['#e11d48', '#f59e0b', '#fbbf24', '#be123c', '#d97706', '#ffe4e6'] });
       }
       showToast('Registration & e-KYC Verified! 🎉', 'UIDAI Aadhaar, Bhulekh Land Quota, and Bank Account authenticated. Now choose your Mandi.');
       render();
@@ -1339,7 +1339,7 @@
       
       // Trigger confetti celebration!
       if (window.confetti) {
-        window.confetti({ particleCount: 75, spread: 70, origin: { y: 0.6 } });
+        window.confetti({ particleCount: 75, spread: 70, origin: { y: 0.6 }, colors: ['#e11d48', '#f59e0b', '#fbbf24', '#be123c', '#d97706', '#ffe4e6'] });
       }
 
       render();
@@ -1432,9 +1432,9 @@
     const mandi = getActiveMandi();
 
     root.innerHTML = `
-      <div class="min-h-screen bg-stone-100/70 pb-16 font-sans text-stone-900 antialiased selection:bg-emerald-200">
+      <div class="min-h-screen bg-stone-100/70 pb-16 font-sans text-stone-900 antialiased selection:bg-rose-200">
         <!-- TOP TRICOLOR ACCENT BAR -->
-        <div class="h-1.5 w-full bg-linear-to-r from-orange-500 via-white to-emerald-600 shadow-xs"></div>
+        <div class="h-1.5 w-full bg-linear-to-r from-rose-600 via-amber-400 to-red-600 shadow-xs"></div>
 
         <!-- HEADER -->
         <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-stone-200 shadow-xs">
@@ -1442,13 +1442,13 @@
             <div class="flex items-center justify-between py-2.5 border-b border-stone-100">
               <!-- LOGO & BRANDING -->
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-700 to-emerald-900 text-white flex items-center justify-center font-bold text-xl shadow-sm ring-2 ring-emerald-800/20">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-700 via-red-800 to-amber-900 text-white flex items-center justify-center font-bold text-xl shadow-sm ring-2 ring-amber-400/40">
                   🌾
                 </div>
                 <div>
                   <div class="flex items-center gap-2">
                     <span class="font-extrabold text-lg sm:text-xl text-stone-900 tracking-tight">${t.appName}</span>
-                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-950 border border-amber-300 font-extrabold">
                       ${t.sihBadge}
                     </span>
                   </div>
@@ -1459,8 +1459,8 @@
               <!-- CONTROLS & STATUS -->
               <div class="flex items-center gap-2 sm:gap-3">
                 <!-- Live Sync Indicator -->
-                <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-900 border border-rose-200">
+                  <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
                   <span class="text-[11px] font-bold">${t.liveSync}</span>
                 </div>
 
@@ -1484,29 +1484,29 @@
             <!-- NAVIGATION ROLES -->
             <nav class="flex items-center space-x-1 sm:space-x-2 py-2 overflow-x-auto no-scrollbar">
               <button onclick="appHandlers.setTab('farmer')"
-                class="flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${state.activeTab === 'farmer' ? 'bg-emerald-800 text-white shadow-sm ring-1 ring-emerald-900' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900'}">
+                class="flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${state.activeTab === 'farmer' ? 'bg-gradient-to-r from-rose-700 to-red-800 text-white shadow-sm ring-1 ring-amber-400/50' : 'text-stone-600 hover:bg-rose-50/60 hover:text-rose-900'}">
                 ${Icons.tractor}
                 <span>${t.tabFarmer}</span>
               </button>
 
               <button onclick="appHandlers.setTab('staff')"
-                class="flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${state.activeTab === 'staff' ? 'bg-emerald-800 text-white shadow-sm ring-1 ring-emerald-900' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900'}">
+                class="flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${state.activeTab === 'staff' ? 'bg-gradient-to-r from-rose-700 to-red-800 text-white shadow-sm ring-1 ring-amber-400/50' : 'text-stone-600 hover:bg-rose-50/60 hover:text-rose-900'}">
                 ${Icons.building}
                 <span>${t.tabStaff}</span>
-                <span class="ml-1 px-1.5 py-0.5 rounded-full text-[10px] bg-emerald-600/30 text-white">4</span>
+                <span class="ml-1 px-1.5 py-0.5 rounded-full text-[10px] bg-amber-400/30 text-white font-bold">4</span>
               </button>
 
               <button onclick="appHandlers.setTab('ministry')"
-                class="flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${state.activeTab === 'ministry' ? 'bg-emerald-800 text-white shadow-sm ring-1 ring-emerald-900' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900'}">
+                class="flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${state.activeTab === 'ministry' ? 'bg-gradient-to-r from-rose-700 to-red-800 text-white shadow-sm ring-1 ring-amber-400/50' : 'text-stone-600 hover:bg-rose-50/60 hover:text-rose-900'}">
                 ${Icons.chart}
                 <span>${t.tabMinistry}</span>
               </button>
 
               <button onclick="appHandlers.setTab('sms')"
-                class="flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${state.activeTab === 'sms' ? 'bg-emerald-800 text-white shadow-sm ring-1 ring-emerald-900' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900'}">
+                class="flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${state.activeTab === 'sms' ? 'bg-gradient-to-r from-rose-700 to-red-800 text-white shadow-sm ring-1 ring-amber-400/50' : 'text-stone-600 hover:bg-rose-50/60 hover:text-rose-900'}">
                 ${Icons.sms}
                 <span>${t.tabSms}</span>
-                <span class="px-1.5 py-0.5 rounded-full text-[10px] font-extrabold ${state.activeTab === 'sms' ? 'bg-white text-emerald-900' : 'bg-amber-100 text-amber-900'}">
+                <span class="px-1.5 py-0.5 rounded-full text-[10px] font-extrabold ${state.activeTab === 'sms' ? 'bg-white text-rose-900' : 'bg-amber-100 text-amber-900'}">
                   ${state.smsList.length}
                 </span>
               </button>
@@ -1522,18 +1522,18 @@
         </header>
 
         <!-- LIVE RATES & PRIVATE MANDI HIGHLIGHT TICKER (VISIBLE ON ALL SCREENS) -->
-        <div class="bg-gradient-to-r from-amber-50 via-stone-50 to-emerald-50 border-b border-stone-200/90 py-2 px-3 sm:px-6 shadow-2xs">
+        <div class="bg-gradient-to-r from-amber-50 via-rose-50/30 to-amber-100/50 border-b border-amber-200/90 py-2 px-3 sm:px-6 shadow-2xs">
           <div class="max-w-7xl mx-auto flex items-center justify-between gap-3 text-xs">
             <div class="flex items-center gap-2.5 overflow-x-auto whitespace-nowrap no-scrollbar py-0.5">
-              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-amber-600 text-white font-extrabold text-[10px] uppercase tracking-wider shadow-2xs shrink-0">
+              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-gradient-to-r from-rose-700 to-amber-600 text-white font-black text-[10px] uppercase tracking-wider shadow-2xs shadow-2xs shrink-0">
                 <span>⚡</span> Live Procurement Rates
               </span>
               <div class="inline-flex items-center gap-2 font-bold text-stone-800 text-[11px]">
                 <span class="text-amber-950 bg-amber-100/90 px-2 py-0.5 rounded border border-amber-300 flex items-center gap-1 shadow-2xs">
-                  <span>🏢</span> <strong>ITC Choupal Saagar (Private):</strong> <span class="font-mono text-emerald-800 font-extrabold">₹2,460/Qtl</span> <span class="text-emerald-700 font-black text-[10px]">(+₹60 Bonus • 15m Fast-Track)</span>
+                  <span>🏢</span> <strong>ITC Choupal Saagar (Private):</strong> <span class="font-mono text-rose-950 font-black">₹2,460/Qtl</span> <span class="text-amber-800 font-black text-[10px]">(+₹60 Bonus • 15m Fast-Track)</span>
                 </span>
                 <span class="text-amber-950 bg-amber-100/90 px-2 py-0.5 rounded border border-amber-300 flex items-center gap-1 shadow-2xs">
-                  <span>🏢</span> <strong>Adani Agri Modern Silo (Private):</strong> <span class="font-mono text-emerald-800 font-extrabold">₹2,450/Qtl</span> <span class="text-emerald-700 font-black text-[10px]">(+₹50 Bonus • 18m Tipper)</span>
+                  <span>🏢</span> <strong>Adani Agri Modern Silo (Private):</strong> <span class="font-mono text-rose-950 font-black">₹2,450/Qtl</span> <span class="text-amber-800 font-black text-[10px]">(+₹50 Bonus • 18m Tipper)</span>
                 </span>
                 <span class="text-stone-700 bg-stone-100 px-2 py-0.5 rounded border border-stone-200 flex items-center gap-1">
                   <span>🏛️</span> <strong>Rau APMC (Govt):</strong> <span class="font-mono text-stone-900 font-bold">₹2,400/Qtl</span> <span class="text-stone-500 font-normal text-[10px]">(Govt MSP)</span>
@@ -1545,7 +1545,7 @@
             </div>
 
             <button onclick="appHandlers.setTab('farmer'); appHandlers.setFarmerStep('choose_mandi');"
-              class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shrink-0 shadow-2xs transition-colors">
+              class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-gradient-to-r from-rose-700 to-red-700 hover:from-rose-800 hover:to-red-800 text-white font-bold text-xs shrink-0 shadow-xs shadow-2xs transition-colors">
               <span>Compare & Book Slot</span>
               <span>➔</span>
             </button>
@@ -1555,7 +1555,7 @@
         <!-- NOTIFICATION TOAST -->
         ${state.notificationToast ? `
           <div class="fixed top-24 right-4 z-50 max-w-sm w-full bg-white rounded-xl shadow-xl border border-stone-200 p-4 animate-slide-in flex items-start gap-3">
-            <div class="w-8 h-8 rounded-lg ${state.notificationToast.type === 'alert' ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'} flex items-center justify-center font-bold text-sm shrink-0">
+            <div class="w-8 h-8 rounded-lg ${state.notificationToast.type === 'alert' ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-950 border border-amber-300'} flex items-center justify-center font-bold text-sm shrink-0">
               ${state.notificationToast.type === 'alert' ? '⚠️' : '🔔'}
             </div>
             <div class="flex-1">
@@ -1572,15 +1572,15 @@
 
         <!-- FLOATING AI AGENT BUTTON (FAB) -->
         <button onclick="appHandlers.toggleAiAgent()"
-          class="fixed bottom-5 right-5 z-40 flex items-center gap-2.5 px-4 py-3 rounded-full bg-gradient-to-r from-emerald-700 via-emerald-800 to-teal-900 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 border-2 border-emerald-400/40 group">
-          <span class="w-3 h-3 rounded-full bg-emerald-400 animate-ping shrink-0"></span>
+          class="fixed bottom-5 right-5 z-40 flex items-center gap-2.5 px-4 py-3 rounded-full bg-gradient-to-r from-rose-700 via-red-800 to-amber-800 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 border-2 border-amber-400/50 group">
+          <span class="w-3 h-3 rounded-full bg-amber-400 animate-ping shrink-0"></span>
           <span class="text-lg shrink-0">🤖</span>
           <div class="text-left">
             <div class="text-xs font-black tracking-tight leading-tight flex items-center gap-1.5">
               <span>Kisan Sahayak AI</span>
               <span class="text-[9px] font-bold bg-amber-400 text-amber-950 px-1.5 py-0.2 rounded-full uppercase">Agent</span>
             </div>
-            <div class="text-[10px] text-emerald-200">Compare Prices & Book Slot</div>
+            <div class="text-[10px] text-amber-200">Compare Prices & Book Slot</div>
           </div>
         </button>
 
@@ -1627,11 +1627,11 @@
             <button onclick="appHandlers.setFarmerStep('register')"
               class="flex items-center gap-2 p-2 sm:p-3 rounded-xl text-left transition-all ${
                 auth.currentStep === 'register' 
-                  ? 'bg-emerald-50 border-2 border-emerald-600 text-emerald-950 font-black shadow-2xs' 
+                  ? 'bg-rose-50 border-2 border-rose-600 text-rose-950 font-black shadow-2xs card-hover-lift' 
                   : 'bg-stone-50 border border-stone-200 text-stone-600 hover:bg-stone-100'
               }">
               <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                auth.isVerified ? 'bg-emerald-600 text-white' : auth.currentStep === 'register' ? 'bg-emerald-700 text-white' : 'bg-stone-300 text-stone-700'
+                auth.isVerified ? 'bg-amber-500 text-amber-950 font-black' : auth.currentStep === 'register' ? 'bg-rose-700 text-white' : 'bg-stone-300 text-stone-700'
               }">
                 ${auth.isVerified ? '✓' : '1'}
               </div>
@@ -1646,11 +1646,11 @@
             <button onclick="appHandlers.setFarmerStep('choose_mandi')"
               class="flex items-center gap-2 p-2 sm:p-3 rounded-xl text-left transition-all ${
                 auth.currentStep === 'choose_mandi' 
-                  ? 'bg-emerald-50 border-2 border-emerald-600 text-emerald-950 font-black shadow-2xs' 
+                  ? 'bg-rose-50 border-2 border-rose-600 text-rose-950 font-black shadow-2xs card-hover-lift' 
                   : auth.isVerified ? 'bg-stone-50 border border-stone-200 text-stone-700 hover:bg-stone-100' : 'bg-stone-100/50 border border-dashed border-stone-300 text-stone-400 cursor-not-allowed'
               }">
               <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                token ? 'bg-emerald-600 text-white' : auth.currentStep === 'choose_mandi' ? 'bg-emerald-700 text-white' : 'bg-stone-300 text-stone-700'
+                token ? 'bg-amber-500 text-amber-950 font-black' : auth.currentStep === 'choose_mandi' ? 'bg-rose-700 text-white' : 'bg-stone-300 text-stone-700'
               }">
                 ${token ? '✓' : '2'}
               </div>
@@ -1665,11 +1665,11 @@
             <button onclick="${token ? "appHandlers.setFarmerStep('active_pass')" : "alert('No active gate pass yet. Complete Mandi slot booking in Step 2 to generate your pass.')"}"
               class="flex items-center gap-2 p-2 sm:p-3 rounded-xl text-left transition-all ${
                 auth.currentStep === 'active_pass' 
-                  ? 'bg-emerald-50 border-2 border-emerald-600 text-emerald-950 font-black shadow-2xs' 
+                  ? 'bg-rose-50 border-2 border-rose-600 text-rose-950 font-black shadow-2xs card-hover-lift' 
                   : token ? 'bg-stone-50 border border-stone-200 text-stone-700 hover:bg-stone-100' : 'bg-stone-100/50 border border-dashed border-stone-300 text-stone-400 cursor-not-allowed'
               }">
               <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                auth.currentStep === 'active_pass' ? 'bg-emerald-700 text-white' : token ? 'bg-emerald-600 text-white' : 'bg-stone-300 text-stone-700'
+                auth.currentStep === 'active_pass' ? 'bg-rose-700 text-white' : token ? 'bg-amber-500 text-amber-950 font-black' : 'bg-stone-300 text-stone-700'
               }">
                 3
               </div>
@@ -1702,35 +1702,35 @@
     return `
       <div class="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden animate-fade-in">
         <!-- HEADER BANNER -->
-        <div class="bg-gradient-to-r from-emerald-800 via-emerald-900 to-teal-950 text-white p-5 sm:p-6">
+        <div class="bg-gradient-to-r from-rose-800 via-red-900 to-amber-950 text-white p-5 sm:p-6 border-b-2 border-amber-400/40">
           <div class="flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center gap-3.5">
               <div class="w-12 h-12 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-2xl shadow-xs">
                 👨‍🌾
               </div>
               <div>
-                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/15 text-emerald-100 border border-white/20 mb-1">
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/15 text-amber-200 border border-amber-300/30 mb-1">
                   <span>🔒 Step 1 of 3 • Government e-KYC Verification</span>
                 </div>
                 <h2 class="text-xl sm:text-2xl font-black tracking-tight">Farmer Registration & Bank DBT Dashboard</h2>
-                <p class="text-xs text-emerald-200/90 mt-0.5">Enter farmer profile, Aadhaar, and Bank Account details for MSP procurement.</p>
+                <p class="text-xs text-amber-200/90 mt-0.5">Enter farmer profile, Aadhaar, and Bank Account details for MSP procurement.</p>
               </div>
             </div>
 
             <!-- Pre-fill 1-Click Judge Buttons -->
             <div class="bg-white/10 p-2.5 rounded-xl border border-white/20 text-xs text-right">
-              <span class="block text-[10px] font-bold uppercase tracking-wider text-emerald-200 mb-1.5">⚡ Judge 1-Click Quick Fill:</span>
+              <span class="block text-[10px] font-bold uppercase tracking-wider text-amber-200 mb-1.5">⚡ Judge 1-Click Quick Fill:</span>
               <div class="flex flex-wrap gap-1.5 justify-end">
                 <button type="button" onclick="appHandlers.prefillFarmerRegistration('FARMER-01')"
-                  class="px-2.5 py-1 rounded-lg bg-white text-emerald-900 hover:bg-emerald-50 text-[11px] font-bold shadow-2xs transition-colors">
+                  class="px-2.5 py-1 rounded-lg bg-white text-rose-900 hover:bg-amber-50 text-[11px] font-bold border border-amber-200 shadow-2xs transition-colors">
                   Ramesh Kumar (Rau)
                 </button>
                 <button type="button" onclick="appHandlers.prefillFarmerRegistration('FARMER-02')"
-                  class="px-2.5 py-1 rounded-lg bg-white text-emerald-900 hover:bg-emerald-50 text-[11px] font-bold shadow-2xs transition-colors">
+                  class="px-2.5 py-1 rounded-lg bg-white text-rose-900 hover:bg-amber-50 text-[11px] font-bold border border-amber-200 shadow-2xs transition-colors">
                   Suresh Patel (Rangwasa)
                 </button>
                 <button type="button" onclick="appHandlers.prefillFarmerRegistration('FARMER-03')"
-                  class="px-2.5 py-1 rounded-lg bg-white text-emerald-900 hover:bg-emerald-50 text-[11px] font-bold shadow-2xs transition-colors">
+                  class="px-2.5 py-1 rounded-lg bg-white text-rose-900 hover:bg-amber-50 text-[11px] font-bold border border-amber-200 shadow-2xs transition-colors">
                   Rajesh Verma (Sanwer)
                 </button>
                 <button type="button" onclick="appHandlers.clearRegistrationForm()"
@@ -1745,7 +1745,7 @@
         <!-- FORM CONTENT -->
         
         <!-- PROMINENT PROCUREMENT CHANNELS SHOWCASE (Govt APMC & Private Mandis) -->
-        <div class="m-5 sm:m-6 p-4 rounded-2xl bg-gradient-to-br from-amber-50 via-stone-50 to-emerald-50 border-2 border-amber-300 shadow-xs space-y-3">
+        <div class="m-5 sm:m-6 p-4 rounded-2xl bg-gradient-to-br from-amber-50 via-rose-50/20 to-amber-100/40 border-2 border-amber-300 shadow-xs space-y-3">
           <div class="flex flex-wrap items-center justify-between gap-2 border-b border-amber-200/80 pb-2.5">
             <div class="flex items-center gap-2">
               <span class="text-xl">🏢</span>
@@ -1755,7 +1755,7 @@
               </div>
             </div>
             <button type="button" onclick="appHandlers.setFarmerStep('choose_mandi')"
-              class="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs shadow-2xs transition-all hover:scale-102 flex items-center gap-1.5">
+              class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-black text-xs shadow-xs transition-all hover:scale-102 flex items-center gap-1.5">
               <span>👉 Browse All Mandis & Private Rates (Step 2)</span>
               <span>➔</span>
             </button>
@@ -1768,11 +1768,11 @@
                 <span class="px-2 py-0.5 rounded text-[10px] font-black bg-amber-100 text-amber-950 border border-amber-300">
                   🏢 LICENSED PRIVATE MANDIS
                 </span>
-                <span class="font-mono text-emerald-800 font-black text-sm">₹2,460 / Qtl</span>
+                <span class="font-mono text-rose-900 font-black text-sm">₹2,460 / Qtl</span>
               </div>
               <div class="font-bold text-stone-900 text-xs">ITC Choupal Saagar & Adani Modern Silo</div>
               <ul class="text-[11px] text-stone-600 space-y-0.5">
-                <li class="flex items-center gap-1 text-emerald-800 font-bold">
+                <li class="flex items-center gap-1 text-amber-900 font-bold">
                   <span>✓</span> <span>⚡ +₹60/Qtl Private Bonus over Govt MSP</span>
                 </li>
                 <li class="flex items-center gap-1">
@@ -1787,7 +1787,7 @@
             <!-- Option B: Govt APMC -->
             <div class="p-3 bg-white rounded-xl border border-stone-200 shadow-2xs space-y-1.5">
               <div class="flex items-center justify-between">
-                <span class="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-100 text-emerald-950 border border-emerald-300">
+                <span class="px-2 py-0.5 rounded text-[10px] font-black bg-rose-100 text-rose-950 border border-rose-300">
                   🏛️ GOVERNMENT APMC YARDS
                 </span>
                 <span class="font-mono text-stone-900 font-bold text-sm">₹2,400 / Qtl</span>
@@ -1821,7 +1821,7 @@
                 <input type="text" required value="${auth.name}"
                   oninput="state.farmerAuth.name = this.value"
                   placeholder="e.g. Ramesh Kumar"
-                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-bold text-stone-900 focus:ring-2 focus:ring-emerald-500 bg-white">
+                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-bold text-stone-900 focus:ring-2 focus:ring-rose-500 bg-white">
               </div>
 
               <div>
@@ -1829,7 +1829,7 @@
                 <input type="text" required value="${auth.village}"
                   oninput="state.farmerAuth.village = this.value"
                   placeholder="e.g. Rau Village, Indore"
-                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-bold text-stone-900 focus:ring-2 focus:ring-emerald-500 bg-white">
+                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-bold text-stone-900 focus:ring-2 focus:ring-rose-500 bg-white">
               </div>
 
               <div>
@@ -1837,7 +1837,7 @@
                 <input type="text" required value="${auth.phone}"
                   oninput="state.farmerAuth.phone = this.value"
                   placeholder="+91 9876543210"
-                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-mono font-bold text-stone-900 focus:ring-2 focus:ring-emerald-500 bg-white">
+                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-mono font-bold text-stone-900 focus:ring-2 focus:ring-rose-500 bg-white">
               </div>
             </div>
           </div>
@@ -1851,20 +1851,20 @@
               <div>
                 <label class="block font-bold text-stone-700 mb-1 flex justify-between">
                   <span>12-Digit Aadhaar Number *</span>
-                  <span class="text-emerald-700 font-mono text-[10px]">UIDAI Integrated</span>
+                  <span class="text-rose-700 font-mono text-[10px]">UIDAI Integrated</span>
                 </label>
                 <input type="text" maxlength="14" required value="${auth.aadhaar}"
                   oninput="state.farmerAuth.aadhaar = this.value"
                   placeholder="1234 5678 9012"
-                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-mono font-black text-sm tracking-widest text-emerald-950 focus:ring-2 focus:ring-emerald-500 bg-white">
+                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-mono font-black text-sm tracking-widest text-rose-950 focus:ring-2 focus:ring-rose-500 bg-white">
                 <span class="text-[10px] text-stone-500 mt-1 block">Aadhaar will be validated via simulated OTP verification</span>
               </div>
 
-              <div class="p-3 bg-emerald-50/70 rounded-xl border border-emerald-200 space-y-1 text-xs">
-                <div class="font-bold text-emerald-900 flex items-center gap-1.5">
+              <div class="p-3 bg-amber-50/80 rounded-xl border border-amber-200 space-y-1 text-xs">
+                <div class="font-bold text-amber-950 flex items-center gap-1.5">
                   <span>🛡️</span> Aadhaar e-KYC Guarantee
                 </div>
-                <p class="text-[11px] text-emerald-800 leading-relaxed">
+                <p class="text-[11px] text-stone-700 leading-relaxed">
                   Direct Aadhaar seeding ensures transparent MSP payment transfers without middlemen or identity duplication.
                 </p>
               </div>
@@ -1882,7 +1882,7 @@
                 <input type="text" required value="${auth.bankName}"
                   oninput="state.farmerAuth.bankName = this.value"
                   placeholder="e.g. State Bank of India (SBI)"
-                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-bold text-stone-900 focus:ring-2 focus:ring-emerald-500 bg-white">
+                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-bold text-stone-900 focus:ring-2 focus:ring-rose-500 bg-white">
               </div>
 
               <div>
@@ -1890,7 +1890,7 @@
                 <input type="text" required value="${auth.bankAcc}"
                   oninput="state.farmerAuth.bankAcc = this.value"
                   placeholder="e.g. 308941204091"
-                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-mono font-bold text-stone-900 focus:ring-2 focus:ring-emerald-500 bg-white">
+                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-mono font-bold text-stone-900 focus:ring-2 focus:ring-rose-500 bg-white">
               </div>
 
               <div>
@@ -1898,17 +1898,17 @@
                 <input type="text" required value="${auth.ifsc}"
                   oninput="state.farmerAuth.ifsc = this.value"
                   placeholder="e.g. SBIN0030128"
-                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-mono font-bold uppercase text-stone-900 focus:ring-2 focus:ring-emerald-500 bg-white">
+                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-mono font-bold uppercase text-stone-900 focus:ring-2 focus:ring-rose-500 bg-white">
               </div>
             </div>
 
             <!-- DBT Seeding Badge -->
             <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between text-xs">
               <div class="flex items-center gap-2">
-                <span class="text-emerald-600 font-bold text-base">✓</span>
-                <span class="text-stone-700 font-semibold">NPCI Aadhaar Payment Bridge: <strong class="text-emerald-800">${auth.dbtStatus}</strong></span>
+                <span class="text-amber-600 font-bold text-base">✓</span>
+                <span class="text-stone-700 font-semibold">NPCI Aadhaar Payment Bridge: <strong class="text-rose-900 font-black">${auth.dbtStatus}</strong></span>
               </div>
-              <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">T+0 DBT Active</span>
+              <span class="text-[10px] bg-amber-100 text-amber-950 font-bold px-2 py-0.5 rounded border border-amber-300">T+0 DBT Active</span>
             </div>
           </div>
 
@@ -1923,7 +1923,7 @@
                 <input type="text" value="${auth.khasraNo}"
                   oninput="state.farmerAuth.khasraNo = this.value"
                   placeholder="214/1-क"
-                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-mono font-bold text-stone-900 focus:ring-2 focus:ring-emerald-500 bg-white">
+                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-mono font-bold text-stone-900 focus:ring-2 focus:ring-rose-500 bg-white">
               </div>
 
               <div>
@@ -1931,14 +1931,14 @@
                 <input type="text" value="${auth.landArea}"
                   oninput="state.farmerAuth.landArea = this.value"
                   placeholder="4.2 Hectares"
-                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-bold text-stone-900 focus:ring-2 focus:ring-emerald-500 bg-white">
+                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-bold text-stone-900 focus:ring-2 focus:ring-rose-500 bg-white">
               </div>
 
               <div>
                 <label class="block font-bold text-stone-700 mb-1">Permissible Wheat Quota</label>
-                <div class="px-3 py-2 rounded-xl border border-emerald-300 bg-emerald-50/60 font-mono font-black text-emerald-900 flex justify-between items-center">
+                <div class="px-3 py-2 rounded-xl border border-amber-300 bg-amber-50/70 font-mono font-black text-amber-950 flex justify-between items-center">
                   <span>${auth.quotaWheat} Quintals</span>
-                  <span class="text-[10px] text-emerald-700 font-bold">Bhulekh Verified</span>
+                  <span class="text-[10px] text-amber-800 font-bold">Bhulekh Verified</span>
                 </div>
               </div>
             </div>
@@ -1969,14 +1969,14 @@
               <div onclick="state.preferredMandiType = 'government'; state.mandiFilter = 'government'; render();"
                 class="p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
                   state.preferredMandiType === 'government'
-                    ? 'border-emerald-600 bg-emerald-50/70 ring-2 ring-emerald-500/20 shadow-xs'
+                    ? 'border-rose-600 bg-rose-50/80 ring-2 ring-rose-500/25 shadow-xs'
                     : 'border-stone-200 bg-white hover:border-stone-300'
                 }">
                 <div class="flex items-center justify-between">
                   <span class="font-extrabold text-stone-900 flex items-center gap-1.5">
                     <span>🏛️</span> Government APMC Mandi (Rau / Indore)
                   </span>
-                  ${state.preferredMandiType === 'government' ? '<span class="text-emerald-700 text-xs font-black">✓ Selected</span>' : ''}
+                  ${state.preferredMandiType === 'government' ? '<span class="text-rose-700 text-xs font-black">✓ Selected</span>' : ''}
                 </div>
                 <p class="text-[11px] text-stone-600 mt-1">Standard Government MSP procurement at official state mandis with PFMS DBT bank credit.</p>
               </div>
@@ -1988,7 +1988,7 @@
             <span class="text-xs text-stone-500">All fields verified with UIDAI & MP Bhulekh Portal</span>
             
             <button type="submit" ${auth.isAuthenticating ? 'disabled' : ''}
-              class="px-6 py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs sm:text-sm shadow-md flex items-center gap-2 transition-all hover:scale-[1.02]">
+              class="px-6 py-3 rounded-xl bg-gradient-to-r from-rose-700 via-rose-800 to-red-800 hover:from-rose-800 hover:to-red-900 text-white font-extrabold text-xs sm:text-sm shadow-md flex items-center gap-2 transition-all hover:scale-[1.02]">
               <span>${auth.isAuthenticating ? 'Authenticating with UIDAI...' : 'Verify Details & Proceed to Mandi Selection (Govt & Private) ➔'}</span>
             </button>
           </div>
@@ -2011,7 +2011,7 @@
 
               <input type="text" maxlength="6" value="${auth.otpInput}"
                 oninput="state.farmerAuth.otpInput = this.value"
-                class="w-full text-center tracking-widest font-mono text-2xl py-2.5 bg-stone-50 rounded-xl border-2 border-emerald-600 font-black text-stone-900 outline-none">
+                class="w-full text-center tracking-widest font-mono text-2xl py-2.5 bg-stone-50 rounded-xl border-2 border-rose-600 font-black text-stone-900 outline-none">
 
               <div class="flex gap-2">
                 <button type="button" onclick="state.farmerAuth.otpSent = false; render();"
@@ -2019,7 +2019,7 @@
                   Cancel
                 </button>
                 <button type="button" onclick="appHandlers.verifyFarmerOtp(event)"
-                  class="flex-1 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-xs">
+                  class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-rose-700 to-red-700 hover:from-rose-800 hover:to-red-800 text-white font-bold text-xs shadow-xs">
                   Verify & Continue ➔
                 </button>
               </div>
@@ -2054,17 +2054,17 @@
       <div class="space-y-6 animate-fade-in">
         
         <!-- VERIFIED FARMER SUMMARY PILL -->
-        <div class="bg-emerald-900 text-white p-4 rounded-2xl shadow-xs flex flex-wrap items-center justify-between gap-3">
+        <div class="bg-gradient-to-r from-rose-900 via-red-900 to-amber-950 text-white p-4 rounded-2xl shadow-xs border border-amber-400/30 flex flex-wrap items-center justify-between gap-3">
           <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-lg bg-emerald-800 border border-emerald-700 flex items-center justify-center font-bold text-lg">
+            <div class="w-9 h-9 rounded-lg bg-amber-500 text-amber-950 font-black border border-amber-400 flex items-center justify-center font-bold text-lg">
               ✓
             </div>
             <div>
               <div class="flex items-center gap-2">
                 <span class="font-extrabold text-sm sm:text-base">${auth.name}</span>
-                <span class="px-2 py-0.2 rounded text-[10px] font-bold bg-emerald-500/30 text-emerald-200 border border-emerald-400/30">e-KYC Verified</span>
+                <span class="px-2 py-0.2 rounded text-[10px] font-bold bg-amber-400/30 text-amber-200 border border-amber-400/40">e-KYC Verified</span>
               </div>
-              <p class="text-xs text-emerald-200">${auth.village} • Aadhaar: ${auth.aadhaar.slice(0, 4)} •••• ${auth.aadhaar.slice(-4)} • ${auth.bankName} (A/C •••• ${auth.bankAcc.slice(-4)})</p>
+              <p class="text-xs text-amber-200">${auth.village} • Aadhaar: ${auth.aadhaar.slice(0, 4)} •••• ${auth.aadhaar.slice(-4)} • ${auth.bankName} (A/C •••• ${auth.bankAcc.slice(-4)})</p>
             </div>
           </div>
 
@@ -2077,7 +2077,7 @@
         <!-- MAIN BOOKING CONTAINER -->
         <div class="bg-white rounded-2xl border border-stone-200 p-5 sm:p-7 shadow-sm space-y-6">
           <div>
-            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 mb-1">
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-900 border border-rose-200 mb-1">
               <span>🌾 Step 2 of 3 • Slot Scheduling</span>
             </div>
             <h2 class="text-xl sm:text-2xl font-black text-stone-900 tracking-tight">Choose Mandi & Schedule Delivery Slot</h2>
@@ -2096,24 +2096,21 @@
               <div class="flex items-center gap-2 pb-1 overflow-x-auto no-scrollbar">
                 <button type="button" onclick="appHandlers.setMandiFilter('all')"
                   class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    state.mandiFilter === 'all' 
-                      ? 'bg-emerald-800 text-white shadow-2xs' 
+                    state.mandiFilter === 'all' ? 'bg-gradient-to-r from-rose-700 to-red-800 text-white shadow-2xs font-extrabold' 
                       : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
                   }">
                   All Procurement Centers (6)
                 </button>
                 <button type="button" onclick="appHandlers.setMandiFilter('government')"
                   class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    state.mandiFilter === 'government' 
-                      ? 'bg-emerald-800 text-white shadow-2xs' 
+                    state.mandiFilter === 'government' ? 'bg-gradient-to-r from-rose-700 to-red-800 text-white shadow-2xs font-extrabold' 
                       : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
                   }">
                   🏛️ Government APMC Mandis (4)
                 </button>
                 <button type="button" onclick="appHandlers.setMandiFilter('private')"
                   class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    state.mandiFilter === 'private' 
-                      ? 'bg-amber-600 text-white shadow-2xs' 
+                    state.mandiFilter === 'private' ? 'bg-gradient-to-r from-amber-600 to-amber-700 text-white shadow-2xs font-extrabold' 
                       : 'bg-amber-50 text-amber-900 border border-amber-200 hover:bg-amber-100'
                   }">
                   🏢 Private Mandis & Silos (2)
@@ -2126,24 +2123,24 @@
                   <div onclick="appHandlers.selectBookingMandi('${m.id}')"
                     class="p-4 rounded-xl border-2 cursor-pointer transition-all ${
                       form.mandiId === m.id 
-                        ? (m.type === 'private' ? 'border-amber-500 bg-amber-50/70 shadow-sm ring-2 ring-amber-400/30' : 'border-emerald-600 bg-emerald-50/70 shadow-sm ring-2 ring-emerald-500/30')
+                        ? (m.type === 'private' ? 'border-amber-500 bg-amber-50/70 shadow-sm ring-2 ring-amber-400/30' : 'border-rose-600 bg-rose-50/70 shadow-sm ring-2 ring-rose-500/30')
                         : 'border-stone-200 bg-stone-50/60 hover:bg-white hover:border-stone-300'
                     }">
                     <div class="flex items-start justify-between">
                       <div>
                         <div class="font-extrabold text-sm text-stone-900 flex items-center gap-1.5">
                           <span>${m.name.split('(')[0]}</span>
-                          ${form.mandiId === m.id ? '<span class="' + (m.type === 'private' ? 'text-amber-800' : 'text-emerald-700') + ' text-xs font-black">✓ Selected</span>' : ''}
+                          ${form.mandiId === m.id ? '<span class="' + (m.type === 'private' ? 'text-amber-800' : 'text-amber-800') + ' text-xs font-black">✓ Selected</span>' : ''}
                         </div>
                         <div class="flex items-center gap-1.5 mt-0.5">
-                          <span class="px-1.5 py-0.2 rounded text-[9px] font-extrabold ${m.type === 'private' ? 'bg-amber-100 text-amber-950 border border-amber-300' : 'bg-emerald-100 text-emerald-950 border border-emerald-300'}">
+                          <span class="px-1.5 py-0.2 rounded text-[9px] font-extrabold ${m.type === 'private' ? 'bg-amber-100 text-amber-950 border border-amber-300' : 'bg-rose-100 text-rose-950 border border-rose-300'}">
                             ${m.type === 'private' ? '🏢 Private Mandi' : '🏛️ Govt APMC'}
                           </span>
                           <span class="text-[11px] text-stone-500">${m.district} • ${m.distanceKm || '6.8'} km</span>
                         </div>
                       </div>
                       <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
-                        m.capacityPercent > 75 ? 'bg-amber-100 text-amber-900' : 'bg-emerald-100 text-emerald-900'
+                        m.capacityPercent > 75 ? 'bg-amber-100 text-amber-900' : 'bg-rose-100 text-rose-900'
                       }">
                         ~${m.avgWaitMins}m wait
                       </span>
@@ -2152,7 +2149,7 @@
                     <div class="grid grid-cols-2 gap-2 mt-3 pt-2.5 border-t border-stone-200/70 text-xs">
                       <div>
                         <span class="text-[10px] text-stone-400 block">Today's Rate:</span>
-                        <strong class="font-mono text-emerald-900 font-extrabold text-sm">₹${cropRate.total + (m.priceOffset || 0)} / Qtl</strong>
+                        <strong class="font-mono text-rose-900 font-extrabold text-sm">₹${cropRate.total + (m.priceOffset || 0)} / Qtl</strong>
                         <span class="text-[9px] font-bold ${m.type === 'private' ? 'text-amber-800' : 'text-stone-500'} block">
                           ${m.type === 'private' ? '+₹' + m.priceOffset + ' Private Premium' : (m.priceOffset > 0 ? '+₹' + m.priceOffset + ' Volume Premium' : 'Official Govt MSP')}
                         </span>
@@ -2169,16 +2166,16 @@
             </div>
 
             <!-- DYNAMIC MANDI ESTIMATION & VALUATION DASHBOARD (CHANGES AS PER CHOSEN MANDI) -->
-            <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-br ${selectedMandi.type === 'private' ? 'from-amber-50 via-stone-50 to-emerald-50 border-2 border-amber-400 shadow-sm' : 'from-emerald-50 via-stone-50 to-teal-50 border-2 border-emerald-400 shadow-sm'} space-y-4 animate-fade-in">
+            <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-br ${selectedMandi.type === 'private' ? 'from-amber-50 via-white to-rose-50/30 border-2 border-amber-400 shadow-md' : 'from-rose-50 via-white to-amber-50/40 border-2 border-rose-300 shadow-md'} space-y-4 animate-fade-in">
               <div class="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200/80 pb-3">
                 <div class="flex items-center gap-2.5">
-                  <div class="w-10 h-10 rounded-xl ${selectedMandi.type === 'private' ? 'bg-amber-500 text-stone-950 font-black' : 'bg-emerald-700 text-white font-black'} flex items-center justify-center text-xl shadow-2xs">
+                  <div class="w-10 h-10 rounded-xl ${selectedMandi.type === 'private' ? 'bg-amber-500 text-stone-950 font-black' : 'bg-gradient-to-r from-rose-700 to-red-700 text-white font-black'} flex items-center justify-center text-xl shadow-2xs">
                     ${selectedMandi.type === 'private' ? '🏢' : '🏛️'}
                   </div>
                   <div>
                     <div class="flex items-center gap-2">
                       <span class="font-black text-sm sm:text-base text-stone-900">${selectedMandi.name}</span>
-                      <span class="px-2 py-0.2 rounded text-[10px] font-black ${selectedMandi.type === 'private' ? 'bg-amber-100 text-amber-950 border border-amber-300' : 'bg-emerald-100 text-emerald-950 border border-emerald-300'}">
+                      <span class="px-2 py-0.2 rounded text-[10px] font-black ${selectedMandi.type === 'private' ? 'bg-amber-100 text-amber-950 border border-amber-300' : 'bg-rose-100 text-rose-950 border border-rose-300'}">
                         ${selectedMandi.type === 'private' ? '🏢 Licensed Private Mandi' : '🏛️ Govt APMC'}
                       </span>
                     </div>
@@ -2188,7 +2185,7 @@
 
                 <div class="text-right">
                   <span class="text-[10px] uppercase font-bold text-stone-400 block">Selected Procurement Hub</span>
-                  <span class="font-mono font-extrabold text-xs text-emerald-800 bg-white px-2.5 py-0.5 rounded border border-emerald-300 shadow-2xs inline-block mt-0.5">
+                  <span class="font-mono font-extrabold text-xs text-amber-950 bg-white px-2.5 py-0.5 rounded border border-amber-300 font-black shadow-2xs inline-block mt-0.5">
                     Live Queue: ${selectedMandi.queueLength} Trucks Ahead
                   </span>
                 </div>
@@ -2199,19 +2196,19 @@
                 <!-- Metric 1: Effective Price per Qtl -->
                 <div class="p-3 bg-white rounded-xl border border-stone-200 shadow-2xs space-y-0.5">
                   <span class="text-[10px] uppercase font-extrabold text-stone-400 block">Effective Rate</span>
-                  <div class="font-mono text-lg font-black text-emerald-950">
+                  <div class="font-mono text-lg font-black text-rose-950">
                     ₹${effectiveRate}
                     <span class="text-[11px] font-bold text-stone-500">/ Qtl</span>
                   </div>
                   <div class="text-[10px] text-stone-500">
-                    Base: ₹${baseRate} ${mandiOffset > 0 ? `<span class="text-emerald-700 font-bold">(+₹${mandiOffset} Bonus)</span>` : ''}
+                    Base: ₹${baseRate} ${mandiOffset > 0 ? `<span class="text-amber-800 font-bold">(+₹${mandiOffset} Bonus)</span>` : ''}
                   </div>
                 </div>
 
                 <!-- Metric 2: Total Estimated Payout -->
                 <div class="p-3 bg-white rounded-xl border border-stone-200 shadow-2xs space-y-0.5">
                   <span class="text-[10px] uppercase font-extrabold text-stone-400 block">Total Est. Payout</span>
-                  <div class="font-mono text-lg font-black text-emerald-900">
+                  <div class="font-mono text-lg font-black text-rose-900">
                     ₹${totalEstPayout.toLocaleString('en-IN')}
                   </div>
                   <div class="text-[10px] ${bonusPayout > 0 ? 'text-amber-800 font-bold' : 'text-stone-500'}">
@@ -2222,7 +2219,7 @@
                 <!-- Metric 3: Yard Wait & Turnaround Time -->
                 <div class="p-3 bg-white rounded-xl border border-stone-200 shadow-2xs space-y-0.5">
                   <span class="text-[10px] uppercase font-extrabold text-stone-400 block">Est. Yard Wait</span>
-                  <div class="font-mono text-lg font-black ${yardWaitMins <= 20 ? 'text-emerald-700' : 'text-amber-700'}">
+                  <div class="font-mono text-lg font-black ${yardWaitMins <= 20 ? 'text-rose-700' : 'text-amber-700'}">
                     ~${yardWaitMins} Mins
                   </div>
                   <div class="text-[10px] text-stone-500">
@@ -2291,21 +2288,21 @@
                 </div>
 
                 <!-- Live Calculated Payout Card (with Chosen Mandi Rate) -->
-                <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-300 space-y-1">
+                <div class="p-3 bg-gradient-to-br from-amber-50 to-rose-50/40 rounded-xl border border-amber-300 space-y-1">
                   <div class="flex justify-between items-center">
-                    <span class="text-[10px] text-emerald-800 uppercase font-extrabold block">Estimated Settlement Payout</span>
-                    <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-emerald-200 text-emerald-900 font-mono">@ ₹${effectiveRate}/Qtl</span>
+                    <span class="text-[10px] text-stone-700 uppercase font-extrabold block">Estimated Settlement Payout</span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-amber-200 text-amber-950 font-black font-mono">@ ₹${effectiveRate}/Qtl</span>
                   </div>
-                  <div class="font-mono text-xl font-black text-emerald-950 mt-0.5">
+                  <div class="font-mono text-xl font-black text-rose-950 mt-0.5">
                     ₹${totalEstPayout.toLocaleString('en-IN')}
                   </div>
-                  <div class="text-[10px] text-stone-600 flex justify-between pt-0.5 border-t border-emerald-200/60">
+                  <div class="text-[10px] text-stone-600 flex justify-between pt-0.5 border-t border-amber-200/60">
                     <span>Base MSP: ₹${(qty * baseRate).toLocaleString('en-IN')}</span>
                     <span class="font-bold ${mandiOffset > 0 ? 'text-amber-800' : 'text-stone-500'}">
                       ${mandiOffset > 0 ? `+₹${(qty * mandiOffset).toLocaleString('en-IN')} (${selectedMandi.name.split(' ')[0]} Bonus)` : 'Govt MSP'}
                     </span>
                   </div>
-                  <span class="text-[10px] text-emerald-700 block font-medium">Channel: ${paymentMode}</span>
+                  <span class="text-[10px] text-amber-900 block font-bold">Channel: ${paymentMode}</span>
                 </div>
               </div>
             </div>
@@ -2355,7 +2352,7 @@
               </button>
 
               <button type="submit" ${form.isSubmitting ? 'disabled' : ''}
-                class="px-7 py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs sm:text-sm shadow-md flex items-center gap-2 transition-all hover:scale-[1.02]">
+                class="px-7 py-3 rounded-xl bg-gradient-to-r from-rose-700 via-rose-800 to-red-800 hover:from-rose-800 hover:to-red-900 text-white font-extrabold text-xs sm:text-sm shadow-md flex items-center gap-2 transition-all hover:scale-[1.02]">
                 <span>${form.isSubmitting ? 'Generating Token...' : `Confirm Slot for ${selectedMandi.name.split('(')[0]} (Est. ₹${totalEstPayout.toLocaleString('en-IN')}) ➔`}</span>
               </button>
             </div>
@@ -2382,15 +2379,15 @@
       <!-- DIGITAL GATE PASS CARD -->
       <div id="printable-pass" class="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
         <!-- PASS HEADER -->
-        <div class="bg-gradient-to-r from-emerald-800 via-emerald-900 to-teal-950 text-white p-5 sm:p-6 relative">
+        <div class="bg-gradient-to-r from-rose-800 via-red-900 to-amber-950 text-white p-5 sm:p-6 border-b-2 border-amber-400/40 relative">
           <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white/15 text-emerald-100 border border-white/20 mb-1">
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white/15 text-amber-200 border border-amber-300/30 mb-1">
                 <span>🎫 Digital Gate Pass • ${mandi.type === 'private' ? '🏢 Licensed Private Mandi' : '🏛️ Government APMC'}</span>
               </div>
               <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight font-mono">${token.id}</h2>
-              <p class="text-xs text-emerald-200 mt-0.5">${token.crop} (${token.variety}) • ${token.quantityQuintals} Quintals • <strong>${mandi.name}</strong></p>
-              <div class="text-[11px] text-emerald-100/90 mt-1 flex flex-wrap gap-2">
+              <p class="text-xs text-amber-200 mt-0.5">${token.crop} (${token.variety}) • ${token.quantityQuintals} Quintals • <strong>${mandi.name}</strong></p>
+              <div class="text-[11px] text-amber-100/90 mt-1 flex flex-wrap gap-2">
                 <span>Operator: ${mandi.operator}</span>
                 <span>•</span>
                 <span>Lic: ${mandi.licenseNo || 'APMC-MP-IND-01'}</span>
@@ -2419,7 +2416,7 @@
             </div>
             <div class="p-3 bg-stone-50 rounded-xl border border-stone-200">
               <div class="text-[10px] uppercase font-bold text-stone-400">Current Serving</div>
-              <div class="text-xs sm:text-sm font-mono font-bold text-emerald-800 mt-0.5">${mandi.currentServingToken}</div>
+              <div class="text-xs sm:text-sm font-mono font-bold text-rose-900 mt-0.5">${mandi.currentServingToken}</div>
             </div>
             <div class="p-3 bg-stone-50 rounded-xl border border-stone-200">
               <div class="text-[10px] uppercase font-bold text-stone-400">Vehicles Ahead</div>
@@ -2440,7 +2437,7 @@
               
               <!-- Step 1: Booked -->
               <div class="relative z-10 flex flex-col items-center">
-                <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold ring-4 ring-white">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-r from-rose-600 to-amber-600 text-white flex items-center justify-center text-xs font-bold ring-4 ring-white">
                   ✓
                 </div>
                 <span class="text-[10px] font-bold text-stone-800 mt-1">Booked</span>
@@ -2448,34 +2445,34 @@
 
               <!-- Step 2: In-Transit -->
               <div class="relative z-10 flex flex-col items-center">
-                <div class="w-8 h-8 rounded-full ${isTransit || isAtGate || isQC || isWeigh || isCompleted ? 'bg-emerald-600 text-white' : 'bg-stone-200 text-stone-600'} flex items-center justify-center text-xs font-bold ring-4 ring-white">
+                <div class="w-8 h-8 rounded-full ${isTransit || isAtGate || isQC || isWeigh || isCompleted ? 'bg-gradient-to-r from-rose-600 to-amber-600 text-white' : 'bg-stone-200 text-stone-600'} flex items-center justify-center text-xs font-bold ring-4 ring-white">
                   ${isTransit || isAtGate || isQC || isWeigh || isCompleted ? '✓' : '2'}
                 </div>
-                <span class="text-[10px] font-bold ${isTransit ? 'text-emerald-700' : 'text-stone-600'} mt-1">Transit</span>
+                <span class="text-[10px] font-bold ${isTransit ? 'text-rose-700 font-bold' : 'text-stone-600'} mt-1">Transit</span>
               </div>
 
               <!-- Step 3: Gate Entry -->
               <div class="relative z-10 flex flex-col items-center">
-                <div class="w-8 h-8 rounded-full ${isAtGate || isQC || isWeigh || isCompleted ? 'bg-emerald-600 text-white' : 'bg-stone-200 text-stone-600'} flex items-center justify-center text-xs font-bold ring-4 ring-white">
+                <div class="w-8 h-8 rounded-full ${isAtGate || isQC || isWeigh || isCompleted ? 'bg-gradient-to-r from-rose-600 to-amber-600 text-white' : 'bg-stone-200 text-stone-600'} flex items-center justify-center text-xs font-bold ring-4 ring-white">
                   ${isAtGate || isQC || isWeigh || isCompleted ? '✓' : '3'}
                 </div>
-                <span class="text-[10px] font-bold ${isAtGate ? 'text-emerald-700' : 'text-stone-600'} mt-1">Gate Entry</span>
+                <span class="text-[10px] font-bold ${isAtGate ? 'text-rose-700 font-bold' : 'text-stone-600'} mt-1">Gate Entry</span>
               </div>
 
               <!-- Step 4: Quality Check -->
               <div class="relative z-10 flex flex-col items-center">
-                <div class="w-8 h-8 rounded-full ${isQC || isWeigh || isCompleted ? 'bg-emerald-600 text-white' : 'bg-stone-200 text-stone-600'} flex items-center justify-center text-xs font-bold ring-4 ring-white">
+                <div class="w-8 h-8 rounded-full ${isQC || isWeigh || isCompleted ? 'bg-gradient-to-r from-rose-600 to-amber-600 text-white' : 'bg-stone-200 text-stone-600'} flex items-center justify-center text-xs font-bold ring-4 ring-white">
                   ${isQC || isWeigh || isCompleted ? '✓' : '4'}
                 </div>
-                <span class="text-[10px] font-bold ${isQC ? 'text-emerald-700' : 'text-stone-600'} mt-1">Quality Check</span>
+                <span class="text-[10px] font-bold ${isQC ? 'text-rose-700 font-bold' : 'text-stone-600'} mt-1">Quality Check</span>
               </div>
 
               <!-- Step 5: Weigh & MSP -->
               <div class="relative z-10 flex flex-col items-center">
-                <div class="w-8 h-8 rounded-full ${isCompleted ? 'bg-emerald-600 text-white' : 'bg-stone-200 text-stone-600'} flex items-center justify-center text-xs font-bold ring-4 ring-white">
+                <div class="w-8 h-8 rounded-full ${isCompleted ? 'bg-gradient-to-r from-rose-600 to-amber-600 text-white' : 'bg-stone-200 text-stone-600'} flex items-center justify-center text-xs font-bold ring-4 ring-white">
                   ${isCompleted ? '✓' : '5'}
                 </div>
-                <span class="text-[10px] font-bold ${isCompleted ? 'text-emerald-700' : 'text-stone-600'} mt-1">MSP Payout</span>
+                <span class="text-[10px] font-bold ${isCompleted ? 'text-rose-700 font-bold' : 'text-stone-600'} mt-1">MSP Payout</span>
               </div>
             </div>
           </div>
@@ -2493,16 +2490,16 @@
               <div>
                 ${token.status === 'scheduled' ? `
                   <button onclick="appHandlers.toggleTransit('${token.id}')"
-                    class="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg text-xs shadow-xs transition-colors">
+                    class="px-4 py-1.5 bg-gradient-to-r from-rose-700 to-red-700 hover:from-rose-800 hover:to-red-800 text-white font-bold rounded-lg text-xs shadow-xs transition-colors">
                     Start Journey to Mandi
                   </button>
                 ` : token.status === 'in_transit' ? `
                   <button onclick="appHandlers.toggleTransit('${token.id}')"
-                    class="px-4 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-lg text-xs shadow-xs transition-colors animate-pulse">
+                    class="px-4 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold rounded-lg text-xs shadow-xs transition-colors animate-pulse">
                     Simulate Arrival at Gate
                   </button>
                 ` : `
-                  <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 font-bold rounded-lg text-xs border border-emerald-300">
+                  <span class="px-2.5 py-1 bg-amber-100 text-amber-950 font-bold rounded-lg text-xs border border-amber-300">
                     Status: ${token.status.replace('_', ' ').toUpperCase()}
                   </span>
                 `}
@@ -2519,17 +2516,17 @@
 
           <!-- IF COMPLETED: SHOW MSP SETTLEMENT E-RECEIPT -->
           ${isCompleted && token.payout ? `
-            <div class="p-5 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl border border-emerald-200 space-y-3">
-              <div class="flex items-center justify-between border-b border-emerald-200/80 pb-2">
+            <div class="p-5 bg-gradient-to-br from-amber-50 via-rose-50/20 to-amber-100/50 rounded-xl border border-amber-300 space-y-3">
+              <div class="flex items-center justify-between border-b border-amber-200/80 pb-2">
                 <div class="flex items-center gap-2">
                   <span class="text-2xl">🎉</span>
                   <div>
-                    <h4 class="font-bold text-sm text-emerald-950">Procurement e-Receipt & Payment Credit</h4>
-                    <p class="text-[11px] text-emerald-700">${mandi.paymentMode || 'Govt. Direct Benefit Transfer (DBT)'}</p>
+                    <h4 class="font-bold text-sm text-rose-950">Procurement e-Receipt & Payment Credit</h4>
+                    <p class="text-[11px] text-amber-800">${mandi.paymentMode || 'Govt. Direct Benefit Transfer (DBT)'}</p>
                   </div>
                 </div>
                 <div class="text-right">
-                  <span class="text-xs font-mono font-bold text-emerald-900 bg-white px-2 py-0.5 rounded border border-emerald-200">
+                  <span class="text-xs font-mono font-bold text-amber-950 bg-white px-2 py-0.5 rounded border border-amber-300 font-black">
                     UTR: ${token.payout.utrNo}
                   </span>
                 </div>
@@ -2550,7 +2547,7 @@
                 </div>
                 <div>
                   <span class="text-stone-500 block">Total Credited:</span>
-                  <strong class="font-mono text-emerald-800 text-base">₹${token.payout.totalAmount.toLocaleString('en-IN')}</strong>
+                  <strong class="font-mono text-rose-900 font-black text-base">₹${token.payout.totalAmount.toLocaleString('en-IN')}</strong>
                 </div>
               </div>
             </div>
@@ -2611,10 +2608,10 @@
               const q = parseFloat(form.quantity) || 45;
               const totalPayout = rate * q;
               return `
-                <div class="p-3 rounded-xl border ${selM.type === 'Private Mandi' ? 'bg-amber-50/70 border-amber-200' : 'bg-emerald-50/70 border-emerald-200'} text-xs space-y-1.5">
+                <div class="p-3 rounded-xl border ${selM.type === 'Private Mandi' ? 'bg-amber-50/70 border-amber-200' : 'bg-rose-50/70 border-rose-200'} text-xs space-y-1.5">
                   <div class="flex items-center justify-between">
                     <span class="font-bold text-stone-800 flex items-center gap-1.5">
-                      <span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${selM.type === 'Private Mandi' ? 'bg-amber-200 text-amber-900' : 'bg-emerald-200 text-emerald-900'}">${selM.type}</span>
+                      <span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${selM.type === 'Private Mandi' ? 'bg-amber-200 text-amber-950 font-bold' : 'bg-rose-100 text-rose-950 border border-rose-200 font-bold'}">${selM.type}</span>
                       ${selM.name}
                     </span>
                     <span class="font-mono font-black text-stone-900 bg-white px-2 py-0.5 rounded-lg border border-stone-200 shadow-2xs">
@@ -2624,7 +2621,7 @@
                   <div class="grid grid-cols-3 gap-2 pt-1 border-t border-stone-200/60 text-[11px]">
                     <div>
                       <span class="text-stone-400 block text-[10px]">Effective Rate</span>
-                      <strong class="text-emerald-700 font-mono">₹${rate.toLocaleString('en-IN')}/Qtl</strong>
+                      <strong class="text-amber-800 font-mono">₹${rate.toLocaleString('en-IN')}/Qtl</strong>
                       ${selM.priceOffset > 0 ? `<span class="text-[9px] text-amber-700 block font-semibold">(+₹${selM.priceOffset} Bonus)</span>` : ''}
                     </div>
                     <div>
@@ -2713,7 +2710,7 @@
 
             <!-- Anti-Deadlock Rate Limiting Guarantee -->
             <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 text-[11px] text-stone-600 flex items-center gap-2">
-              <span class="text-emerald-700 font-bold">⚡ Redis Token Bucket:</span>
+              <span class="text-amber-800 font-bold">⚡ Redis Token Bucket:</span>
               <span>Smooth queue distribution guarantees zero 502/504 slot booking collisions.</span>
             </div>
 
@@ -2723,7 +2720,7 @@
                 Cancel
               </button>
               <button type="submit" ${form.isSubmitting ? 'disabled' : ''}
-                class="flex-1 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-xs transition-colors flex items-center justify-center gap-2">
+                class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-rose-700 to-red-700 hover:from-rose-800 hover:to-red-800 text-white font-bold text-xs shadow-xs transition-colors flex items-center justify-center gap-2">
                 ${form.isSubmitting ? 'Generating Token...' : 'Confirm & Generate Token'}
               </button>
             </div>
@@ -2748,12 +2745,12 @@
           <div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-xs">
             <span class="text-xs font-bold text-stone-500 uppercase">Active Procurement Center</span>
             <div class="text-base sm:text-lg font-extrabold text-stone-900 mt-1">${mandi.name.split('(')[0]}</div>
-            <span class="text-[11px] text-emerald-700 font-bold">District: ${mandi.district}</span>
+            <span class="text-[11px] text-amber-800 font-bold">District: ${mandi.district}</span>
           </div>
 
           <div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-xs">
             <span class="text-xs font-bold text-stone-500 uppercase">Current Serving Token</span>
-            <div class="text-xl sm:text-2xl font-mono font-extrabold text-emerald-800 mt-1">${mandi.currentServingToken}</div>
+            <div class="text-xl sm:text-2xl font-mono font-extrabold text-rose-900 mt-1">${mandi.currentServingToken}</div>
             <span class="text-[11px] text-stone-500">Gate 2 / Bay 4</span>
           </div>
 
@@ -2766,7 +2763,7 @@
           <div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-xs">
             <span class="text-xs font-bold text-stone-500 uppercase">Today's Intake</span>
             <div class="text-xl sm:text-2xl font-extrabold text-stone-900 mt-1">${mandi.todayProcuredMT} MT</div>
-            <span class="text-[11px] text-emerald-700 font-bold">100% Target Alignment</span>
+            <span class="text-[11px] text-amber-800 font-bold">100% Target Alignment</span>
           </div>
         </div>
 
@@ -2780,7 +2777,7 @@
                 <p class="text-[11px] text-stone-500">Vehicles slotted for today</p>
               </div>
               <button onclick="appHandlers.callNextToken()"
-                class="px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs shadow-xs transition-colors flex items-center gap-1.5">
+                class="px-3.5 py-1.5 bg-gradient-to-r from-rose-700 to-red-700 hover:from-rose-800 hover:to-red-800 text-white font-bold rounded-xl text-xs shadow-xs transition-colors flex items-center gap-1.5">
                 <span>📢</span>
                 <span>Call Next Token</span>
               </button>
@@ -2790,11 +2787,11 @@
             <div class="space-y-2.5 max-h-[520px] overflow-y-auto pr-1">
               ${waitingTokens.map(tok => `
                 <div onclick="appHandlers.selectStaffToken('${tok.id}')"
-                  class="p-3 rounded-xl border text-xs cursor-pointer transition-all ${selectedTok?.id === tok.id ? 'border-emerald-600 bg-emerald-50/60 ring-2 ring-emerald-500/20 shadow-2xs' : 'border-stone-200 bg-stone-50 hover:bg-white'}">
+                  class="p-3 rounded-xl border text-xs cursor-pointer transition-all ${selectedTok?.id === tok.id ? 'border-rose-600 bg-rose-50/70 ring-2 ring-rose-500/20 shadow-2xs' : 'border-stone-200 bg-stone-50 hover:bg-white'}">
                   <div class="flex items-center justify-between mb-1">
                     <span class="font-mono font-extrabold text-stone-900">${tok.id}</span>
                     <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
-                      tok.status === 'completed' ? 'bg-emerald-100 text-emerald-800' :
+                      tok.status === 'completed' ? 'bg-amber-100 text-amber-950 font-bold border border-amber-300' :
                       tok.status === 'at_weighbridge' ? 'bg-indigo-100 text-indigo-800' :
                       tok.status === 'in_quality_check' ? 'bg-amber-100 text-amber-800' :
                       'bg-stone-200 text-stone-700'
@@ -2835,7 +2832,7 @@
           <div>
             <div class="flex items-center gap-2">
               <span class="font-mono font-extrabold text-2xl text-stone-900">${tok.id}</span>
-              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-950 border border-amber-300 font-extrabold">
                 ${tok.crop} • ${tok.quantityQuintals} Qtl
               </span>
             </div>
@@ -2865,15 +2862,15 @@
             <div class="space-y-1">
               <div class="flex justify-between text-xs font-bold">
                 <span>Grain Moisture Content</span>
-                <span class="font-mono text-emerald-800">${state.mandiStaff.moisture}% (Max 12%)</span>
+                <span class="font-mono text-rose-900">${state.mandiStaff.moisture}% (Max 12%)</span>
               </div>
               <input type="range" min="8" max="18" step="0.1"
                 value="${state.mandiStaff.moisture}"
                 oninput="state.mandiStaff.moisture = Number(this.value); appHandlers.selectStaffToken('${tok.id}');"
-                class="w-full accent-emerald-700 cursor-pointer">
+                class="w-full accent-rose-600 cursor-pointer">
               <div class="flex justify-between text-[10px] text-stone-400">
                 <span>Dry (8%)</span>
-                <span class="text-emerald-700 font-bold">Optimal (12%)</span>
+                <span class="text-amber-800 font-bold">Optimal (12%)</span>
                 <span class="text-rose-600 font-bold">Excess (>14%)</span>
               </div>
             </div>
@@ -2887,14 +2884,14 @@
               <input type="range" min="0" max="3" step="0.1"
                 value="${state.mandiStaff.foreignMatter}"
                 oninput="state.mandiStaff.foreignMatter = Number(this.value); appHandlers.selectStaffToken('${tok.id}');"
-                class="w-full accent-emerald-700 cursor-pointer">
+                class="w-full accent-rose-600 cursor-pointer">
             </div>
 
             <!-- Auto-Calculated Quality Grade -->
             <div class="p-3 bg-white rounded-lg border border-stone-200 space-y-1 text-xs">
               <div class="flex justify-between">
                 <span class="text-stone-500">Grading Result:</span>
-                <span class="font-bold ${state.mandiStaff.moisture > 14 ? 'text-rose-600' : 'text-emerald-800'}">
+                <span class="font-bold ${state.mandiStaff.moisture > 14 ? 'text-rose-600' : 'text-rose-800 font-bold'}">
                   ${state.mandiStaff.moisture > 14 ? 'Rejected (Moisture High)' : 'Grade A (FAQ Standard)'}
                 </span>
               </div>
@@ -2916,7 +2913,7 @@
               <span class="text-xs font-extrabold text-stone-900 flex items-center gap-1.5">
                 ${Icons.scale} Digital Weighbridge & MSP
               </span>
-              <span class="text-[10px] font-bold bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded">
+              <span class="text-[10px] font-bold bg-amber-100 text-amber-950 px-2 py-0.5 rounded border border-amber-300 font-bold">
                 Auto-Tare
               </span>
             </div>
@@ -2956,16 +2953,16 @@
                   </div>
                   <div class="flex justify-between">
                     <span class="text-stone-500">MSP Rate + State Bonus:</span>
-                    <span class="font-mono font-bold text-emerald-800">₹${rate} / Qtl</span>
+                    <span class="font-mono font-bold text-rose-900">₹${rate} / Qtl</span>
                   </div>
                   <div class="flex justify-between border-t border-stone-100 pt-1.5 text-sm font-extrabold">
                     <span class="text-stone-800">Direct DBT Credit:</span>
-                    <span class="font-mono text-emerald-900">₹${payout.toLocaleString('en-IN')}</span>
+                    <span class="font-mono text-rose-950 font-black">₹${payout.toLocaleString('en-IN')}</span>
                   </div>
                 </div>
 
                 <button onclick="appHandlers.completeWeighbridgeAndProcurement('${tok.id}')"
-                  class="w-full py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold rounded-lg text-xs shadow-xs transition-colors flex items-center justify-center gap-1.5">
+                  class="w-full py-2.5 bg-gradient-to-r from-rose-700 via-rose-800 to-amber-700 hover:from-rose-800 hover:to-amber-800 text-white font-extrabold rounded-lg text-xs shadow-xs transition-colors flex items-center justify-center gap-1.5">
                   <span>💰</span>
                   <span>Authorize Procurement & Issue e-Receipt</span>
                 </button>
@@ -2991,24 +2988,24 @@
           <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-xs">
             <span class="text-xs font-bold text-stone-400 uppercase tracking-wider">Connected Mandis</span>
             <div class="text-2xl sm:text-3xl font-extrabold text-stone-900 mt-1">48 Centers</div>
-            <div class="text-[11px] text-emerald-700 font-bold mt-1">● 100% Operational Uptime</div>
+            <div class="text-[11px] text-amber-800 font-bold mt-1">● 100% Operational Uptime</div>
           </div>
 
           <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-xs">
             <span class="text-xs font-bold text-stone-400 uppercase tracking-wider">Metric Tonnes Procured</span>
-            <div class="text-2xl sm:text-3xl font-extrabold text-emerald-800 mt-1">${totalProcuredMT.toLocaleString()} MT</div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-rose-900 mt-1">${totalProcuredMT.toLocaleString()} MT</div>
             <div class="text-[11px] text-stone-500 mt-1">Target: 85,000 MT (Seasonal)</div>
           </div>
 
           <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-xs">
             <span class="text-xs font-bold text-stone-400 uppercase tracking-wider">Total MSP Disbursed</span>
             <div class="text-2xl sm:text-3xl font-extrabold text-stone-900 mt-1">₹${totalMSPDisbursedCr} Cr</div>
-            <div class="text-[11px] text-emerald-700 font-bold mt-1">100% Direct DBT Bank Credit</div>
+            <div class="text-[11px] text-amber-800 font-bold mt-1">100% Direct DBT Bank Credit</div>
           </div>
 
           <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-xs">
             <span class="text-xs font-bold text-stone-400 uppercase tracking-wider">Average Yard Wait Time</span>
-            <div class="text-2xl sm:text-3xl font-extrabold text-emerald-700 mt-1">38 Mins</div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-amber-800 mt-1">38 Mins</div>
             <div class="text-[11px] text-stone-500 mt-1">Reduced from 8.5 Hours (Manual)</div>
           </div>
         </div>
@@ -3020,7 +3017,7 @@
               <h3 class="font-extrabold text-base text-stone-900">District Mandi Congestion & Throughput Heatmap</h3>
               <p class="text-xs text-stone-500">Real-time load balancing and slot rate-limiting telemetry</p>
             </div>
-            <span class="px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold text-xs rounded-full">
+            <span class="px-2.5 py-1 bg-rose-50 text-rose-900 border border-rose-200 font-bold text-xs rounded-full">
               Indore Division
             </span>
           </div>
@@ -3044,17 +3041,17 @@
                     <td class="py-3 px-3 font-bold text-stone-900">${m.name}</td>
                     <td class="py-3 px-3 font-mono">${m.gates} Operational</td>
                     <td class="py-3 px-3 font-mono font-bold">${m.queueLength} Trucks</td>
-                    <td class="py-3 px-3 font-mono text-emerald-800 font-bold">${m.avgWaitMins} mins</td>
+                    <td class="py-3 px-3 font-mono text-rose-900 font-bold">${m.avgWaitMins} mins</td>
                     <td class="py-3 px-3">
                       <div class="w-28 bg-stone-200 h-2 rounded-full overflow-hidden">
-                        <div class="h-full rounded-full ${m.capacityPercent > 75 ? 'bg-amber-500' : 'bg-emerald-600'}"
+                        <div class="h-full rounded-full ${m.capacityPercent > 75 ? 'bg-amber-500' : 'bg-rose-600'}"
                           style="width: ${m.capacityPercent}%"></div>
                       </div>
                       <span class="text-[10px] text-stone-500 mt-0.5 block">${m.capacityPercent}% Full</span>
                     </td>
                     <td class="py-3 px-3 font-mono font-bold">${m.todayProcuredMT} MT</td>
                     <td class="py-3 px-3">
-                      <span class="px-2 py-0.5 rounded text-[10px] font-bold ${m.capacityPercent > 75 ? 'bg-amber-100 text-amber-900' : 'bg-emerald-100 text-emerald-900'}">
+                      <span class="px-2 py-0.5 rounded text-[10px] font-bold ${m.capacityPercent > 75 ? 'bg-amber-100 text-amber-900' : 'bg-rose-100 text-rose-900'}">
                         ${m.capacityPercent > 75 ? 'Heavy Load' : 'Smooth Flow'}
                       </span>
                     </td>
@@ -3086,7 +3083,7 @@
                   <span class="font-mono">22% (495 MT)</span>
                 </div>
                 <div class="w-full bg-stone-100 h-2.5 rounded-full overflow-hidden">
-                  <div class="bg-emerald-700 h-full rounded-full" style="width: 22%"></div>
+                  <div class="bg-gradient-to-r from-rose-600 to-amber-600 h-full rounded-full" style="width: 22%"></div>
                 </div>
               </div>
 
@@ -3107,11 +3104,11 @@
             <div class="p-3.5 bg-stone-50 rounded-xl border border-stone-200 space-y-2 text-xs">
               <div class="flex justify-between">
                 <span class="text-stone-500">NPCI Aadhaar Payment Bridge:</span>
-                <span class="font-bold text-emerald-800">Connected (99.8% Success)</span>
+                <span class="font-bold text-rose-900">Connected (99.8% Success)</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-stone-500">PFMS Gateway Settlement:</span>
-                <span class="font-bold text-emerald-800">T+0 Realtime Transfer</span>
+                <span class="font-bold text-rose-900">T+0 Realtime Transfer</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-stone-500">Middlemen Elimination:</span>
@@ -3157,7 +3154,7 @@
             ${state.smsList.map(sms => `
               <div class="bg-white p-3.5 rounded-2xl shadow-2xs border border-stone-200 space-y-1.5 animate-slide-in">
                 <div class="flex items-center justify-between">
-                  <span class="text-[10px] font-extrabold px-2 py-0.5 rounded bg-emerald-100 text-emerald-900">
+                  <span class="text-[10px] font-extrabold px-2 py-0.5 rounded bg-rose-100 text-rose-900 font-bold">
                     ${sms.tag}
                   </span>
                   <span class="text-[10px] text-stone-400 font-mono">${sms.timestamp}</span>
@@ -3194,7 +3191,7 @@
             </div>
             
             <button onclick="appHandlers.toggleConcurrencySim()"
-              class="px-5 py-2.5 rounded-xl font-extrabold text-xs shadow-md transition-all ${sim.isRunning ? 'bg-rose-600 hover:bg-rose-700 text-white animate-pulse' : 'bg-emerald-500 hover:bg-emerald-400 text-stone-900'}">
+              class="px-5 py-2.5 rounded-xl font-extrabold text-xs shadow-md transition-all ${sim.isRunning ? 'bg-rose-600 hover:bg-rose-700 text-white animate-pulse' : 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-950 font-black'}">
               ${sim.isRunning ? '⏹ Stop Simulation' : '▶ Run 10,000 Slot Booking Surge'}
             </button>
           </div>
@@ -3222,12 +3219,12 @@
 
           <!-- RIGHT: KISAN SETU ASYNC DECOUPLED (THE SOLUTION IN SLIDE 2 & 3) -->
           <div onclick="appHandlers.setSimMode('async')"
-            class="p-5 rounded-2xl border-2 cursor-pointer transition-all ${sim.systemMode === 'async' ? 'border-emerald-500 bg-emerald-50/40 shadow-sm' : 'border-stone-200 bg-white hover:border-stone-300'}">
+            class="p-5 rounded-2xl border-2 cursor-pointer transition-all ${sim.systemMode === 'async' ? 'border-rose-500 bg-rose-50/40 shadow-sm' : 'border-stone-200 bg-white hover:border-stone-300'}">
             <div class="flex items-center justify-between mb-3">
-              <span class="text-xs font-extrabold text-emerald-800 uppercase flex items-center gap-1.5">
+              <span class="text-xs font-extrabold text-rose-900 uppercase flex items-center gap-1.5">
                 <span>✅</span> 02. Kisan Setu Decoupled Engine
               </span>
-              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300 font-bold">
                 BuildBeyond Innovation
               </span>
             </div>
@@ -3246,17 +3243,17 @@
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div class="p-3 bg-stone-50 rounded-xl border border-stone-200">
               <span class="text-[10px] font-bold text-stone-500 uppercase">Server CPU Load</span>
-              <div class="text-2xl font-mono font-extrabold ${sim.cpuLoad > 80 ? 'text-rose-600' : 'text-emerald-700'} mt-1">
+              <div class="text-2xl font-mono font-extrabold ${sim.cpuLoad > 80 ? 'text-rose-600' : 'text-amber-800'} mt-1">
                 ${sim.cpuLoad}%
               </div>
               <div class="w-full bg-stone-200 h-1.5 rounded-full overflow-hidden mt-2">
-                <div class="h-full rounded-full ${sim.cpuLoad > 80 ? 'bg-rose-600' : 'bg-emerald-600'}" style="width: ${sim.cpuLoad}%"></div>
+                <div class="h-full rounded-full ${sim.cpuLoad > 80 ? 'bg-rose-600' : 'bg-rose-600'}" style="width: ${sim.cpuLoad}%"></div>
               </div>
             </div>
 
             <div class="p-3 bg-stone-50 rounded-xl border border-stone-200">
               <span class="text-[10px] font-bold text-stone-500 uppercase">API Response Latency</span>
-              <div class="text-2xl font-mono font-extrabold ${sim.latencyMs > 1000 ? 'text-rose-600' : 'text-emerald-700'} mt-1">
+              <div class="text-2xl font-mono font-extrabold ${sim.latencyMs > 1000 ? 'text-rose-600' : 'text-amber-800'} mt-1">
                 ${sim.latencyMs} ms
               </div>
               <span class="text-[10px] text-stone-400 mt-1 block">${sim.latencyMs > 1000 ? 'Severe Latency Degradation' : 'Sub-50ms Edge Response'}</span>
@@ -3264,10 +3261,10 @@
 
             <div class="p-3 bg-stone-50 rounded-xl border border-stone-200">
               <span class="text-[10px] font-bold text-stone-500 uppercase">Successful Bookings</span>
-              <div class="text-2xl font-mono font-extrabold text-emerald-800 mt-1">
+              <div class="text-2xl font-mono font-extrabold text-rose-900 mt-1">
                 ${sim.processedCount.toLocaleString()}
               </div>
-              <span class="text-[10px] text-emerald-700 font-bold mt-1 block">Dynamic Tokens Allocated</span>
+              <span class="text-[10px] text-amber-800 font-bold mt-1 block">Dynamic Tokens Allocated</span>
             </div>
 
             <div class="p-3 bg-stone-50 rounded-xl border border-stone-200">
@@ -3280,7 +3277,7 @@
           </div>
 
           <!-- Realtime Terminal Logs -->
-          <div class="bg-stone-900 rounded-xl p-4 font-mono text-[11px] text-emerald-400 space-y-1">
+          <div class="bg-stone-900 rounded-xl p-4 font-mono text-[11px] text-amber-400 space-y-1">
             <div class="text-stone-400 pb-1 border-b border-stone-800 text-[10px] flex justify-between">
               <span>CLUSTER LOG STREAM</span>
               <span>NODE: ap-south-1 • INSTANCE: kisan-setu-worker-01</span>
@@ -3304,7 +3301,7 @@
     return `
       <div class="space-y-6 animate-fade-in">
         <!-- HEADER -->
-        <div class="bg-gradient-to-r from-emerald-900 via-stone-900 to-teal-950 text-white p-6 rounded-2xl shadow-sm">
+        <div class="bg-gradient-to-r from-rose-900 via-stone-900 to-amber-950 text-white p-6 rounded-2xl border-b-2 border-amber-400/30 shadow-sm">
           <div class="flex flex-wrap items-center justify-between gap-4">
             <div>
               <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/15 text-amber-300 border border-white/20 mb-2">
@@ -3325,7 +3322,7 @@
                 🏢 Private Mandis (2)
               </button>
               <button onclick="appHandlers.setMandiFilter('government')"
-                class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${state.mandiFilter === 'government' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-white/10 text-white hover:bg-white/20'}">
+                class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${state.mandiFilter === 'government' ? 'bg-rose-700 text-white shadow-xs' : 'bg-white/10 text-white hover:bg-white/20'}">
                 🏛️ Govt APMC (4)
               </button>
             </div>
@@ -3342,7 +3339,7 @@
               <thead class="bg-stone-50 text-stone-700 font-bold border-b border-stone-200">
                 <tr>
                   <th class="py-2.5 px-3">Evaluation Parameter</th>
-                  <th class="py-2.5 px-3 text-emerald-900 bg-emerald-50/50">🏛️ Government APMC Mandis</th>
+                  <th class="py-2.5 px-3 text-rose-950 bg-rose-50/60 font-bold">🏛️ Government APMC Mandis</th>
                   <th class="py-2.5 px-3 text-amber-950 bg-amber-50/50">🏢 Licensed Private Mandis & Silos</th>
                   <th class="py-2.5 px-3">Farmer Benefit Summary</th>
                 </tr>
@@ -3351,8 +3348,8 @@
                 <tr>
                   <td class="py-3 px-3 font-bold text-stone-800">Wheat Procurement Rate</td>
                   <td class="py-3 px-3 font-mono">₹2,400 / Qtl (Official MSP)</td>
-                  <td class="py-3 px-3 font-mono font-bold text-emerald-800 bg-amber-50/30">₹2,450 – ₹2,460 / Qtl (+₹50-₹60 Bonus)</td>
-                  <td class="py-3 px-3 text-emerald-700 font-bold">+₹2,400 extra profit per 40 Qtl trolley</td>
+                  <td class="py-3 px-3 font-mono font-bold text-rose-900 bg-amber-50/30">₹2,450 – ₹2,460 / Qtl (+₹50-₹60 Bonus)</td>
+                  <td class="py-3 px-3 text-amber-800 font-bold">+₹2,400 extra profit per 40 Qtl trolley</td>
                 </tr>
                 <tr>
                   <td class="py-3 px-3 font-bold text-stone-800">Avg. Unloading Time</td>
@@ -3369,8 +3366,8 @@
                 <tr>
                   <td class="py-3 px-3 font-bold text-stone-800">Payment Channel & Speed</td>
                   <td class="py-3 px-3">PFMS Direct Benefit Transfer (24–48 hrs)</td>
-                  <td class="py-3 px-3 font-bold text-emerald-800 bg-amber-50/30">Instant Same-Day Corporate NEFT / RTGS</td>
-                  <td class="py-3 px-3 text-emerald-700 font-bold">Immediate bank credit on same day</td>
+                  <td class="py-3 px-3 font-bold text-rose-900 bg-amber-50/30">Instant Same-Day Corporate NEFT / RTGS</td>
+                  <td class="py-3 px-3 text-amber-800 font-bold">Immediate bank credit on same day</td>
                 </tr>
                 <tr>
                   <td class="py-3 px-3 font-bold text-stone-800">Legal Licensing</td>
@@ -3390,13 +3387,13 @@
               <div class="space-y-3">
                 <div class="flex items-start justify-between gap-2">
                   <div>
-                    <span class="px-2 py-0.5 rounded text-[10px] font-extrabold ${m.type === 'private' ? 'bg-amber-100 text-amber-950 border border-amber-300' : 'bg-emerald-100 text-emerald-950 border border-emerald-300'}">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-extrabold ${m.type === 'private' ? 'bg-amber-100 text-amber-950 border border-amber-300' : 'bg-rose-100 text-rose-950 border border-rose-300'}">
                       ${m.type === 'private' ? '🏢 LICENSED PRIVATE MANDI' : '🏛️ GOVERNMENT APMC'}
                     </span>
                     <h4 class="font-black text-base text-stone-900 mt-1">${m.name}</h4>
                     <p class="text-[11px] text-stone-500">${m.operator || 'MP Mandi Board'} • ${m.district}</p>
                   </div>
-                  <span class="px-2 py-1 rounded-lg text-xs font-bold ${m.capacityPercent > 75 ? 'bg-amber-100 text-amber-900' : 'bg-emerald-100 text-emerald-900'} shrink-0">
+                  <span class="px-2 py-1 rounded-lg text-xs font-bold ${m.capacityPercent > 75 ? 'bg-amber-100 text-amber-900' : 'bg-rose-100 text-rose-900'} shrink-0">
                     ~${m.avgWaitMins}m wait
                   </span>
                 </div>
@@ -3404,7 +3401,7 @@
                 <div class="p-3 bg-stone-50 rounded-xl space-y-2 text-xs">
                   <div class="flex justify-between items-center">
                     <span class="text-stone-500">Wheat Today's Rate:</span>
-                    <strong class="font-mono text-emerald-900 text-sm font-extrabold">₹${cropRate.total + (m.priceOffset || 0)} / Qtl</strong>
+                    <strong class="font-mono text-rose-900 text-sm font-extrabold">₹${cropRate.total + (m.priceOffset || 0)} / Qtl</strong>
                   </div>
                   ${m.type === 'private' ? `
                     <div class="flex justify-between items-center text-amber-900 font-bold text-[11px]">
@@ -3439,7 +3436,7 @@
                 class="w-full py-2.5 rounded-xl font-bold text-xs shadow-xs transition-colors flex items-center justify-center gap-1.5 ${
                   m.type === 'private'
                     ? 'bg-amber-600 hover:bg-amber-700 text-white'
-                    : 'bg-emerald-700 hover:bg-emerald-800 text-white'
+                    : 'bg-gradient-to-r from-rose-700 to-red-700 hover:from-rose-800 hover:to-red-800 text-white font-bold'
                 }">
                 <span>⚡ Book Delivery Slot at this Mandi</span>
                 <span>➔</span>
@@ -3461,7 +3458,7 @@
         <div class="bg-white rounded-t-3xl sm:rounded-2xl border border-stone-200 shadow-2xl w-full max-w-lg h-[85vh] sm:h-[620px] flex flex-col overflow-hidden animate-slide-up">
           
           <!-- AI MODAL HEADER -->
-          <div class="bg-gradient-to-r from-emerald-800 via-emerald-900 to-teal-950 text-white p-4 flex items-center justify-between shrink-0 shadow-xs">
+          <div class="bg-gradient-to-r from-rose-800 via-red-900 to-amber-950 text-white p-4 border-b border-amber-400/30 flex items-center justify-between shrink-0 shadow-xs">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-xl shadow-xs">
                 🤖
@@ -3469,11 +3466,11 @@
               <div>
                 <div class="flex items-center gap-2">
                   <h3 class="font-black text-sm sm:text-base tracking-tight">Kisan Sahayak AI</h3>
-                  <span class="text-[10px] font-bold bg-emerald-500/30 text-emerald-200 border border-emerald-400/30 px-2 py-0.2 rounded-full">
+                  <span class="text-[10px] font-bold bg-amber-400/30 text-amber-200 border border-amber-400/40 px-2 py-0.2 rounded-full">
                     कृषि सहायक • Online
                   </span>
                 </div>
-                <p class="text-[11px] text-emerald-200/90">Compare Mandi Rates & Instant Slot Booking</p>
+                <p class="text-[11px] text-amber-200/90">Compare Mandi Rates & Instant Slot Booking</p>
               </div>
             </div>
 
@@ -3498,7 +3495,7 @@
             ${agent.messages.map(m => `
               <div class="flex gap-2.5 ${m.sender === 'user' ? 'justify-end' : 'justify-start'}">
                 ${m.sender === 'agent' ? `
-                  <div class="w-7 h-7 rounded-lg bg-emerald-700 text-white flex items-center justify-center text-xs shrink-0 shadow-2xs font-bold">
+                  <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-500 to-amber-600 text-amber-950 flex items-center justify-center text-xs shrink-0 shadow-2xs font-black">
                     🤖
                   </div>
                 ` : ''}
@@ -3506,9 +3503,8 @@
                 <div class="max-w-[85%] space-y-2">
                   <!-- Message Bubble -->
                   <div class="p-3.5 rounded-2xl text-xs leading-relaxed shadow-2xs ${
-                    m.sender === 'user' 
-                      ? 'bg-emerald-700 text-white rounded-tr-xs' 
-                      : 'bg-white text-stone-800 border border-stone-200 rounded-tl-xs'
+                    m.sender === 'user' ? 'bg-gradient-to-r from-rose-700 to-red-800 text-white rounded-tr-xs shadow-2xs' 
+                      : 'bg-white text-stone-800 border border-amber-200/90 rounded-tl-xs shadow-2xs'
                   }">
                     ${m.text.replace(/\n/g, '<br>')}
                   </div>
@@ -3527,9 +3523,9 @@
             ${agent.isThinking ? `
               <div class="flex items-center gap-2 text-stone-500 text-xs pl-9">
                 <div class="flex items-center gap-1 bg-white border border-stone-200 px-3 py-2 rounded-full shadow-2xs">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 typing-dot-1"></span>
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 typing-dot-2"></span>
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 typing-dot-3"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-rose-600 typing-dot-1"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-rose-600 typing-dot-2"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-rose-600 typing-dot-3"></span>
                   <span class="text-[11px] font-bold text-stone-600 ml-1">Analyzing Mandis & Quota...</span>
                 </div>
               </div>
@@ -3543,23 +3539,23 @@
               🏢 Compare Govt vs Private Mandis
             </button>
             <button onclick="appHandlers.triggerAiPrompt('Book slot for 40 quintals of Wheat at ITC Choupal Saagar private mandi')"
-              class="px-2.5 py-1 rounded-full bg-white border border-stone-300 text-stone-700 text-[11px] font-bold whitespace-nowrap hover:border-emerald-600 hover:text-emerald-800 transition-colors shadow-2xs">
+              class="px-2.5 py-1 rounded-full bg-white border border-stone-300 text-stone-700 text-[11px] font-bold whitespace-nowrap hover:border-rose-600 hover:text-rose-800 transition-colors shadow-2xs">
               ⚡ Book ITC Private Mandi
             </button>
             <button onclick="appHandlers.triggerAiPrompt('Compare Wheat prices across all Mandis')"
-              class="px-2.5 py-1 rounded-full bg-white border border-stone-300 text-stone-700 text-[11px] font-bold whitespace-nowrap hover:border-emerald-600 hover:text-emerald-800 transition-colors shadow-2xs">
+              class="px-2.5 py-1 rounded-full bg-white border border-stone-300 text-stone-700 text-[11px] font-bold whitespace-nowrap hover:border-rose-600 hover:text-rose-800 transition-colors shadow-2xs">
               📊 Compare Wheat Prices
             </button>
             <button onclick="appHandlers.triggerAiPrompt('Book slot for 40 quintals of Wheat at Rau Mandi tomorrow')"
-              class="px-2.5 py-1 rounded-full bg-white border border-stone-300 text-stone-700 text-[11px] font-bold whitespace-nowrap hover:border-emerald-600 hover:text-emerald-800 transition-colors shadow-2xs">
+              class="px-2.5 py-1 rounded-full bg-white border border-stone-300 text-stone-700 text-[11px] font-bold whitespace-nowrap hover:border-rose-600 hover:text-rose-800 transition-colors shadow-2xs">
               ⚡ Book 40 Qtl at Rau Mandi
             </button>
             <button onclick="appHandlers.triggerAiPrompt('Which Mandi has the lowest waiting time right now?')"
-              class="px-2.5 py-1 rounded-full bg-white border border-stone-300 text-stone-700 text-[11px] font-bold whitespace-nowrap hover:border-emerald-600 hover:text-emerald-800 transition-colors shadow-2xs">
+              class="px-2.5 py-1 rounded-full bg-white border border-stone-300 text-stone-700 text-[11px] font-bold whitespace-nowrap hover:border-rose-600 hover:text-rose-800 transition-colors shadow-2xs">
               ⏱️ Lowest Waiting Time
             </button>
             <button onclick="appHandlers.triggerAiPrompt('राऊ मंडी में गेहूं का 50 क्विंटल स्लॉट बुक करो')"
-              class="px-2.5 py-1 rounded-full bg-white border border-stone-300 text-stone-700 text-[11px] font-bold whitespace-nowrap hover:border-emerald-600 hover:text-emerald-800 transition-colors shadow-2xs">
+              class="px-2.5 py-1 rounded-full bg-white border border-stone-300 text-stone-700 text-[11px] font-bold whitespace-nowrap hover:border-rose-600 hover:text-rose-800 transition-colors shadow-2xs">
               🇮🇳 हिंदी: स्लॉट बुक करो
             </button>
           </div>
@@ -3568,10 +3564,10 @@
           <form onsubmit="event.preventDefault(); appHandlers.sendAiMessage();" class="p-3 bg-white border-t border-stone-200 flex items-center gap-2 shrink-0">
             <input id="ai-query-input" type="text"
               placeholder="Ask to compare prices or say 'Book slot at Rau Mandi'..."
-              class="flex-1 px-3.5 py-2.5 rounded-xl border border-stone-300 text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-stone-50 focus:bg-white transition-all font-medium">
+              class="flex-1 px-3.5 py-2.5 rounded-xl border border-stone-300 text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-rose-500 bg-stone-50 focus:bg-white transition-all font-medium">
             
             <button type="submit"
-              class="p-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs shadow-xs transition-colors shrink-0 flex items-center justify-center">
+              class="p-2.5 bg-gradient-to-r from-rose-700 to-red-700 hover:from-rose-800 hover:to-red-800 text-white font-bold rounded-xl text-xs shadow-xs transition-colors shrink-0 flex items-center justify-center">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m5 12 14-7-7 14-2-5-5-2Z"/></svg>
             </button>
           </form>
@@ -3588,7 +3584,7 @@
         <div class="bg-white rounded-xl border border-stone-200 p-3 space-y-2 shadow-xs">
           <div class="text-[11px] font-extrabold text-stone-800 uppercase tracking-wider flex items-center justify-between border-b border-stone-100 pb-1.5">
             <span>${card.title || 'Mandi Comparison Matrix'}</span>
-            <span class="text-[10px] text-emerald-700 font-bold">Live MSP Rates</span>
+            <span class="text-[10px] text-amber-800 font-bold">Live MSP Rates</span>
           </div>
           <div class="space-y-1.5">
             ${items.map(m => `
@@ -3596,7 +3592,7 @@
                 <div>
                   <div class="font-bold text-stone-900 flex items-center gap-1.5">
                     <span>${m.name.split('(')[0]}</span>
-                    <span class="text-[9px] px-1.5 py-0.2 rounded font-bold ${m.badge === 'Recommended' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                    <span class="text-[9px] px-1.5 py-0.2 rounded font-bold ${m.badge === 'Recommended' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-amber-100 text-amber-800'}">
                       ${m.badge}
                     </span>
                   </div>
@@ -3605,7 +3601,7 @@
                 <div class="text-right">
                   <span class="font-mono font-extrabold text-stone-900 text-xs block">${m.price}</span>
                   <button onclick="appHandlers.bookViaAi('${m.mandiId}', '${card.crop || 'Wheat'}', 40)"
-                    class="mt-1 px-2 py-0.5 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-[10px] shadow-2xs transition-colors">
+                    class="mt-1 px-2 py-0.5 rounded bg-gradient-to-r from-rose-700 to-amber-700 hover:from-rose-800 hover:to-amber-800 text-white font-bold text-[10px] shadow-2xs transition-colors">
                     ⚡ Book Slot
                   </button>
                 </div>
@@ -3619,16 +3615,16 @@
     if (card.type === 'booking_confirmed') {
       const tok = card.token;
       return `
-        <div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl border-2 border-emerald-500/80 p-3.5 space-y-2.5 shadow-sm text-xs">
-          <div class="flex items-center justify-between border-b border-emerald-200/80 pb-2">
+        <div class="bg-gradient-to-br from-rose-50 via-white to-amber-50 rounded-xl border-2 border-amber-400 p-3.5 space-y-2.5 shadow-sm text-xs">
+          <div class="flex items-center justify-between border-b border-amber-200/80 pb-2">
             <div class="flex items-center gap-2">
               <span class="text-xl">🎫</span>
               <div>
-                <span class="font-mono font-black text-sm text-emerald-950 block">${tok.id}</span>
-                <span class="text-[10px] text-emerald-700 font-bold">Verified Gate Entry Token</span>
+                <span class="font-mono font-black text-sm text-rose-950 block">${tok.id}</span>
+                <span class="text-[10px] text-amber-800 font-bold">Verified Gate Entry Token</span>
               </div>
             </div>
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white">CONFIRMED</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gradient-to-r from-rose-600 to-amber-600 text-white font-black">CONFIRMED</span>
           </div>
 
           <div class="grid grid-cols-2 gap-2 text-[11px]">
@@ -3651,7 +3647,7 @@
           </div>
 
           <button onclick="appHandlers.toggleAiAgent(false); appHandlers.setTab('farmer');"
-            class="w-full py-2 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs rounded-lg shadow-xs transition-colors flex items-center justify-center gap-1.5">
+            class="w-full py-2 bg-gradient-to-r from-rose-800 to-amber-900 hover:from-rose-900 hover:to-amber-950 text-white font-bold text-xs rounded-lg shadow-xs transition-colors flex items-center justify-center gap-1.5">
             <span>👉</span>
             <span>View Active Gate Pass in Farmer Dashboard</span>
           </button>
@@ -3664,7 +3660,7 @@
         <div class="flex flex-wrap gap-1.5 pt-1">
           ${card.buttons.map(b => `
             <button onclick="appHandlers.bookViaAi('${b.mandiId}', '${b.crop}', ${b.qty})"
-              class="px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-2xs transition-colors">
+              class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-rose-700 to-amber-700 hover:from-rose-800 hover:to-amber-800 text-white font-bold text-xs shadow-2xs transition-colors">
               ${b.label}
             </button>
           `).join('')}

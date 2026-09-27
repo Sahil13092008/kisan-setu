@@ -21,13 +21,28 @@
         extend: {
           colors: {
             brand: {
-              50: '#f0fdf4',
-              100: '#dcfce7',
-              200: '#bbf7d0',
-              600: '#16a34a',
-              700: '#15803d',
-              800: '#166534',
-              900: '#14532d',
+              50: '#fff1f2',
+              100: '#ffe4e6',
+              200: '#fecdd3',
+              300: '#fda4af',
+              400: '#fb7185',
+              500: '#f43f5e',
+              600: '#e11d48',
+              700: '#be123c',
+              800: '#9f1239',
+              900: '#881337',
+            },
+            gold: {
+              50: '#fffdf0',
+              100: '#fef9c3',
+              200: '#fef08a',
+              300: '#fde047',
+              400: '#facc15',
+              500: '#eab308',
+              600: '#ca8a04',
+              700: '#a16207',
+              800: '#854d0e',
+              900: '#713f12',
             }
           }
         }
@@ -38,18 +53,18 @@
   <!-- Canvas Confetti for MSP Settlement Celebration -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
 
-  <!-- Custom Stylesheet (v3) -->
-  <link rel="stylesheet" href="./styles.v3.css?v=4.3.0">
+  <!-- Custom Stylesheet (v3) with Light Red & Gold theme -->
+  <link rel="stylesheet" href="./styles.v3.css?v=4.4.0">
 </head>
-<body class="bg-stone-100/70 text-stone-900 font-sans antialiased min-h-screen">
+<body class="bg-gradient-to-br from-stone-50 via-rose-50/25 to-amber-50/20 text-stone-900 font-sans antialiased min-h-screen">
   <div id="root">
     <!-- Application renders here via app.v4.js -->
-    <div class="flex items-center justify-center min-h-screen text-stone-500 font-bold">
+    <div class="flex items-center justify-center min-h-screen text-rose-800 font-bold">
       Loading Kisan Setu Platform (Govt & Private Mandis)...
     </div>
   </div>
 
   <!-- Core Application Script (v4) with explicit cache buster -->
-  <script src="./app.v4.js?v=4.3.0"></script>
+  <script src="./app.v4.js?v=4.4.0"></script>
 </body>
 </html>
