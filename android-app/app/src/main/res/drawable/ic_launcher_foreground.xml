@@ -1,30 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path android:pathData="M31,63.928c0,0 6.4,-11 12.1,-13.1c7.2,-2.6 26,-1.4 26,-1.4l38.1,38.1L107,108.928l-32,-1L31,63.928z">
-        <aapt:attr name="android:fillColor">
-            <gradient
-                android:endX="85.84757"
-                android:endY="92.4963"
-                android:startX="42.9492"
-                android:startY="49.59793"
-                android:type="linear">
-                <item
-                    android:color="#44000000"
-                    android:offset="0.0" />
-                <item
-                    android:color="#00000000"
-                    android:offset="1.0" />
-            </gradient>
-        </aapt:attr>
-    </path>
+
+    <!-- Rising Sun Behind Bridge -->
     <path
-        android:fillColor="#FFFFFF"
-        android:fillType="nonZero"
-        android:pathData="M65.3,45.828l3.8,-6.6c0.2,-0.4 0.1,-0.9 -0.3,-1.1c-0.4,-0.2 -0.9,-0.1 -1.1,0.3l-3.9,6.7c-6.3,-2.8 -13.4,-2.8 -19.7,0l-3.9,-6.7c-0.2,-0.4 -0.7,-0.5 -1.1,-0.3C38.8,38.328 38.7,38.828 38.9,39.228l3.8,6.6C36.2,49.428 31.7,56.028 31,63.928h46C76.3,56.028 71.8,49.428 65.3,45.828zM43.4,57.328c-0.8,0 -1.5,-0.5 -1.8,-1.2c-0.3,-0.7 -0.1,-1.5 0.4,-2.1c0.5,-0.5 1.4,-0.7 2.1,-0.4c0.7,0.3 1.2,1 1.2,1.8C45.3,56.528 44.5,57.328 43.4,57.328L43.4,57.328zM64.6,57.328c-0.8,0 -1.5,-0.5 -1.8,-1.2s-0.1,-1.5 0.4,-2.1c0.5,-0.5 1.4,-0.7 2.1,-0.4c0.7,0.3 1.2,1 1.2,1.8C66.5,56.528 65.6,57.328 64.6,57.328L64.6,57.328z"
-        android:strokeWidth="1"
-        android:strokeColor="#00000000" />
+        android:pathData="M54,34 A14,14 0 1,1 53.99,34"
+        android:fillColor="#FACC15" />
+
+    <!-- Sun Rays -->
+    <path
+        android:pathData="M54,26 L54,21 M43,30 L39,26 M65,30 L69,26 M36,38 L31,36 M72,38 L77,36"
+        android:strokeColor="#FACC15"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+
+    <!-- Arch Bridge ("Setu") Connecting Farm to Mandi -->
+    <path
+        android:pathData="M27,68 C37,50 71,50 81,68"
+        android:strokeColor="#FACC15"
+        android:strokeWidth="4.2"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+    <path
+        android:pathData="M29,71 C38,55 70,55 79,71"
+        android:strokeColor="#FEF08A"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+
+    <!-- Bridge Suspension Pillars -->
+    <path
+        android:pathData="M39,59 L39,71 M46,55 L46,72 M54,54 L54,72 M62,55 L62,72 M69,59 L69,71"
+        android:strokeColor="#FACC15"
+        android:strokeWidth="1.2"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+
+    <!-- Left Golden Wheat Stalk -->
+    <path
+        android:pathData="M32,74 C26,58 27,42 34,29"
+        android:strokeColor="#EAB308"
+        android:strokeWidth="1.6"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+    <!-- Left Wheat Grains -->
+    <path
+        android:pathData="M34,28 C35,26 38,27 38,29 C38,31 35,32 34,28 Z"
+        android:fillColor="#FACC15" />
+    <path
+        android:pathData="M31,34 C30,32 27,33 27,35 C27,37 30,38 31,34 Z"
+        android:fillColor="#FACC15" />
+    <path
+        android:pathData="M35,37 C36,35 39,36 39,38 C39,40 36,41 35,37 Z"
+        android:fillColor="#FACC15" />
+    <path
+        android:pathData="M30,43 C29,41 26,42 26,44 C26,46 29,47 30,43 Z"
+        android:fillColor="#FACC15" />
+    <path
+        android:pathData="M34,47 C35,45 38,46 38,48 C38,50 35,51 34,47 Z"
+        android:fillColor="#FACC15" />
+    <path
+        android:pathData="M29,53 C28,51 25,52 25,54 C25,56 28,57 29,53 Z"
+        android:fillColor="#FACC15" />
+
+    <!-- Right Golden Wheat Stalk -->
+    <path
+        android:pathData="M76,74 C82,58 81,42 74,29"
+        android:strokeColor="#EAB308"
+        android:strokeWidth="1.6"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+    <!-- Right Wheat Grains -->
+    <path
+        android:pathData="M74,28 C73,26 70,27 70,29 C70,31 73,32 74,28 Z"
+        android:fillColor="#FACC15" />
+    <path
+        android:pathData="M77,34 C78,32 81,33 81,35 C81,37 78,38 77,34 Z"
+        android:fillColor="#FACC15" />
+    <path
+        android:pathData="M73,37 C72,35 69,36 69,38 C69,40 72,41 73,37 Z"
+        android:fillColor="#FACC15" />
+    <path
+        android:pathData="M78,43 C79,41 82,42 82,44 C82,46 79,47 78,43 Z"
+        android:fillColor="#FACC15" />
+    <path
+        android:pathData="M74,47 C73,45 70,46 70,48 C70,50 73,51 74,47 Z"
+        android:fillColor="#FACC15" />
+    <path
+        android:pathData="M79,53 C80,51 83,52 83,54 C83,56 80,57 79,53 Z"
+        android:fillColor="#FACC15" />
+
+    <!-- Fertile Field Furrows at Base -->
+    <path
+        android:pathData="M32,79 L54,73 L76,79 M38,83 L54,77 L70,83"
+        android:strokeColor="#55FACC15"
+        android:strokeWidth="1.0"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+
+    <!-- Digital Smart Tech Sparkle / Node (Center) -->
+    <path
+        android:pathData="M54,45 A3.5,3.5 0 1,1 53.99,45"
+        android:fillColor="#FFFFFF" />
+    <path
+        android:pathData="M54,43 A5.5,5.5 0 1,1 53.99,43"
+        android:strokeColor="#FACC15"
+        android:strokeWidth="1.0"
+        android:fillColor="#00000000" />
 </vector>

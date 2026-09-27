@@ -1480,8 +1480,9 @@
             <div class="flex items-center justify-between py-2.5 border-b border-stone-100">
               <!-- LOGO & BRANDING -->
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-700 via-red-800 to-amber-900 text-white flex items-center justify-center font-bold text-xl shadow-sm ring-2 ring-amber-400/40">
-                  🌾
+                <div class="relative w-10 h-10 rounded-xl overflow-hidden shadow-sm ring-2 ring-amber-400/60 bg-gradient-to-br from-rose-800 to-amber-900 flex items-center justify-center shrink-0">
+                  <img src="./logo-icon.svg" alt="Kisan Setu Logo" class="w-full h-full object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                  <span style="display:none;" class="w-full h-full items-center justify-center text-xl">🌾</span>
                 </div>
                 <div>
                   <div class="flex items-center gap-2">
