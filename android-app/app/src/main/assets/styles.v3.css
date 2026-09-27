@@ -1,0 +1,147 @@
+/* Kisan Setu - Light Red + Golden Theme Styles & Animations */
+:root {
+  --primary-red: #be123c;
+  --primary-rose: #e11d48;
+  --light-rose: #fff1f2;
+  --accent-gold: #f59e0b;
+  --warm-gold: #fbbf24;
+  --deep-gold: #b45309;
+  --gold-bg: #fffbeb;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.02); }
+}
+
+@keyframes pulseGoldGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.45);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 16px 4px rgba(245, 158, 11, 0.25);
+    transform: scale(1.015);
+  }
+}
+
+@keyframes pulseRoseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 12px 3px rgba(225, 29, 72, 0.2);
+  }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes ripple {
+  0% { transform: scale(0.9); opacity: 1; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+@keyframes bounceDot {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-in {
+  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.pulse-glow {
+  animation: pulseGlow 2s infinite ease-in-out;
+}
+
+.pulse-gold {
+  animation: pulseGoldGlow 2.2s infinite ease-in-out;
+}
+
+.pulse-rose {
+  animation: pulseRoseGlow 2s infinite ease-in-out;
+}
+
+.ripple-effect {
+  animation: ripple 1.8s infinite ease-out;
+}
+
+.typing-dot-1 {
+  animation: bounceDot 1.4s infinite ease-in-out both;
+  animation-delay: -0.32s;
+}
+.typing-dot-2 {
+  animation: bounceDot 1.4s infinite ease-in-out both;
+  animation-delay: -0.16s;
+}
+.typing-dot-3 {
+  animation: bounceDot 1.4s infinite ease-in-out both;
+}
+
+/* User-friendly card lift effect */
+.card-hover-lift {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card-hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -4px rgba(190, 18, 60, 0.08), 0 4px 8px -2px rgba(245, 158, 11, 0.06);
+}
+
+/* Custom scrollbars themed to Light Red & Gold */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #fff5f5;
+}
+::-webkit-scrollbar-thumb {
+  background: #fca5a5;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #f87171;
+}
+
+/* Subtle focus enhancement for accessibility */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(244, 63, 94, 0.25);
+}
+
+/* Print styles for digital gate pass */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-pass, #printable-pass * {
+    visibility: visible;
+  }
+  #printable-pass {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}

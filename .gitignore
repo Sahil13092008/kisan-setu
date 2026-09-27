@@ -27,3 +27,11 @@ dist-ssr
 old_index.*
 old_extracted.html
 *.zip
+*.apk
+
+# Android build outputs
+android-app/.gradle/
+android-app/app/build/
+android-app/build/
+android-app/local.properties
+.gradle/

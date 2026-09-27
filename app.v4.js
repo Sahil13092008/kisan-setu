@@ -536,6 +536,7 @@
       ]
     },
     farmerAuth: {
+      formSection: 1, // 1: Profile & Aadhaar, 2: Bank & Land, 3: Mandi Preference
       isVerified: false, // Starts as false so user completes Registration Dashboard first
       currentStep: 'register', // 'register' | 'choose_mandi' | 'active_pass'
       selectedFarmerId: 'FARMER-01',
@@ -558,6 +559,7 @@
       quotaRemaining: 128
     },
     bookingForm: {
+      bookingSection: 1, // 1: Mandi & Rates, 2: Crop, Qty, Date & Slot
       isOpen: false,
       mandiId: 'RAU',
       crop: 'Wheat',
@@ -979,7 +981,43 @@
       state.farmerAuth.currentStep = step;
       render();
     },
+    
+    setRegistrationSection: (sec) => {
+      state.farmerAuth.formSection = Number(sec);
+      render();
+    },
+    nextRegistrationSection: () => {
+      const cur = state.farmerAuth.formSection || 1;
+      if (cur < 3) {
+        state.farmerAuth.formSection = cur + 1;
+        render();
+        window.scrollTo({ top: 120, behavior: 'smooth' });
+      }
+    },
+    prevRegistrationSection: () => {
+      const cur = state.farmerAuth.formSection || 1;
+      if (cur > 1) {
+        state.farmerAuth.formSection = cur - 1;
+        render();
+        window.scrollTo({ top: 120, behavior: 'smooth' });
+      }
+    },
+    setBookingSection: (sec) => {
+      state.bookingForm.bookingSection = Number(sec);
+      render();
+    },
+    nextBookingSection: () => {
+      state.bookingForm.bookingSection = 2;
+      render();
+      window.scrollTo({ top: 120, behavior: 'smooth' });
+    },
+    prevBookingSection: () => {
+      state.bookingForm.bookingSection = 1;
+      render();
+      window.scrollTo({ top: 120, behavior: 'smooth' });
+    },
     prefillFarmerRegistration: (farmerId) => {
+      state.farmerAuth.formSection = 3;
       const f = state.farmers.find(x => x.id === farmerId) || state.farmers[0];
       state.farmerAuth.selectedFarmerId = f.id;
       state.farmerAuth.name = f.name;
@@ -1696,42 +1734,44 @@
   }
 
   // --- SUB-VIEW 1: FARMER REGISTRATION DASHBOARD ---
+    // --- SUB-VIEW 1: FARMER REGISTRATION DASHBOARD (MOBILE-FIRST MULTI-SECTION WIZARD) ---
   function renderRegistrationDashboard() {
     const auth = state.farmerAuth;
+    const curSec = auth.formSection || 1;
 
     return `
       <div class="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden animate-fade-in">
         <!-- HEADER BANNER -->
-        <div class="bg-gradient-to-r from-rose-800 via-red-900 to-amber-950 text-white p-5 sm:p-6 border-b-2 border-amber-400/40">
-          <div class="flex flex-wrap items-center justify-between gap-4">
-            <div class="flex items-center gap-3.5">
-              <div class="w-12 h-12 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-2xl shadow-xs">
+        <div class="bg-gradient-to-r from-rose-800 via-red-900 to-amber-950 text-white p-4 sm:p-6 border-b-2 border-amber-400/40">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-2xl shadow-xs shrink-0">
                 👨‍🌾
               </div>
               <div>
-                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/15 text-amber-200 border border-amber-300/30 mb-1">
+                <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/15 text-amber-200 border border-amber-300/30 mb-0.5">
                   <span>🔒 Step 1 of 3 • Government e-KYC Verification</span>
                 </div>
-                <h2 class="text-xl sm:text-2xl font-black tracking-tight">Farmer Registration & Bank DBT Dashboard</h2>
-                <p class="text-xs text-amber-200/90 mt-0.5">Enter farmer profile, Aadhaar, and Bank Account details for MSP procurement.</p>
+                <h2 class="text-lg sm:text-2xl font-black tracking-tight">Farmer Registration & Bank DBT</h2>
+                <p class="text-[11px] sm:text-xs text-amber-200/90">Organized in 3 quick sections for easy mobile entry without scrolling.</p>
               </div>
             </div>
 
             <!-- Pre-fill 1-Click Judge Buttons -->
-            <div class="bg-white/10 p-2.5 rounded-xl border border-white/20 text-xs text-right">
-              <span class="block text-[10px] font-bold uppercase tracking-wider text-amber-200 mb-1.5">⚡ Judge 1-Click Quick Fill:</span>
-              <div class="flex flex-wrap gap-1.5 justify-end">
+            <div class="bg-white/10 p-2 rounded-xl border border-white/20 text-xs text-right w-full sm:w-auto">
+              <span class="block text-[10px] font-bold uppercase tracking-wider text-amber-200 mb-1">⚡ Judge 1-Click Quick Fill:</span>
+              <div class="flex flex-wrap gap-1 justify-start sm:justify-end">
                 <button type="button" onclick="appHandlers.prefillFarmerRegistration('FARMER-01')"
-                  class="px-2.5 py-1 rounded-lg bg-white text-rose-900 hover:bg-amber-50 text-[11px] font-bold border border-amber-200 shadow-2xs transition-colors">
-                  Ramesh Kumar (Rau)
+                  class="px-2 py-1 rounded-lg bg-white text-rose-900 hover:bg-amber-50 text-[11px] font-bold border border-amber-200 shadow-2xs transition-colors">
+                  Ramesh (Rau)
                 </button>
                 <button type="button" onclick="appHandlers.prefillFarmerRegistration('FARMER-02')"
-                  class="px-2.5 py-1 rounded-lg bg-white text-rose-900 hover:bg-amber-50 text-[11px] font-bold border border-amber-200 shadow-2xs transition-colors">
-                  Suresh Patel (Rangwasa)
+                  class="px-2 py-1 rounded-lg bg-white text-rose-900 hover:bg-amber-50 text-[11px] font-bold border border-amber-200 shadow-2xs transition-colors">
+                  Suresh (Rangwasa)
                 </button>
                 <button type="button" onclick="appHandlers.prefillFarmerRegistration('FARMER-03')"
-                  class="px-2.5 py-1 rounded-lg bg-white text-rose-900 hover:bg-amber-50 text-[11px] font-bold border border-amber-200 shadow-2xs transition-colors">
-                  Rajesh Verma (Sanwer)
+                  class="px-2 py-1 rounded-lg bg-white text-rose-900 hover:bg-amber-50 text-[11px] font-bold border border-amber-200 shadow-2xs transition-colors">
+                  Rajesh (Sanwer)
                 </button>
                 <button type="button" onclick="appHandlers.clearRegistrationForm()"
                   class="px-2 py-1 rounded-lg bg-white/20 hover:bg-white/30 text-white text-[11px] font-bold transition-colors">
@@ -1742,256 +1782,283 @@
           </div>
         </div>
 
-        <!-- FORM CONTENT -->
-        
-        <!-- PROMINENT PROCUREMENT CHANNELS SHOWCASE (Govt APMC & Private Mandis) -->
-        <div class="m-5 sm:m-6 p-4 rounded-2xl bg-gradient-to-br from-amber-50 via-rose-50/20 to-amber-100/40 border-2 border-amber-300 shadow-xs space-y-3">
-          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-amber-200/80 pb-2.5">
-            <div class="flex items-center gap-2">
-              <span class="text-xl">🏢</span>
-              <div>
-                <h3 class="font-black text-sm text-stone-900">Procurement Channels Available: Govt APMC & Private Mandis</h3>
-                <p class="text-[11px] text-stone-600">Sell at official Government MSP or choose licensed Private Mandis with extra bonus pricing.</p>
-              </div>
-            </div>
-            <button type="button" onclick="appHandlers.setFarmerStep('choose_mandi')"
-              class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-black text-xs shadow-xs transition-all hover:scale-102 flex items-center gap-1.5">
-              <span>👉 Browse All Mandis & Private Rates (Step 2)</span>
-              <span>➔</span>
-            </button>
+        <!-- MOBILE-FIRST SECTION TABS (PREVENTS SCROLLING) -->
+        <div class="px-3 sm:px-6 pt-3 pb-2.5 bg-stone-50 border-b border-stone-200 sticky top-[61px] z-20 backdrop-blur-md">
+          <div class="flex items-center justify-between text-[11px] font-extrabold uppercase tracking-wider text-stone-500 mb-2">
+            <span class="flex items-center gap-1.5">
+              <span>📑</span> Registration Wizard (अनुभाग)
+            </span>
+            <span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-900 font-bold">
+              Section ${curSec} of 3
+            </span>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            <!-- Option A: Private Mandis -->
-            <div class="p-3 bg-white rounded-xl border border-amber-300 shadow-2xs space-y-1.5">
-              <div class="flex items-center justify-between">
-                <span class="px-2 py-0.5 rounded text-[10px] font-black bg-amber-100 text-amber-950 border border-amber-300">
-                  🏢 LICENSED PRIVATE MANDIS
-                </span>
-                <span class="font-mono text-rose-900 font-black text-sm">₹2,460 / Qtl</span>
-              </div>
-              <div class="font-bold text-stone-900 text-xs">ITC Choupal Saagar & Adani Modern Silo</div>
-              <ul class="text-[11px] text-stone-600 space-y-0.5">
-                <li class="flex items-center gap-1 text-amber-900 font-bold">
-                  <span>✓</span> <span>⚡ +₹60/Qtl Private Bonus over Govt MSP</span>
-                </li>
-                <li class="flex items-center gap-1">
-                  <span>✓</span> <span>15-Minute Automated Unloading (No Yard Jam)</span>
-                </li>
-                <li class="flex items-center gap-1">
-                  <span>✓</span> <span>Same-Day Direct NEFT / RTGS Bank Transfer</span>
-                </li>
-              </ul>
-            </div>
+          <div class="grid grid-cols-3 gap-1.5 sm:gap-2">
+            <button type="button" onclick="appHandlers.setRegistrationSection(1)"
+              class="py-2 px-1.5 rounded-xl text-center transition-all card-hover-lift ${
+                curSec === 1
+                  ? 'bg-gradient-to-r from-rose-700 to-red-800 text-white font-black shadow-xs ring-1 ring-amber-400/40'
+                  : 'bg-white text-stone-700 border border-stone-200 hover:bg-stone-50 font-bold'
+              }">
+              <div class="text-[11px] sm:text-xs leading-tight">👤 1. Profile</div>
+              <div class="text-[9px] ${curSec === 1 ? 'text-rose-100' : 'text-stone-400'}">Aadhaar e-KYC</div>
+            </button>
 
-            <!-- Option B: Govt APMC -->
-            <div class="p-3 bg-white rounded-xl border border-stone-200 shadow-2xs space-y-1.5">
-              <div class="flex items-center justify-between">
-                <span class="px-2 py-0.5 rounded text-[10px] font-black bg-rose-100 text-rose-950 border border-rose-300">
-                  🏛️ GOVERNMENT APMC YARDS
-                </span>
-                <span class="font-mono text-stone-900 font-bold text-sm">₹2,400 / Qtl</span>
-              </div>
-              <div class="font-bold text-stone-900 text-xs">Rau, Indore Chhawani, Sanwer, Depalpur</div>
-              <ul class="text-[11px] text-stone-600 space-y-0.5">
-                <li class="flex items-center gap-1">
-                  <span>✓</span> <span>100% Government MSP Guaranteed</span>
-                </li>
-                <li class="flex items-center gap-1">
-                  <span>✓</span> <span>Direct DBT Credit via PFMS (Aadhaar Seeding)</span>
-                </li>
-                <li class="flex items-center gap-1">
-                  <span>✓</span> <span>Open yard auction & physical lot inspection</span>
-                </li>
-              </ul>
-            </div>
+            <button type="button" onclick="appHandlers.setRegistrationSection(2)"
+              class="py-2 px-1.5 rounded-xl text-center transition-all card-hover-lift ${
+                curSec === 2
+                  ? 'bg-gradient-to-r from-rose-700 to-red-800 text-white font-black shadow-xs ring-1 ring-amber-400/40'
+                  : 'bg-white text-stone-700 border border-stone-200 hover:bg-stone-50 font-bold'
+              }">
+              <div class="text-[11px] sm:text-xs leading-tight">🏦 2. Bank & Land</div>
+              <div class="text-[9px] ${curSec === 2 ? 'text-rose-100' : 'text-stone-400'}">DBT & Quota</div>
+            </button>
+
+            <button type="button" onclick="appHandlers.setRegistrationSection(3)"
+              class="py-2 px-1.5 rounded-xl text-center transition-all card-hover-lift ${
+                curSec === 3
+                  ? 'bg-gradient-to-r from-rose-700 to-red-800 text-white font-black shadow-xs ring-1 ring-amber-400/40'
+                  : 'bg-white text-stone-700 border border-stone-200 hover:bg-stone-50 font-bold'
+              }">
+              <div class="text-[11px] sm:text-xs leading-tight">🏢 3. Mandi Choice</div>
+              <div class="text-[9px] ${curSec === 3 ? 'text-rose-100' : 'text-stone-400'}">Govt vs Private</div>
+            </button>
           </div>
         </div>
 
-        <form onsubmit="appHandlers.requestFarmerVerification(event)" class="p-5 sm:p-7 space-y-6">
+        <form onsubmit="appHandlers.requestFarmerVerification(event)" class="p-4 sm:p-6 space-y-5">
           
-          <!-- SECTION 1: PERSONAL & CONTACT DETAILS -->
-          <div class="space-y-3">
-            <h4 class="text-xs font-black text-stone-900 uppercase tracking-wider flex items-center gap-1.5 border-b border-stone-200 pb-1.5">
-              <span>👤</span> 1. Personal & Contact Information (किसान की व्यक्तिगत जानकारी)
-            </h4>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-              <div>
-                <label class="block font-bold text-stone-700 mb-1">Full Name / किसान का पूरा नाम *</label>
-                <input type="text" required value="${auth.name}"
-                  oninput="state.farmerAuth.name = this.value"
-                  placeholder="e.g. Ramesh Kumar"
-                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-bold text-stone-900 focus:ring-2 focus:ring-rose-500 bg-white">
+          <!-- SECTION 1: PERSONAL & AADHAAR e-KYC -->
+          ${curSec === 1 ? `
+            <div class="space-y-4 animate-fade-in">
+              <div class="flex items-center justify-between border-b border-stone-200 pb-2">
+                <h4 class="text-xs font-black text-stone-900 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>👤</span> Section 1: Personal & Aadhaar Details (व्यक्तिगत व आधार विवरण)
+                </h4>
+                <span class="text-[10px] text-rose-700 font-bold">Part 1 of 3</span>
               </div>
 
-              <div>
-                <label class="block font-bold text-stone-700 mb-1">Village & District / गाँव व जिला *</label>
-                <input type="text" required value="${auth.village}"
-                  oninput="state.farmerAuth.village = this.value"
-                  placeholder="e.g. Rau Village, Indore"
-                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-bold text-stone-900 focus:ring-2 focus:ring-rose-500 bg-white">
-              </div>
-
-              <div>
-                <label class="block font-bold text-stone-700 mb-1">Mobile Number (For OTP & SMS alerts) *</label>
-                <input type="text" required value="${auth.phone}"
-                  oninput="state.farmerAuth.phone = this.value"
-                  placeholder="+91 9876543210"
-                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-mono font-bold text-stone-900 focus:ring-2 focus:ring-rose-500 bg-white">
-              </div>
-            </div>
-          </div>
-
-          <!-- SECTION 2: IDENTITY & AADHAAR e-KYC -->
-          <div class="space-y-3">
-            <h4 class="text-xs font-black text-stone-900 uppercase tracking-wider flex items-center gap-1.5 border-b border-stone-200 pb-1.5">
-              <span>🔒</span> 2. UIDAI Aadhaar Verification (आधार सत्यापन)
-            </h4>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-              <div>
-                <label class="block font-bold text-stone-700 mb-1 flex justify-between">
-                  <span>12-Digit Aadhaar Number *</span>
-                  <span class="text-rose-700 font-mono text-[10px]">UIDAI Integrated</span>
-                </label>
-                <input type="text" maxlength="14" required value="${auth.aadhaar}"
-                  oninput="state.farmerAuth.aadhaar = this.value"
-                  placeholder="1234 5678 9012"
-                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-mono font-black text-sm tracking-widest text-rose-950 focus:ring-2 focus:ring-rose-500 bg-white">
-                <span class="text-[10px] text-stone-500 mt-1 block">Aadhaar will be validated via simulated OTP verification</span>
-              </div>
-
-              <div class="p-3 bg-amber-50/80 rounded-xl border border-amber-200 space-y-1 text-xs">
-                <div class="font-bold text-amber-950 flex items-center gap-1.5">
-                  <span>🛡️</span> Aadhaar e-KYC Guarantee
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                <div>
+                  <label class="block font-bold text-stone-700 mb-1">Full Name / किसान का पूरा नाम *</label>
+                  <input type="text" required value="${auth.name}"
+                    oninput="state.farmerAuth.name = this.value"
+                    placeholder="e.g. Ramesh Kumar"
+                    class="w-full px-3 py-2.5 rounded-xl border border-stone-300 font-bold text-stone-900 focus:ring-2 focus:ring-rose-500 bg-white">
                 </div>
-                <p class="text-[11px] text-stone-700 leading-relaxed">
-                  Direct Aadhaar seeding ensures transparent MSP payment transfers without middlemen or identity duplication.
-                </p>
-              </div>
-            </div>
-          </div>
 
-          <!-- SECTION 3: BANK ACCOUNT DETAILS (FOR DBT PAYMENT CREDIT) -->
-          <div class="space-y-3">
-            <h4 class="text-xs font-black text-stone-900 uppercase tracking-wider flex items-center gap-1.5 border-b border-stone-200 pb-1.5">
-              <span>🏦</span> 3. Bank Account Details for MSP Direct Benefit Transfer (बैंक खाता विवरण)
-            </h4>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-              <div>
-                <label class="block font-bold text-stone-700 mb-1">Bank Name / बैंक का नाम *</label>
-                <input type="text" required value="${auth.bankName}"
-                  oninput="state.farmerAuth.bankName = this.value"
-                  placeholder="e.g. State Bank of India (SBI)"
-                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-bold text-stone-900 focus:ring-2 focus:ring-rose-500 bg-white">
-              </div>
+                <div>
+                  <label class="block font-bold text-stone-700 mb-1">Village & District / गाँव व जिला *</label>
+                  <input type="text" required value="${auth.village}"
+                    oninput="state.farmerAuth.village = this.value"
+                    placeholder="e.g. Rau Village, Indore"
+                    class="w-full px-3 py-2.5 rounded-xl border border-stone-300 font-bold text-stone-900 focus:ring-2 focus:ring-rose-500 bg-white">
+                </div>
 
-              <div>
-                <label class="block font-bold text-stone-700 mb-1">Account Number / खाता संख्या *</label>
-                <input type="text" required value="${auth.bankAcc}"
-                  oninput="state.farmerAuth.bankAcc = this.value"
-                  placeholder="e.g. 308941204091"
-                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-mono font-bold text-stone-900 focus:ring-2 focus:ring-rose-500 bg-white">
-              </div>
-
-              <div>
-                <label class="block font-bold text-stone-700 mb-1">IFSC Code / आईएफएससी कोड *</label>
-                <input type="text" required value="${auth.ifsc}"
-                  oninput="state.farmerAuth.ifsc = this.value"
-                  placeholder="e.g. SBIN0030128"
-                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-mono font-bold uppercase text-stone-900 focus:ring-2 focus:ring-rose-500 bg-white">
-              </div>
-            </div>
-
-            <!-- DBT Seeding Badge -->
-            <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between text-xs">
-              <div class="flex items-center gap-2">
-                <span class="text-amber-600 font-bold text-base">✓</span>
-                <span class="text-stone-700 font-semibold">NPCI Aadhaar Payment Bridge: <strong class="text-rose-900 font-black">${auth.dbtStatus}</strong></span>
-              </div>
-              <span class="text-[10px] bg-amber-100 text-amber-950 font-bold px-2 py-0.5 rounded border border-amber-300">T+0 DBT Active</span>
-            </div>
-          </div>
-
-          <!-- SECTION 4: BHULEKH LAND RECORDS (BHULEKH SYNC) -->
-          <div class="space-y-3">
-            <h4 class="text-xs font-black text-stone-900 uppercase tracking-wider flex items-center gap-1.5 border-b border-stone-200 pb-1.5">
-              <span>📜</span> 4. Bhulekh Land Records & Quota (भूलेख भूमि रिकॉर्ड)
-            </h4>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-              <div>
-                <label class="block font-bold text-stone-700 mb-1">Khasra Number (खसरा संख्या) *</label>
-                <input type="text" value="${auth.khasraNo}"
-                  oninput="state.farmerAuth.khasraNo = this.value"
-                  placeholder="214/1-क"
-                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-mono font-bold text-stone-900 focus:ring-2 focus:ring-rose-500 bg-white">
-              </div>
-
-              <div>
-                <label class="block font-bold text-stone-700 mb-1">Land Holding (भूमि का क्षेत्रफल) *</label>
-                <input type="text" value="${auth.landArea}"
-                  oninput="state.farmerAuth.landArea = this.value"
-                  placeholder="4.2 Hectares"
-                  class="w-full px-3 py-2 rounded-xl border border-stone-300 font-bold text-stone-900 focus:ring-2 focus:ring-rose-500 bg-white">
-              </div>
-
-              <div>
-                <label class="block font-bold text-stone-700 mb-1">Permissible Wheat Quota</label>
-                <div class="px-3 py-2 rounded-xl border border-amber-300 bg-amber-50/70 font-mono font-black text-amber-950 flex justify-between items-center">
-                  <span>${auth.quotaWheat} Quintals</span>
-                  <span class="text-[10px] text-amber-800 font-bold">Bhulekh Verified</span>
+                <div>
+                  <label class="block font-bold text-stone-700 mb-1">Mobile Number (For OTP & Alerts) *</label>
+                  <input type="text" required value="${auth.phone}"
+                    oninput="state.farmerAuth.phone = this.value"
+                    placeholder="+91 9876543210"
+                    class="w-full px-3 py-2.5 rounded-xl border border-stone-300 font-mono font-bold text-stone-900 focus:ring-2 focus:ring-rose-500 bg-white">
                 </div>
               </div>
-            </div>
-          </div>
 
-          
-          <!-- SECTION 5: PREFERRED PROCUREMENT CHANNEL -->
-          <div class="space-y-3">
-            <h4 class="text-xs font-black text-stone-900 uppercase tracking-wider flex items-center gap-1.5 border-b border-stone-200 pb-1.5">
-              <span>🏢</span> 5. Preferred Procurement Channel / खरीद केंद्र चयन (Government vs Private Mandi)
-            </h4>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-              <div onclick="state.preferredMandiType = 'private'; state.mandiFilter = 'private'; render();"
-                class="p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
-                  state.preferredMandiType === 'private'
-                    ? 'border-amber-500 bg-amber-50/70 ring-2 ring-amber-400/20 shadow-xs'
-                    : 'border-stone-200 bg-white hover:border-stone-300'
-                }">
-                <div class="flex items-center justify-between">
-                  <span class="font-extrabold text-stone-900 flex items-center gap-1.5">
-                    <span>🏢</span> Private Mandi / Silo (ITC Choupal / Adani)
-                  </span>
-                  ${state.preferredMandiType === 'private' ? '<span class="text-amber-800 text-xs font-black">✓ Selected</span>' : ''}
+              <!-- UIDAI Aadhaar Verification -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-1">
+                <div>
+                  <label class="block font-bold text-stone-700 mb-1 flex justify-between">
+                    <span>12-Digit Aadhaar Number *</span>
+                    <span class="text-rose-700 font-mono text-[10px]">UIDAI Integrated</span>
+                  </label>
+                  <input type="text" maxlength="14" required value="${auth.aadhaar}"
+                    oninput="state.farmerAuth.aadhaar = this.value"
+                    placeholder="1234 5678 9012"
+                    class="w-full px-3 py-2.5 rounded-xl border border-stone-300 font-mono font-black text-sm tracking-widest text-rose-950 focus:ring-2 focus:ring-rose-500 bg-white">
+                  <span class="text-[10px] text-stone-500 mt-1 block">Aadhaar validated via simulated OTP verification</span>
                 </div>
-                <p class="text-[11px] text-stone-600 mt-1">Offers <strong>₹2,460/Qtl (+₹60 Bonus)</strong> with 15-minute fast-track unloading and direct NEFT settlement.</p>
+
+                <div class="p-3 bg-amber-50/80 rounded-xl border border-amber-200 space-y-1 text-xs">
+                  <div class="font-bold text-amber-950 flex items-center gap-1.5">
+                    <span>🛡️</span> Aadhaar e-KYC Direct Seeding
+                  </div>
+                  <p class="text-[11px] text-stone-700 leading-relaxed">
+                    Direct Aadhaar seeding ensures transparent MSP payment transfers without middlemen or identity duplication.
+                  </p>
+                </div>
               </div>
 
-              <div onclick="state.preferredMandiType = 'government'; state.mandiFilter = 'government'; render();"
-                class="p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
-                  state.preferredMandiType === 'government'
-                    ? 'border-rose-600 bg-rose-50/80 ring-2 ring-rose-500/25 shadow-xs'
-                    : 'border-stone-200 bg-white hover:border-stone-300'
-                }">
-                <div class="flex items-center justify-between">
-                  <span class="font-extrabold text-stone-900 flex items-center gap-1.5">
-                    <span>🏛️</span> Government APMC Mandi (Rau / Indore)
-                  </span>
-                  ${state.preferredMandiType === 'government' ? '<span class="text-rose-700 text-xs font-black">✓ Selected</span>' : ''}
-                </div>
-                <p class="text-[11px] text-stone-600 mt-1">Standard Government MSP procurement at official state mandis with PFMS DBT bank credit.</p>
+              <div class="pt-3 border-t border-stone-100 flex items-center justify-between">
+                <span class="text-[11px] text-stone-500">Filled? Proceed to Bank & Land</span>
+                <button type="button" onclick="appHandlers.nextRegistrationSection()"
+                  class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-700 to-red-700 hover:from-rose-800 hover:to-red-800 text-white font-extrabold text-xs shadow-xs flex items-center gap-1.5">
+                  <span>Continue to Bank & Land (Section 2)</span>
+                  <span>➔</span>
+                </button>
               </div>
             </div>
-          </div>
+          ` : ''}
 
-          <!-- VERIFY ACTION & OTP MODAL -->
-          <div class="pt-4 border-t border-stone-100 flex items-center justify-between">
-            <span class="text-xs text-stone-500">All fields verified with UIDAI & MP Bhulekh Portal</span>
-            
-            <button type="submit" ${auth.isAuthenticating ? 'disabled' : ''}
-              class="px-6 py-3 rounded-xl bg-gradient-to-r from-rose-700 via-rose-800 to-red-800 hover:from-rose-800 hover:to-red-900 text-white font-extrabold text-xs sm:text-sm shadow-md flex items-center gap-2 transition-all hover:scale-[1.02]">
-              <span>${auth.isAuthenticating ? 'Authenticating with UIDAI...' : 'Verify Details & Proceed to Mandi Selection (Govt & Private) ➔'}</span>
-            </button>
-          </div>
+          <!-- SECTION 2: BANK ACCOUNT & LAND RECORDS -->
+          ${curSec === 2 ? `
+            <div class="space-y-4 animate-fade-in">
+              <div class="flex items-center justify-between border-b border-stone-200 pb-2">
+                <h4 class="text-xs font-black text-stone-900 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>🏦</span> Section 2: Bank Account & Land Records (बैंक व भूमि रिकॉर्ड)
+                </h4>
+                <span class="text-[10px] text-rose-700 font-bold">Part 2 of 3</span>
+              </div>
+
+              <!-- Bank Details -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                <div>
+                  <label class="block font-bold text-stone-700 mb-1">Bank Name / बैंक का नाम *</label>
+                  <input type="text" required value="${auth.bankName}"
+                    oninput="state.farmerAuth.bankName = this.value"
+                    placeholder="e.g. State Bank of India (SBI)"
+                    class="w-full px-3 py-2.5 rounded-xl border border-stone-300 font-bold text-stone-900 focus:ring-2 focus:ring-rose-500 bg-white">
+                </div>
+
+                <div>
+                  <label class="block font-bold text-stone-700 mb-1">Account Number / खाता संख्या *</label>
+                  <input type="text" required value="${auth.bankAcc}"
+                    oninput="state.farmerAuth.bankAcc = this.value"
+                    placeholder="e.g. 308941204091"
+                    class="w-full px-3 py-2.5 rounded-xl border border-stone-300 font-mono font-bold text-stone-900 focus:ring-2 focus:ring-rose-500 bg-white">
+                </div>
+
+                <div>
+                  <label class="block font-bold text-stone-700 mb-1">IFSC Code / आईएफएससी कोड *</label>
+                  <input type="text" required value="${auth.ifsc}"
+                    oninput="state.farmerAuth.ifsc = this.value"
+                    placeholder="e.g. SBIN0030128"
+                    class="w-full px-3 py-2.5 rounded-xl border border-stone-300 font-mono font-bold uppercase text-stone-900 focus:ring-2 focus:ring-rose-500 bg-white">
+                </div>
+              </div>
+
+              <!-- DBT Seeding Badge -->
+              <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2">
+                  <span class="text-amber-600 font-bold text-base">✓</span>
+                  <span class="text-stone-700 font-semibold">NPCI Aadhaar Payment Bridge: <strong class="text-rose-900 font-black">${auth.dbtStatus}</strong></span>
+                </div>
+                <span class="text-[10px] bg-amber-100 text-amber-950 font-bold px-2 py-0.5 rounded border border-amber-300">T+0 DBT Active</span>
+              </div>
+
+              <!-- Bhulekh Land Records -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs pt-1">
+                <div>
+                  <label class="block font-bold text-stone-700 mb-1">Khasra Number (खसरा संख्या) *</label>
+                  <input type="text" value="${auth.khasraNo}"
+                    oninput="state.farmerAuth.khasraNo = this.value"
+                    placeholder="214/1-क"
+                    class="w-full px-3 py-2.5 rounded-xl border border-stone-300 font-mono font-bold text-stone-900 focus:ring-2 focus:ring-rose-500 bg-white">
+                </div>
+
+                <div>
+                  <label class="block font-bold text-stone-700 mb-1">Land Holding (भूमि क्षेत्रफल) *</label>
+                  <input type="text" value="${auth.landArea}"
+                    oninput="state.farmerAuth.landArea = this.value"
+                    placeholder="4.2 Hectares"
+                    class="w-full px-3 py-2.5 rounded-xl border border-stone-300 font-bold text-stone-900 focus:ring-2 focus:ring-rose-500 bg-white">
+                </div>
+
+                <div>
+                  <label class="block font-bold text-stone-700 mb-1">Permissible Wheat Quota</label>
+                  <div class="px-3 py-2.5 rounded-xl border border-amber-300 bg-amber-50/70 font-mono font-black text-amber-950 flex justify-between items-center">
+                    <span>${auth.quotaWheat} Quintals</span>
+                    <span class="text-[10px] text-amber-800 font-bold">Bhulekh Verified</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pt-3 border-t border-stone-100 flex items-center justify-between">
+                <button type="button" onclick="appHandlers.prevRegistrationSection()"
+                  class="px-4 py-2 rounded-xl border border-stone-200 text-stone-700 font-bold text-xs hover:bg-stone-50">
+                  ← Back to Profile
+                </button>
+                <button type="button" onclick="appHandlers.nextRegistrationSection()"
+                  class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-700 to-red-700 hover:from-rose-800 hover:to-red-800 text-white font-extrabold text-xs shadow-xs flex items-center gap-1.5">
+                  <span>Continue to Mandi Channel (Section 3)</span>
+                  <span>➔</span>
+                </button>
+              </div>
+            </div>
+          ` : ''}
+
+          <!-- SECTION 3: PREFERRED PROCUREMENT CHANNEL & VERIFY -->
+          ${curSec === 3 ? `
+            <div class="space-y-4 animate-fade-in">
+              <div class="flex items-center justify-between border-b border-stone-200 pb-2">
+                <h4 class="text-xs font-black text-stone-900 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>🏢</span> Section 3: Preferred Procurement Channel (Government vs Private Mandi)
+                </h4>
+                <span class="text-[10px] text-rose-700 font-bold">Part 3 of 3</span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <!-- Option A: Private Mandis -->
+                <div onclick="state.preferredMandiType = 'private'; state.mandiFilter = 'private'; render();"
+                  class="p-4 rounded-xl border-2 cursor-pointer transition-all card-hover-lift ${
+                    state.preferredMandiType === 'private'
+                      ? 'border-amber-500 bg-amber-50/80 ring-2 ring-amber-400/30 shadow-xs'
+                      : 'border-stone-200 bg-white hover:border-stone-300'
+                  }">
+                  <div class="flex items-center justify-between">
+                    <span class="font-extrabold text-stone-900 flex items-center gap-1.5">
+                      <span>🏢</span> Private Mandi / Silo (ITC Choupal / Adani)
+                    </span>
+                    ${state.preferredMandiType === 'private' ? '<span class="text-amber-800 text-xs font-black">✓ Selected</span>' : ''}
+                  </div>
+                  <div class="font-mono text-rose-900 font-black text-sm mt-1">₹2,460 / Qtl (+₹60 Bonus)</div>
+                  <p class="text-[11px] text-stone-600 mt-1">15-minute automated hydraulic dump unloading and direct same-day corporate NEFT bank settlement.</p>
+                </div>
+
+                <!-- Option B: Govt APMC -->
+                <div onclick="state.preferredMandiType = 'government'; state.mandiFilter = 'government'; render();"
+                  class="p-4 rounded-xl border-2 cursor-pointer transition-all card-hover-lift ${
+                    state.preferredMandiType === 'government'
+                      ? 'border-rose-600 bg-rose-50/80 ring-2 ring-rose-500/25 shadow-xs'
+                      : 'border-stone-200 bg-white hover:border-stone-300'
+                  }">
+                  <div class="flex items-center justify-between">
+                    <span class="font-extrabold text-stone-900 flex items-center gap-1.5">
+                      <span>🏛️</span> Government APMC Mandi (Rau / Indore)
+                    </span>
+                    ${state.preferredMandiType === 'government' ? '<span class="text-rose-700 text-xs font-black">✓ Selected</span>' : ''}
+                  </div>
+                  <div class="font-mono text-stone-900 font-bold text-sm mt-1">₹2,400 / Qtl (Official MSP)</div>
+                  <p class="text-[11px] text-stone-600 mt-1">Official Government MSP procurement guaranteed with direct Aadhaar DBT payment transfer via PFMS.</p>
+                </div>
+              </div>
+
+              <!-- Quick Summary Pill before submit -->
+              <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 text-xs flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <span class="text-stone-400 block text-[10px] font-bold">FARMER VERIFICATION SUMMARY</span>
+                  <span class="font-bold text-stone-900">${auth.name} • ${auth.village} • Aadhaar ${auth.aadhaar.slice(-4)} • ${auth.bankName}</span>
+                </div>
+                <button type="button" onclick="appHandlers.setRegistrationSection(1)"
+                  class="text-rose-700 hover:text-rose-800 text-[11px] font-bold underline">
+                  Review All Details
+                </button>
+              </div>
+
+              <!-- VERIFY ACTION & SUBMIT -->
+              <div class="pt-3 border-t border-stone-100 flex items-center justify-between gap-3 flex-wrap">
+                <button type="button" onclick="appHandlers.prevRegistrationSection()"
+                  class="px-4 py-2.5 rounded-xl border border-stone-200 text-stone-700 font-bold text-xs hover:bg-stone-50">
+                  ← Back to Bank & Land
+                </button>
+                
+                <button type="submit" ${auth.isAuthenticating ? 'disabled' : ''}
+                  class="flex-1 sm:flex-none px-6 py-3 rounded-xl bg-gradient-to-r from-rose-700 via-rose-800 to-red-800 hover:from-rose-800 hover:to-red-900 text-white font-extrabold text-xs sm:text-sm shadow-md flex items-center justify-center gap-2 transition-all hover:scale-[1.01]">
+                  <span>${auth.isAuthenticating ? 'Authenticating with UIDAI...' : 'Verify Details & Proceed to Mandi Selection (Govt & Private) ➔'}</span>
+                </button>
+              </div>
+            </div>
+          ` : ''}
+
         </form>
 
         <!-- OTP SIMULATION MODAL -->
@@ -2030,10 +2097,11 @@
     `;
   }
 
-  // --- SUB-VIEW 2: CHOOSE MANDI & BOOK PROCUREMENT SLOT ---
+    // --- SUB-VIEW 2: CHOOSE MANDI & BOOK PROCUREMENT SLOT (MOBILE-OPTIMIZED MULTI-SECTION) ---
   function renderMandiSelectionAndBookingDashboard() {
     const auth = state.farmerAuth;
     const form = state.bookingForm;
+    const curSec = form.bookingSection || 1;
     const selectedMandi = state.mandis.find(m => m.id === form.mandiId) || state.mandis[0];
     const cropRate = MSP_RATES[form.crop] || MSP_RATES['Wheat'];
     const baseRate = cropRate.total;
@@ -2051,318 +2119,304 @@
     const unloadingType = selectedMandi.unloadingType || (selectedMandi.type === 'private' ? '15-Min Automated Dump Pit' : 'Yard Weighbridge');
 
     return `
-      <div class="space-y-6 animate-fade-in">
+      <div class="space-y-5 animate-fade-in">
         
         <!-- VERIFIED FARMER SUMMARY PILL -->
-        <div class="bg-gradient-to-r from-rose-900 via-red-900 to-amber-950 text-white p-4 rounded-2xl shadow-xs border border-amber-400/30 flex flex-wrap items-center justify-between gap-3">
-          <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-lg bg-amber-500 text-amber-950 font-black border border-amber-400 flex items-center justify-center font-bold text-lg">
+        <div class="bg-gradient-to-r from-rose-900 via-red-900 to-amber-950 text-white p-3.5 sm:p-4 rounded-2xl shadow-xs border border-amber-400/30 flex flex-wrap items-center justify-between gap-2.5">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-amber-500 text-amber-950 font-black border border-amber-400 flex items-center justify-center font-bold text-base shrink-0">
               ✓
             </div>
             <div>
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-1.5">
                 <span class="font-extrabold text-sm sm:text-base">${auth.name}</span>
-                <span class="px-2 py-0.2 rounded text-[10px] font-bold bg-amber-400/30 text-amber-200 border border-amber-400/40">e-KYC Verified</span>
+                <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-400/30 text-amber-200 border border-amber-400/40">e-KYC Verified</span>
               </div>
-              <p class="text-xs text-amber-200">${auth.village} • Aadhaar: ${auth.aadhaar.slice(0, 4)} •••• ${auth.aadhaar.slice(-4)} • ${auth.bankName} (A/C •••• ${auth.bankAcc.slice(-4)})</p>
+              <p class="text-[11px] text-amber-200">${auth.village} • Aadhaar: •••• ${auth.aadhaar.slice(-4)} • ${auth.bankName}</p>
             </div>
           </div>
 
           <button onclick="appHandlers.setFarmerStep('register')"
-            class="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-bold border border-white/20 transition-colors">
-            ✏️ Edit Registration Details
+            class="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white rounded-lg text-[11px] font-bold border border-white/20 transition-colors">
+            ✏️ Edit Profile
           </button>
         </div>
 
         <!-- MAIN BOOKING CONTAINER -->
-        <div class="bg-white rounded-2xl border border-stone-200 p-5 sm:p-7 shadow-sm space-y-6">
+        <div class="bg-white rounded-2xl border border-stone-200 p-4 sm:p-6 shadow-sm space-y-4">
           <div>
             <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-900 border border-rose-200 mb-1">
               <span>🌾 Step 2 of 3 • Slot Scheduling</span>
             </div>
-            <h2 class="text-xl sm:text-2xl font-black text-stone-900 tracking-tight">Choose Mandi & Schedule Delivery Slot</h2>
-            <p class="text-xs text-stone-500 mt-0.5">Select your preferred Mandi procurement center. Price, waiting time, and transit calculate dynamically for your choice.</p>
+            <h2 class="text-lg sm:text-2xl font-black text-stone-900 tracking-tight">Choose Mandi & Schedule Delivery Slot</h2>
+            <p class="text-xs text-stone-500 mt-0.5">Two easy sections: pick your center first, then customize your crop and slot window.</p>
           </div>
 
-          <form onsubmit="appHandlers.handleBookingSubmit(event)" class="space-y-6">
+          <!-- STEP 2 SECTION TABS (PREVENTS SCROLLING ON MOBILE) -->
+          <div class="grid grid-cols-2 gap-2 bg-stone-100 p-1.5 rounded-xl border border-stone-200 sticky top-[61px] z-20 backdrop-blur-md">
+            <button type="button" onclick="appHandlers.setBookingSection(1)"
+              class="py-2 px-2.5 rounded-lg text-center transition-all text-xs font-bold ${
+                curSec === 1
+                  ? 'bg-gradient-to-r from-rose-700 to-red-800 text-white shadow-xs font-black ring-1 ring-amber-400/40'
+                  : 'text-stone-700 hover:text-stone-950 font-bold bg-white/70'
+              }">
+              🏢 1. Choose Mandi & Rates
+            </button>
+            <button type="button" onclick="appHandlers.setBookingSection(2)"
+              class="py-2 px-2.5 rounded-lg text-center transition-all text-xs font-bold ${
+                curSec === 2
+                  ? 'bg-gradient-to-r from-rose-700 to-red-800 text-white shadow-xs font-black ring-1 ring-amber-400/40'
+                  : 'text-stone-700 hover:text-stone-950 font-bold bg-white/70'
+              }">
+              🌾 2. Crop, Qty & Slot Booking
+            </button>
+          </div>
+
+          <form onsubmit="appHandlers.handleBookingSubmit(event)" class="space-y-5">
             
-            <!-- STEP 2A: SELECT MANDI (INTERACTIVE CARDS GRID) -->
-            <div class="space-y-3">
-              <label class="block text-xs font-black text-stone-900 uppercase tracking-wider">
-                1. Select Mandi Procurement Center / मंडी का चयन करें *
-              </label>
-
-              <!-- MANDI TYPE FILTER BUTTONS -->
-              <div class="flex items-center gap-2 pb-1 overflow-x-auto no-scrollbar">
-                <button type="button" onclick="appHandlers.setMandiFilter('all')"
-                  class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    state.mandiFilter === 'all' ? 'bg-gradient-to-r from-rose-700 to-red-800 text-white shadow-2xs font-extrabold' 
-                      : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
-                  }">
-                  All Procurement Centers (6)
-                </button>
-                <button type="button" onclick="appHandlers.setMandiFilter('government')"
-                  class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    state.mandiFilter === 'government' ? 'bg-gradient-to-r from-rose-700 to-red-800 text-white shadow-2xs font-extrabold' 
-                      : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
-                  }">
-                  🏛️ Government APMC Mandis (4)
-                </button>
-                <button type="button" onclick="appHandlers.setMandiFilter('private')"
-                  class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    state.mandiFilter === 'private' ? 'bg-gradient-to-r from-amber-600 to-amber-700 text-white shadow-2xs font-extrabold' 
-                      : 'bg-amber-50 text-amber-900 border border-amber-200 hover:bg-amber-100'
-                  }">
-                  🏢 Private Mandis & Silos (2)
-                </button>
-              </div>
-
-              <!-- MANDI CARDS (CLICK TO CHOOSE) -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                ${state.mandis.filter(m => state.mandiFilter === 'all' || m.type === state.mandiFilter).map(m => `
-                  <div onclick="appHandlers.selectBookingMandi('${m.id}')"
-                    class="p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                      form.mandiId === m.id 
-                        ? (m.type === 'private' ? 'border-amber-500 bg-amber-50/70 shadow-sm ring-2 ring-amber-400/30' : 'border-rose-600 bg-rose-50/70 shadow-sm ring-2 ring-rose-500/30')
-                        : 'border-stone-200 bg-stone-50/60 hover:bg-white hover:border-stone-300'
+            <!-- SECTION 1: MANDI SELECTION & REAL-TIME VALUATION -->
+            ${curSec === 1 ? `
+              <div class="space-y-4 animate-fade-in">
+                <!-- MANDI TYPE FILTER BUTTONS -->
+                <div class="flex items-center gap-1.5 pb-0.5 overflow-x-auto no-scrollbar">
+                  <button type="button" onclick="appHandlers.setMandiFilter('all')"
+                    class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap ${
+                      state.mandiFilter === 'all' ? 'bg-gradient-to-r from-rose-700 to-red-800 text-white shadow-2xs font-extrabold' 
+                        : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
                     }">
-                    <div class="flex items-start justify-between">
-                      <div>
-                        <div class="font-extrabold text-sm text-stone-900 flex items-center gap-1.5">
-                          <span>${m.name.split('(')[0]}</span>
-                          ${form.mandiId === m.id ? '<span class="' + (m.type === 'private' ? 'text-amber-800' : 'text-amber-800') + ' text-xs font-black">✓ Selected</span>' : ''}
-                        </div>
-                        <div class="flex items-center gap-1.5 mt-0.5">
-                          <span class="px-1.5 py-0.2 rounded text-[9px] font-extrabold ${m.type === 'private' ? 'bg-amber-100 text-amber-950 border border-amber-300' : 'bg-rose-100 text-rose-950 border border-rose-300'}">
-                            ${m.type === 'private' ? '🏢 Private Mandi' : '🏛️ Govt APMC'}
-                          </span>
-                          <span class="text-[11px] text-stone-500">${m.district} • ${m.distanceKm || '6.8'} km</span>
-                        </div>
-                      </div>
-                      <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
-                        m.capacityPercent > 75 ? 'bg-amber-100 text-amber-900' : 'bg-rose-100 text-rose-900'
-                      }">
-                        ~${m.avgWaitMins}m wait
-                      </span>
-                    </div>
+                    All Centers (6)
+                  </button>
+                  <button type="button" onclick="appHandlers.setMandiFilter('government')"
+                    class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap ${
+                      state.mandiFilter === 'government' ? 'bg-gradient-to-r from-rose-700 to-red-800 text-white shadow-2xs font-extrabold' 
+                        : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                    }">
+                    🏛️ Govt APMC (4)
+                  </button>
+                  <button type="button" onclick="appHandlers.setMandiFilter('private')"
+                    class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap ${
+                      state.mandiFilter === 'private' ? 'bg-gradient-to-r from-amber-600 to-amber-700 text-white shadow-2xs font-extrabold' 
+                        : 'bg-amber-50 text-amber-900 border border-amber-200 hover:bg-amber-100'
+                    }">
+                    🏢 Private Mandis (2)
+                  </button>
+                </div>
 
-                    <div class="grid grid-cols-2 gap-2 mt-3 pt-2.5 border-t border-stone-200/70 text-xs">
-                      <div>
-                        <span class="text-[10px] text-stone-400 block">Today's Rate:</span>
-                        <strong class="font-mono text-rose-900 font-extrabold text-sm">₹${cropRate.total + (m.priceOffset || 0)} / Qtl</strong>
-                        <span class="text-[9px] font-bold ${m.type === 'private' ? 'text-amber-800' : 'text-stone-500'} block">
-                          ${m.type === 'private' ? '+₹' + m.priceOffset + ' Private Premium' : (m.priceOffset > 0 ? '+₹' + m.priceOffset + ' Volume Premium' : 'Official Govt MSP')}
+                <!-- MANDI CARDS (CLICK TO CHOOSE) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[380px] overflow-y-auto pr-1">
+                  ${state.mandis.filter(m => state.mandiFilter === 'all' || m.type === state.mandiFilter).map(m => `
+                    <div onclick="appHandlers.selectBookingMandi('${m.id}')"
+                      class="p-3.5 rounded-xl border-2 cursor-pointer transition-all card-hover-lift ${
+                        form.mandiId === m.id 
+                          ? (m.type === 'private' ? 'border-amber-500 bg-amber-50/80 shadow-md ring-2 ring-amber-400/40' : 'border-rose-600 bg-rose-50/80 shadow-md ring-2 ring-rose-500/30')
+                          : 'border-stone-200 bg-stone-50/60 hover:bg-white hover:border-stone-300'
+                      }">
+                      <div class="flex items-start justify-between">
+                        <div>
+                          <div class="font-extrabold text-sm text-stone-900 flex items-center gap-1.5">
+                            <span>${m.name.split('(')[0]}</span>
+                            ${form.mandiId === m.id ? '<span class="' + (m.type === 'private' ? 'text-amber-800' : 'text-rose-700') + ' text-xs font-black">✓ Selected</span>' : ''}
+                          </div>
+                          <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="px-1.5 py-0.2 rounded text-[9px] font-extrabold ${m.type === 'private' ? 'bg-amber-100 text-amber-950 border border-amber-300' : 'bg-rose-100 text-rose-950 border border-rose-300'}">
+                              ${m.type === 'private' ? '🏢 Private' : '🏛️ Govt'}
+                            </span>
+                            <span class="text-[11px] text-stone-500">${m.district} • ${m.distanceKm || '6.8'} km</span>
+                          </div>
+                        </div>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
+                          m.capacityPercent > 75 ? 'bg-amber-100 text-amber-900' : 'bg-rose-100 text-rose-900'
+                        }">
+                          ~${m.avgWaitMins}m wait
                         </span>
                       </div>
+
+                      <div class="grid grid-cols-2 gap-2 mt-2.5 pt-2 border-t border-stone-200/70 text-xs">
+                        <div>
+                          <span class="text-[10px] text-stone-400 block">Rate:</span>
+                          <strong class="font-mono text-rose-900 font-extrabold text-sm">₹${cropRate.total + (m.priceOffset || 0)} / Qtl</strong>
+                          <span class="text-[9px] font-bold ${m.type === 'private' ? 'text-amber-800' : 'text-stone-500'} block">
+                            ${m.type === 'private' ? '+₹' + m.priceOffset + ' Bonus' : 'MSP'}
+                          </span>
+                        </div>
+                        <div>
+                          <span class="text-[10px] text-stone-400 block">Queue & ETA:</span>
+                          <strong class="text-stone-800 font-bold">${m.queueLength} Ahead</strong>
+                          <span class="text-[9px] text-stone-500 block">~${m.travelTimeMins || '15'}m transit</span>
+                        </div>
+                      </div>
+
+                      <button type="button" onclick="event.stopPropagation(); appHandlers.selectBookingMandi('${m.id}'); appHandlers.nextBookingSection();"
+                        class="mt-2.5 w-full py-1.5 rounded-lg ${form.mandiId === m.id ? 'bg-gradient-to-r from-rose-700 to-red-700 text-white' : 'bg-stone-200 hover:bg-stone-300 text-stone-800'} font-bold text-[11px] transition-colors flex items-center justify-center gap-1">
+                        <span>Select & Proceed to Slot</span>
+                        <span>➔</span>
+                      </button>
+                    </div>
+                  `).join('')}
+                </div>
+
+                <!-- DYNAMIC VALUATION DASHBOARD (COMPACT & RICH) -->
+                <div class="p-3.5 sm:p-4 rounded-xl bg-gradient-to-br ${selectedMandi.type === 'private' ? 'from-amber-50 via-white to-rose-50/30 border-2 border-amber-400 shadow-md' : 'from-rose-50 via-white to-amber-50/40 border-2 border-rose-300 shadow-md'} space-y-3">
+                  <div class="flex items-center justify-between border-b border-stone-200/80 pb-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-lg">${selectedMandi.type === 'private' ? '🏢' : '🏛️'}</span>
                       <div>
-                        <span class="text-[10px] text-stone-400 block">Live Queue:</span>
-                        <strong class="text-stone-800 font-bold">${m.queueLength} Vehicles ahead</strong>
-                        <span class="text-[9px] text-stone-500 block">~${m.travelTimeMins || '15'}m driving ETA</span>
+                        <span class="font-black text-sm text-stone-900">${selectedMandi.name}</span>
+                        <span class="text-[10px] text-stone-500 block">${selectedMandi.operator} • Lic: ${selectedMandi.licenseNo || 'APMC-MP-IND-01'}</span>
                       </div>
                     </div>
-                  </div>
-                `).join('')}
-              </div>
-            </div>
-
-            <!-- DYNAMIC MANDI ESTIMATION & VALUATION DASHBOARD (CHANGES AS PER CHOSEN MANDI) -->
-            <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-br ${selectedMandi.type === 'private' ? 'from-amber-50 via-white to-rose-50/30 border-2 border-amber-400 shadow-md' : 'from-rose-50 via-white to-amber-50/40 border-2 border-rose-300 shadow-md'} space-y-4 animate-fade-in">
-              <div class="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200/80 pb-3">
-                <div class="flex items-center gap-2.5">
-                  <div class="w-10 h-10 rounded-xl ${selectedMandi.type === 'private' ? 'bg-amber-500 text-stone-950 font-black' : 'bg-gradient-to-r from-rose-700 to-red-700 text-white font-black'} flex items-center justify-center text-xl shadow-2xs">
-                    ${selectedMandi.type === 'private' ? '🏢' : '🏛️'}
-                  </div>
-                  <div>
-                    <div class="flex items-center gap-2">
-                      <span class="font-black text-sm sm:text-base text-stone-900">${selectedMandi.name}</span>
-                      <span class="px-2 py-0.2 rounded text-[10px] font-black ${selectedMandi.type === 'private' ? 'bg-amber-100 text-amber-950 border border-amber-300' : 'bg-rose-100 text-rose-950 border border-rose-300'}">
-                        ${selectedMandi.type === 'private' ? '🏢 Licensed Private Mandi' : '🏛️ Govt APMC'}
-                      </span>
-                    </div>
-                    <p class="text-[11px] text-stone-600">${selectedMandi.operator} • Lic: <span class="font-mono font-bold">${selectedMandi.licenseNo || 'APMC-MP-IND-01'}</span></p>
-                  </div>
-                </div>
-
-                <div class="text-right">
-                  <span class="text-[10px] uppercase font-bold text-stone-400 block">Selected Procurement Hub</span>
-                  <span class="font-mono font-extrabold text-xs text-amber-950 bg-white px-2.5 py-0.5 rounded border border-amber-300 font-black shadow-2xs inline-block mt-0.5">
-                    Live Queue: ${selectedMandi.queueLength} Trucks Ahead
-                  </span>
-                </div>
-              </div>
-
-              <!-- 4 KEY REAL-TIME COMPUTED METRICS -->
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                <!-- Metric 1: Effective Price per Qtl -->
-                <div class="p-3 bg-white rounded-xl border border-stone-200 shadow-2xs space-y-0.5">
-                  <span class="text-[10px] uppercase font-extrabold text-stone-400 block">Effective Rate</span>
-                  <div class="font-mono text-lg font-black text-rose-950">
-                    ₹${effectiveRate}
-                    <span class="text-[11px] font-bold text-stone-500">/ Qtl</span>
-                  </div>
-                  <div class="text-[10px] text-stone-500">
-                    Base: ₹${baseRate} ${mandiOffset > 0 ? `<span class="text-amber-800 font-bold">(+₹${mandiOffset} Bonus)</span>` : ''}
-                  </div>
-                </div>
-
-                <!-- Metric 2: Total Estimated Payout -->
-                <div class="p-3 bg-white rounded-xl border border-stone-200 shadow-2xs space-y-0.5">
-                  <span class="text-[10px] uppercase font-extrabold text-stone-400 block">Total Est. Payout</span>
-                  <div class="font-mono text-lg font-black text-rose-900">
-                    ₹${totalEstPayout.toLocaleString('en-IN')}
-                  </div>
-                  <div class="text-[10px] ${bonusPayout > 0 ? 'text-amber-800 font-bold' : 'text-stone-500'}">
-                    ${bonusPayout > 0 ? `+₹${bonusPayout.toLocaleString('en-IN')} extra bonus!` : 'Standard Govt MSP'}
-                  </div>
-                </div>
-
-                <!-- Metric 3: Yard Wait & Turnaround Time -->
-                <div class="p-3 bg-white rounded-xl border border-stone-200 shadow-2xs space-y-0.5">
-                  <span class="text-[10px] uppercase font-extrabold text-stone-400 block">Est. Yard Wait</span>
-                  <div class="font-mono text-lg font-black ${yardWaitMins <= 20 ? 'text-rose-700' : 'text-amber-700'}">
-                    ~${yardWaitMins} Mins
-                  </div>
-                  <div class="text-[10px] text-stone-500">
-                    Turnaround: ~${totalTurnaroundMins} mins
-                  </div>
-                </div>
-
-                <!-- Metric 4: Transit Distance & Driving ETA -->
-                <div class="p-3 bg-white rounded-xl border border-stone-200 shadow-2xs space-y-0.5">
-                  <span class="text-[10px] uppercase font-extrabold text-stone-400 block">Transit Distance</span>
-                  <div class="font-mono text-lg font-black text-stone-800">
-                    ${distanceKm} km
-                  </div>
-                  <div class="text-[10px] text-stone-500">
-                    Driving ETA: ~${travelTimeMins} mins
-                  </div>
-                </div>
-              </div>
-
-              <!-- OPERATIONAL DETAILS ACCORDING TO CHOSEN MANDI -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-1">
-                <div class="flex items-center gap-2 p-2.5 bg-white/80 rounded-xl border border-stone-200/80">
-                  <span class="text-base">🏦</span>
-                  <div>
-                    <span class="text-[10px] text-stone-400 block font-bold uppercase">Payment Settlement Mode:</span>
-                    <span class="font-bold text-stone-800">${paymentMode}</span>
-                  </div>
-                </div>
-
-                <div class="flex items-center gap-2 p-2.5 bg-white/80 rounded-xl border border-stone-200/80">
-                  <span class="text-base">🚜</span>
-                  <div>
-                    <span class="text-[10px] text-stone-400 block font-bold uppercase">Unloading & Weighing Setup:</span>
-                    <span class="font-bold text-stone-800">${unloadingType}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- STEP 2B: SELECT CROP & QUANTITY -->
-            <div class="space-y-3">
-              <label class="block text-xs font-black text-stone-900 uppercase tracking-wider">
-                2. Crop & Quantity / उपज व मात्रा *
-              </label>
-
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-                <div>
-                  <label class="block font-bold text-stone-700 mb-1">Crop Type / फसल</label>
-                  <select class="w-full px-3 py-2.5 rounded-xl border border-stone-300 font-bold text-stone-900 bg-white"
-                    onchange="state.bookingForm.crop = this.value; render();">
-                    <option value="Wheat" ${form.crop === 'Wheat' ? 'selected' : ''}>Wheat (गेहूं) - Base MSP ₹2,400</option>
-                    <option value="Soybean" ${form.crop === 'Soybean' ? 'selected' : ''}>Soybean (सोयाबीन) - Base MSP ₹4,992</option>
-                    <option value="Chana" ${form.crop === 'Chana' ? 'selected' : ''}>Chana (चना) - Base MSP ₹5,590</option>
-                    <option value="Mustard" ${form.crop === 'Mustard' ? 'selected' : ''}>Mustard (सरसों) - Base MSP ₹5,750</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label class="block font-bold text-stone-700 mb-1 flex justify-between">
-                    <span>Quantity (Quintals / क्विंटल) *</span>
-                    <span class="text-stone-400 text-[10px]">Quota: ${auth.quotaRemaining} Qtl</span>
-                  </label>
-                  <input type="number" min="1" max="${auth.quotaRemaining || 150}" value="${form.quantity}" required
-                    oninput="state.bookingForm.quantity = this.value; render();"
-                    class="w-full px-3 py-2.5 rounded-xl border border-stone-300 font-mono font-black text-stone-900 bg-white">
-                </div>
-
-                <!-- Live Calculated Payout Card (with Chosen Mandi Rate) -->
-                <div class="p-3 bg-gradient-to-br from-amber-50 to-rose-50/40 rounded-xl border border-amber-300 space-y-1">
-                  <div class="flex justify-between items-center">
-                    <span class="text-[10px] text-stone-700 uppercase font-extrabold block">Estimated Settlement Payout</span>
-                    <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-amber-200 text-amber-950 font-black font-mono">@ ₹${effectiveRate}/Qtl</span>
-                  </div>
-                  <div class="font-mono text-xl font-black text-rose-950 mt-0.5">
-                    ₹${totalEstPayout.toLocaleString('en-IN')}
-                  </div>
-                  <div class="text-[10px] text-stone-600 flex justify-between pt-0.5 border-t border-amber-200/60">
-                    <span>Base MSP: ₹${(qty * baseRate).toLocaleString('en-IN')}</span>
-                    <span class="font-bold ${mandiOffset > 0 ? 'text-amber-800' : 'text-stone-500'}">
-                      ${mandiOffset > 0 ? `+₹${(qty * mandiOffset).toLocaleString('en-IN')} (${selectedMandi.name.split(' ')[0]} Bonus)` : 'Govt MSP'}
+                    <span class="font-mono font-extrabold text-[11px] text-amber-950 bg-white px-2 py-0.5 rounded border border-amber-300 shadow-2xs">
+                      Queue: ${selectedMandi.queueLength} Ahead
                     </span>
                   </div>
-                  <span class="text-[10px] text-amber-900 block font-bold">Channel: ${paymentMode}</span>
+
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                    <div class="p-2 bg-white rounded-lg border border-stone-200">
+                      <span class="text-[9px] uppercase font-bold text-stone-400 block">Rate / Qtl</span>
+                      <strong class="font-mono text-base font-black text-rose-950">₹${effectiveRate}</strong>
+                      <span class="text-[9px] text-stone-500 block">${mandiOffset > 0 ? '+₹' + mandiOffset + ' Bonus' : 'Govt MSP'}</span>
+                    </div>
+
+                    <div class="p-2 bg-white rounded-lg border border-stone-200">
+                      <span class="text-[9px] uppercase font-bold text-stone-400 block">Est. Payout (${qty} Qtl)</span>
+                      <strong class="font-mono text-base font-black text-rose-900">₹${totalEstPayout.toLocaleString('en-IN')}</strong>
+                      <span class="text-[9px] text-stone-500 block">${bonusPayout > 0 ? '+₹' + bonusPayout.toLocaleString('en-IN') + ' Bonus' : 'Standard'}</span>
+                    </div>
+
+                    <div class="p-2 bg-white rounded-lg border border-stone-200">
+                      <span class="text-[9px] uppercase font-bold text-stone-400 block">Yard Wait</span>
+                      <strong class="font-mono text-base font-black text-amber-800">~${yardWaitMins}m</strong>
+                      <span class="text-[9px] text-stone-500 block">Total: ~${totalTurnaroundMins}m</span>
+                    </div>
+
+                    <div class="p-2 bg-white rounded-lg border border-stone-200">
+                      <span class="text-[9px] uppercase font-bold text-stone-400 block">Transit Distance</span>
+                      <strong class="font-mono text-base font-black text-stone-800">${distanceKm} km</strong>
+                      <span class="text-[9px] text-stone-500 block">ETA: ~${travelTimeMins}m</span>
+                    </div>
+                  </div>
+
+                  <div class="pt-2 border-t border-stone-200/60 flex items-center justify-between">
+                    <span class="text-[11px] text-stone-600">Payment: <strong>${paymentMode}</strong></span>
+                    <button type="button" onclick="appHandlers.nextBookingSection()"
+                      class="px-4 py-2 rounded-xl bg-gradient-to-r from-rose-700 to-red-700 hover:from-rose-800 hover:to-red-800 text-white font-extrabold text-xs shadow-xs flex items-center gap-1.5">
+                      <span>Next: Crop & Slot Window</span>
+                      <span>➔</span>
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
+            ` : ''}
 
-            <!-- STEP 2C: DATE, TIME & VEHICLE -->
-            <div class="space-y-3">
-              <label class="block text-xs font-black text-stone-900 uppercase tracking-wider">
-                3. Date, Time Slot & Transport / दिनांक व वाहन *
-              </label>
-
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                <div>
-                  <label class="block font-bold text-stone-700 mb-1">Delivery Date</label>
-                  <input type="date" value="${form.slotDate}" required
-                    onchange="state.bookingForm.slotDate = this.value"
-                    class="w-full px-3 py-2 rounded-xl border border-stone-300 font-bold text-stone-900 bg-white">
+            <!-- SECTION 2: CROP, QUANTITY, DATE, TIME & VEHICLE -->
+            ${curSec === 2 ? `
+              <div class="space-y-4 animate-fade-in">
+                <!-- Selected Mandi Reminder Banner -->
+                <div class="p-3 rounded-xl bg-amber-50 border border-amber-300 flex items-center justify-between text-xs">
+                  <div>
+                    <span class="text-[10px] text-amber-800 uppercase font-bold block">Selected Mandi:</span>
+                    <strong class="text-stone-900 font-extrabold text-sm">${selectedMandi.name}</strong>
+                    <span class="text-[11px] text-stone-600 block">Rate: ₹${effectiveRate}/Qtl • ~${yardWaitMins}m wait • ${distanceKm} km</span>
+                  </div>
+                  <button type="button" onclick="appHandlers.prevBookingSection()"
+                    class="px-2.5 py-1 rounded-lg border border-amber-300 bg-white text-stone-700 hover:bg-stone-50 font-bold text-[11px]">
+                    Change Mandi
+                  </button>
                 </div>
 
-                <div>
-                  <label class="block font-bold text-stone-700 mb-1 flex justify-between">
-                    <span>Time Window (3-Hour Slot)</span>
-                    <span class="text-stone-500 text-[10px]">Transit: ~${travelTimeMins}m</span>
-                  </label>
-                  <select class="w-full px-3 py-2 rounded-xl border border-stone-300 font-bold text-stone-900 bg-white"
-                    onchange="state.bookingForm.slotTime = this.value">
-                    <option value="08:00 AM - 11:00 AM">08:00 AM - 11:00 AM (🟢 Low Traffic • ~${yardWaitMins}m wait)</option>
-                    <option value="11:00 AM - 02:00 PM">11:00 AM - 02:00 PM (🟡 Moderate Traffic)</option>
-                    <option value="02:00 PM - 05:00 PM">02:00 PM - 05:00 PM (🟢 Low Traffic)</option>
-                  </select>
+                <!-- Crop & Quantity -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                  <div>
+                    <label class="block font-bold text-stone-700 mb-1">Crop Type / फसल</label>
+                    <select class="w-full px-3 py-2.5 rounded-xl border border-stone-300 font-bold text-stone-900 bg-white"
+                      onchange="state.bookingForm.crop = this.value; render();">
+                      <option value="Wheat" ${form.crop === 'Wheat' ? 'selected' : ''}>Wheat (गेहूं) - Base MSP ₹2,400</option>
+                      <option value="Soybean" ${form.crop === 'Soybean' ? 'selected' : ''}>Soybean (सोयाबीन) - Base MSP ₹4,992</option>
+                      <option value="Chana" ${form.crop === 'Chana' ? 'selected' : ''}>Chana (चना) - Base MSP ₹5,590</option>
+                      <option value="Mustard" ${form.crop === 'Mustard' ? 'selected' : ''}>Mustard (सरसों) - Base MSP ₹5,750</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-stone-700 mb-1 flex justify-between">
+                      <span>Quantity (Quintals) *</span>
+                      <span class="text-stone-400 text-[10px]">Quota: ${auth.quotaRemaining} Qtl</span>
+                    </label>
+                    <input type="number" min="1" max="${auth.quotaRemaining || 150}" value="${form.quantity}" required
+                      oninput="state.bookingForm.quantity = this.value; render();"
+                      class="w-full px-3 py-2.5 rounded-xl border border-stone-300 font-mono font-black text-stone-900 bg-white">
+                  </div>
+
+                  <!-- Live Calculated Payout Card -->
+                  <div class="p-3 bg-gradient-to-br from-amber-50 to-rose-50/40 rounded-xl border border-amber-300 space-y-0.5">
+                    <div class="flex justify-between items-center">
+                      <span class="text-[9px] text-stone-700 uppercase font-extrabold block">Est. Payout</span>
+                      <span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-200 text-amber-950 font-black font-mono">@ ₹${effectiveRate}/Qtl</span>
+                    </div>
+                    <div class="font-mono text-lg font-black text-rose-950">
+                      ₹${totalEstPayout.toLocaleString('en-IN')}
+                    </div>
+                    <div class="text-[9px] text-stone-600 flex justify-between pt-0.5 border-t border-amber-200/60">
+                      <span>Base: ₹${(qty * baseRate).toLocaleString('en-IN')}</span>
+                      <span class="font-bold ${mandiOffset > 0 ? 'text-amber-800' : 'text-stone-500'}">
+                        ${mandiOffset > 0 ? '+₹' + (qty * mandiOffset).toLocaleString('en-IN') + ' Bonus' : 'Govt MSP'}
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
-                <div>
-                  <label class="block font-bold text-stone-700 mb-1">Vehicle Registration #</label>
-                  <input type="text" value="${form.vehicleNumber}" required
-                    oninput="state.bookingForm.vehicleNumber = this.value"
-                    placeholder="MP-09-BZ-6712"
-                    class="w-full px-3 py-2 rounded-xl border border-stone-300 font-mono font-bold text-stone-900 bg-white">
+                <!-- Date, Time Window & Vehicle Details -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs pt-1">
+                  <div>
+                    <label class="block font-bold text-stone-700 mb-1">Delivery Date</label>
+                    <input type="date" value="${form.slotDate}" required
+                      onchange="state.bookingForm.slotDate = this.value"
+                      class="w-full px-3 py-2 rounded-xl border border-stone-300 font-bold text-stone-900 bg-white">
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-stone-700 mb-1 flex justify-between">
+                      <span>Time Window</span>
+                      <span class="text-stone-500 text-[10px]">Transit: ~${travelTimeMins}m</span>
+                    </label>
+                    <select class="w-full px-3 py-2 rounded-xl border border-stone-300 font-bold text-stone-900 bg-white"
+                      onchange="state.bookingForm.slotTime = this.value">
+                      <option value="08:00 AM - 11:00 AM">08:00 AM - 11:00 AM (🟢 Low Traffic • ~${yardWaitMins}m wait)</option>
+                      <option value="11:00 AM - 02:00 PM">11:00 AM - 02:00 PM (🟡 Moderate Traffic)</option>
+                      <option value="02:00 PM - 05:00 PM">02:00 PM - 05:00 PM (🟢 Low Traffic)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-stone-700 mb-1">Vehicle Registration #</label>
+                    <input type="text" value="${form.vehicleNumber}" required
+                      oninput="state.bookingForm.vehicleNumber = this.value"
+                      placeholder="MP-09-BZ-6712"
+                      class="w-full px-3 py-2 rounded-xl border border-stone-300 font-mono font-bold text-stone-900 bg-white">
+                  </div>
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="pt-3 border-t border-stone-100 flex items-center justify-between gap-3 flex-wrap">
+                  <button type="button" onclick="appHandlers.prevBookingSection()"
+                    class="px-4 py-2.5 rounded-xl border border-stone-200 text-stone-700 font-bold text-xs hover:bg-stone-50">
+                    ← Back to Mandi Centers
+                  </button>
+
+                  <button type="submit" ${form.isSubmitting ? 'disabled' : ''}
+                    class="flex-1 sm:flex-none px-6 py-3 rounded-xl bg-gradient-to-r from-rose-700 via-rose-800 to-red-800 hover:from-rose-800 hover:to-red-900 text-white font-extrabold text-xs sm:text-sm shadow-md flex items-center justify-center gap-2 transition-all hover:scale-[1.01]">
+                    <span>${form.isSubmitting ? 'Generating Token...' : `Confirm Slot for ${selectedMandi.name.split('(')[0]} (Est. ₹${totalEstPayout.toLocaleString('en-IN')}) ➔`}</span>
+                  </button>
                 </div>
               </div>
-            </div>
+            ` : ''}
 
-            <!-- CONFIRM BUTTON WITH REAL-TIME VALUATION -->
-            <div class="pt-4 border-t border-stone-100 flex items-center justify-between">
-              <button type="button" onclick="appHandlers.setFarmerStep('register')"
-                class="px-4 py-2.5 rounded-xl border border-stone-200 text-stone-700 font-bold text-xs hover:bg-stone-50">
-                ← Back to Registration Details
-              </button>
-
-              <button type="submit" ${form.isSubmitting ? 'disabled' : ''}
-                class="px-7 py-3 rounded-xl bg-gradient-to-r from-rose-700 via-rose-800 to-red-800 hover:from-rose-800 hover:to-red-900 text-white font-extrabold text-xs sm:text-sm shadow-md flex items-center gap-2 transition-all hover:scale-[1.02]">
-                <span>${form.isSubmitting ? 'Generating Token...' : `Confirm Slot for ${selectedMandi.name.split('(')[0]} (Est. ₹${totalEstPayout.toLocaleString('en-IN')}) ➔`}</span>
-              </button>
-            </div>
           </form>
         </div>
       </div>
     `;
   }
 
-  // Farmer's Live Token & Gate Pass with transit tracking
   function renderFarmerTokenPipeline(token) {
     const mandi = state.mandis.find(m => m.id === token.mandiId) || state.mandis[0];
     const cropRate = MSP_RATES[token.crop] || MSP_RATES['Wheat'];
