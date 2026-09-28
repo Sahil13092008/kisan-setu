@@ -19,8 +19,13 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Kisan Setu">
 
-  <!-- Tailwind CSS via CDN for 100% reliable standalone browser execution -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tailwind CSS (Offline local with CDN fallback) -->
+  <script src="./tailwind.js"></script>
+  <script>
+    if (typeof tailwind === 'undefined') {
+      document.write('<script src="https://cdn.tailwindcss.com"><\/script>');
+    }
+  </script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -57,8 +62,13 @@
     }
   </script>
 
-  <!-- Canvas Confetti for MSP Settlement Celebration -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
+  <!-- Canvas Confetti for MSP Settlement Celebration (Offline local with CDN fallback) -->
+  <script src="./confetti.browser.min.js"></script>
+  <script>
+    if (typeof confetti === 'undefined') {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"><\/script>');
+    }
+  </script>
 
   <!-- Custom Stylesheet (v3) with Light Red & Gold theme -->
   <link rel="stylesheet" href="./styles.v3.css?v=4.4.0">

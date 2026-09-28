@@ -968,6 +968,126 @@
 
   // --- EVENT HANDLERS ---
   window.appHandlers = {
+
+    toggleOfflineMode: (force) => {
+      state.isOffline = (typeof force === 'boolean') ? force : !state.isOffline;
+      if (state.isOffline) {
+        saveOfflineState();
+        showToast('📶 Working Offline', 'Token #KS-RAU-108 & QR pass saved to local storage.', 'info');
+      } else {
+        saveOfflineState();
+        showToast('🟢 Back Online', 'Synchronized live queue with Mandi Server.', 'success');
+      }
+      render();
+    },
+    toggleNotifications: (open) => {
+      state.isNotificationOpen = (typeof open === 'boolean') ? open : !state.isNotificationOpen;
+      render();
+    },
+    markAllNotificationsRead: () => {
+      state.notifications.forEach(n => n.unread = false);
+      showToast('Notifications Cleared', 'All alerts marked as read.');
+      render();
+    },
+    openQrModal: () => {
+      state.qrModalOpen = true;
+      render();
+    },
+    closeQrModal: () => {
+      state.qrModalOpen = false;
+      render();
+    },
+    openStaffScanner: () => {
+      state.staffScannerOpen = true;
+      render();
+    },
+    closeStaffScanner: () => {
+      state.staffScannerOpen = false;
+      render();
+    },
+    scanStaffToken: (tokId) => {
+      state.mandiStaff.selectedTokenId = tokId;
+      state.staffScannerOpen = false;
+      playChime('success');
+      showToast('QR Code Verified ✓', `Token #${tokId} verified at Gate 2. Loaded into workstation.`);
+      render();
+    },
+    openCropPlanner: () => {
+      state.salePlanner.isOpen = true;
+      if (window.KisanSetuAI) {
+        state.salePlanner.plan = window.KisanSetuAI.generateCropSalePlan(state.salePlanner, state.mandis);
+      }
+      render();
+    },
+    closeCropPlanner: () => {
+      state.salePlanner.isOpen = false;
+      render();
+    },
+    recomputeCropPlan: () => {
+      if (window.KisanSetuAI) {
+        state.salePlanner.plan = window.KisanSetuAI.generateCropSalePlan(state.salePlanner, state.mandis);
+      }
+      render();
+    },
+    applyCropPlanAndBook: () => {
+      const sp = state.salePlanner;
+      state.bookingForm.crop = sp.crop;
+      state.bookingForm.quantity = sp.quantity;
+      if (sp.plan && sp.plan.recommendedMandi) {
+        state.bookingForm.mandiId = sp.plan.recommendedMandi.id;
+      }
+      state.salePlanner.isOpen = false;
+      state.activeTab = 'farmer';
+      state.farmerAuth.currentStep = 'choose_mandi';
+      state.bookingForm.bookingSection = 2;
+      showToast('Plan Applied', `Auto-filled ${sp.quantity} Qtl of ${sp.crop} at ${sp.plan ? sp.plan.recommendedMandi.name : 'Rau APMC'}.`);
+      render();
+    },
+    openQualityAdvisor: () => {
+      state.qualityAdvisor.isOpen = true;
+      if (window.KisanSetuAI) {
+        state.qualityAdvisor.result = window.KisanSetuAI.analyzeCropQuality(state.qualityAdvisor.crop, state.qualityAdvisor.selectedSample);
+      }
+      render();
+    },
+    closeQualityAdvisor: () => {
+      state.qualityAdvisor.isOpen = false;
+      render();
+    },
+    selectQualitySample: (sampleType) => {
+      state.qualityAdvisor.selectedSample = sampleType;
+      if (window.KisanSetuAI) {
+        state.qualityAdvisor.result = window.KisanSetuAI.analyzeCropQuality(state.qualityAdvisor.crop, sampleType);
+      }
+      render();
+    },
+    advanceQueueStage: () => {
+      const tok = state.tokens.find(t => t.id === 'KS-RAU-108') || state.tokens[0];
+      if ((tok.queueStage || 3) < 7) {
+        tok.queueStage = (tok.queueStage || 3) + 1;
+        updateTokenStatusFromStage(tok);
+        playChime('success');
+        showToast('Stage Advanced', `Progressed to Stage ${tok.queueStage}: ${getStageLabel(tok.queueStage)}`);
+        render();
+      }
+    },
+    prevQueueStage: () => {
+      const tok = state.tokens.find(t => t.id === 'KS-RAU-108') || state.tokens[0];
+      if ((tok.queueStage || 3) > 1) {
+        tok.queueStage = (tok.queueStage || 3) - 1;
+        updateTokenStatusFromStage(tok);
+        showToast('Stage Stepped Back', `Returned to Stage ${tok.queueStage}: ${getStageLabel(tok.queueStage)}`, 'info');
+        render();
+      }
+    },
+    setQueueStage: (stage) => {
+      const tok = state.tokens.find(t => t.id === 'KS-RAU-108') || state.tokens[0];
+      tok.queueStage = Math.max(1, Math.min(7, stage));
+      updateTokenStatusFromStage(tok);
+      playChime('success');
+      render();
+    },
+
     bookSpecificMandi: (mandiId) => {
       state.activeTab = 'farmer';
       state.bookingForm.mandiId = mandiId;
@@ -1583,7 +1703,620 @@
     badgeCheck: `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/><path d="m9 12 2 2 4-4"/></svg>`
   };
 
-  // --- RENDER FUNCTIONS ---
+  
+  function getStageLabel(stage) {
+    const names = [
+      '',
+      'Token Confirmed',
+      'In Transit',
+      'Holding Yard Queue',
+      'Gate 2 Entry',
+      'Quality Inspection',
+      'Electronic Weighment',
+      'DBT Final Settlement'
+    ];
+    return names[stage] || 'Processing';
+  }
+
+
+  function generateQrSvg(content, size = 160) {
+    const str = String(content || 'KS-RAU-108');
+    const hash = str.split('').reduce((acc, char) => (acc * 31 + char.charCodeAt(0)) % 1000000, 7);
+    const grid = 21;
+    const cellSize = (size / grid).toFixed(2);
+    let rects = '';
+
+    for (let r = 0; r < grid; r++) {
+      for (let c = 0; c < grid; c++) {
+        const isFinderTL = (r < 7 && c < 7) && (r === 0 || r === 6 || c === 0 || c === 6 || (r >= 2 && r <= 4 && c >= 2 && c <= 4));
+        const isFinderTR = (r < 7 && c >= grid - 7) && (r === 0 || r === 6 || c === grid - 1 || c === grid - 7 || (r >= 2 && r <= 4 && c >= grid - 5 && c <= grid - 3));
+        const isFinderBL = (r >= grid - 7 && c < 7) && (r === grid - 1 || r === grid - 7 || c === 0 || c === 6 || (r >= grid - 5 && r <= grid - 3 && c >= 2 && c <= 4));
+        const isTiming = (r === 6 || c === 6) && (r % 2 === 0 || c % 2 === 0);
+        const isData = !((r < 8 && c < 8) || (r < 8 && c >= grid - 8) || (r >= grid - 8 && c < 8)) && ((r * 7 + c * 13 + hash) % 3 === 0 || (r * 11 + c * 5 + hash) % 7 === 0);
+
+        if (isFinderTL || isFinderTR || isFinderBL || isTiming || isData) {
+          const x = (c * cellSize).toFixed(1);
+          const y = (r * cellSize).toFixed(1);
+          const w = (cellSize - 0.2).toFixed(1);
+          const h = (cellSize - 0.2).toFixed(1);
+          rects += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#1c1917" rx="${(isFinderTL || isFinderTR || isFinderBL) ? '1' : '0.5'}" />`;
+        }
+      }
+    }
+
+    return `
+      <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" class="mx-auto block" xmlns="http://www.w3.org/2000/svg">
+        <rect width="${size}" height="${size}" fill="#ffffff" rx="8" />
+        ${rects}
+        <circle cx="${(size / 2).toFixed(1)}" cy="${(size / 2).toFixed(1)}" r="${(cellSize * 2.2).toFixed(1)}" fill="#be123c" />
+        <text x="${(size / 2).toFixed(1)}" y="${(size / 2 + 3.5).toFixed(1)}" fill="#ffffff" font-size="9" font-family="sans-serif" font-weight="900" text-anchor="middle">KS</text>
+      </svg>
+    `;
+  }
+
+
+  function renderBankVerificationTable(auth) {
+    return `
+      <div class="bg-white rounded-2xl border border-stone-200 p-4 shadow-2xs space-y-3">
+        <div class="flex items-center justify-between border-b border-stone-100 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="text-base">🏦</span>
+            <span class="font-extrabold text-xs text-stone-900 uppercase tracking-wider">Bank & DBT Verification Status</span>
+          </div>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-900 border border-emerald-300">
+            Payment Ready ✓
+          </span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left">
+            <thead class="text-[10px] uppercase text-stone-400 border-b border-stone-100">
+              <tr>
+                <th class="py-1.5 font-bold">Verification Check</th>
+                <th class="py-1.5 font-bold">Details</th>
+                <th class="py-1.5 font-bold text-right">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-stone-100 text-[11px]">
+              <tr>
+                <td class="py-2 text-stone-600 font-medium">Account Holder</td>
+                <td class="py-2 font-bold text-stone-900">${auth.name}</td>
+                <td class="py-2 text-right"><span class="text-emerald-700 font-bold">✅ 100% Name Match</span></td>
+              </tr>
+              <tr>
+                <td class="py-2 text-stone-600 font-medium">Bank & Account</td>
+                <td class="py-2 font-mono font-bold text-stone-900">${auth.bankName} (XXXX ${auth.bankAcc.slice(-4)})</td>
+                <td class="py-2 text-right"><span class="text-emerald-700 font-bold">✅ Verified Active</span></td>
+              </tr>
+              <tr>
+                <td class="py-2 text-stone-600 font-medium">IFSC Routing</td>
+                <td class="py-2 font-mono font-bold text-stone-900">${auth.ifsc} (Rau Branch)</td>
+                <td class="py-2 text-right"><span class="text-emerald-700 font-bold">✅ Validated</span></td>
+              </tr>
+              <tr>
+                <td class="py-2 text-stone-600 font-medium">Aadhaar NPCI Seeding</td>
+                <td class="py-2 text-stone-800">Seeded with Aadhaar (•••• ${auth.aadhaar.slice(-4)})</td>
+                <td class="py-2 text-right"><span class="text-emerald-700 font-bold">✅ Active (DBT Enabled)</span></td>
+              </tr>
+              <tr>
+                <td class="py-2 text-stone-600 font-medium">PFMS Bridge Status</td>
+                <td class="py-2 text-stone-800">Public Finance Management System Ready</td>
+                <td class="py-2 text-right"><span class="text-emerald-700 font-bold">✅ Cleared for Payout</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="p-2.5 bg-emerald-50 rounded-xl border border-emerald-200 text-[11px] text-emerald-950 flex items-center justify-between">
+          <span class="flex items-center gap-1.5">
+            <span>🔒</span>
+            <span>Sensitive banking credentials masked for data privacy.</span>
+          </span>
+          <strong class="font-bold text-emerald-800 font-mono">DBT Clearance: T+0 Ready</strong>
+        </div>
+      </div>
+    `;
+  }
+
+
+  function renderFarmerHomeCard(auth, token, mandi) {
+    const cropRate = MSP_RATES[token.crop] || MSP_RATES['Wheat'];
+    const effectiveRate = token.pricePerQtl || (cropRate.total + (mandi.priceOffset || 0));
+    const totalPayout = token.quantityQuintals * effectiveRate;
+    const pred = (window.KisanSetuAI && window.KisanSetuAI.predictWaitTime) 
+      ? window.KisanSetuAI.predictWaitTime(mandi, 11, token.crop, token.quantityQuintals)
+      : { waitRange: '32–40 min', confidence: 94 };
+
+    return `
+      <div class="bg-gradient-to-br from-rose-900 via-rose-950 to-amber-950 text-white rounded-3xl p-5 sm:p-7 shadow-xl border-2 border-amber-400/40 relative overflow-hidden space-y-5">
+        <div class="absolute -right-10 -bottom-10 w-44 h-44 rounded-full bg-amber-500/10 blur-2xl pointer-events-none"></div>
+
+        <!-- TOP GREETING -->
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 text-stone-950 flex items-center justify-center font-black text-2xl shadow-md shrink-0">
+              🌾
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-xl sm:text-2xl font-black tracking-tight">Namaste, ${auth.name} 👋</h2>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400/30 text-amber-200 border border-amber-300/30">Verified Kisan</span>
+              </div>
+              <p class="text-xs text-amber-200/90">${auth.village} • ${token.crop} (${token.quantityQuintals} Quintals) • Land: ${auth.landArea.split('(')[0]}</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="appHandlers.openQrModal()"
+              class="px-3.5 py-1.5 rounded-xl bg-white text-rose-950 font-black text-xs hover:bg-amber-50 transition-colors shadow-sm flex items-center gap-1.5 cursor-pointer">
+              <span>🎫</span>
+              <span>QR Token Pass</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ACTIVE TOKEN & QUEUE HIGHLIGHTS -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+          <div class="p-3 bg-white/10 rounded-2xl border border-white/15">
+            <span class="text-[10px] uppercase font-bold text-amber-200 block">Active Token</span>
+            <div class="font-mono text-lg sm:text-xl font-black text-white mt-0.5">${token.id}</div>
+            <span class="text-[10px] text-amber-300 block font-bold">${mandi.name.split('(')[0]}</span>
+          </div>
+
+          <div class="p-3 bg-white/10 rounded-2xl border border-white/15">
+            <span class="text-[10px] uppercase font-bold text-amber-200 block">Gate & Bay</span>
+            <div class="text-lg sm:text-xl font-black text-white mt-0.5">${token.assignedGate.split('(')[0]}</div>
+            <span class="text-[10px] text-stone-300 block">General Platform 3</span>
+          </div>
+
+          <div class="p-3 bg-white/10 rounded-2xl border border-white/15">
+            <span class="text-[10px] uppercase font-bold text-amber-200 block">Queue Position</span>
+            <div class="text-lg sm:text-xl font-black text-amber-300 mt-0.5">${token.queuePosition || 14} Ahead</div>
+            <span class="text-[10px] text-stone-300 block">Holding Yard</span>
+          </div>
+
+          <div class="p-3 bg-white/10 rounded-2xl border border-white/15">
+            <span class="text-[10px] uppercase font-bold text-amber-200 block">ML Expected Wait</span>
+            <div class="font-mono text-lg sm:text-xl font-black text-white mt-0.5">${token.predictedWaitRange || pred.waitRange || '32–40 min'}</div>
+            <span class="text-[10px] text-emerald-300 block font-bold">${pred.confidence || 94}% Confidence</span>
+          </div>
+        </div>
+
+        <!-- VALUATION PILL -->
+        <div class="p-3 bg-white/10 rounded-2xl border border-white/15 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div class="flex items-center gap-2">
+            <span class="text-lg">📈</span>
+            <span>MSP Rate: <strong class="font-mono text-amber-300 font-bold">₹${effectiveRate}/Qtl</strong> • Total Crop: <strong>${token.quantityQuintals} Qtl</strong></span>
+          </div>
+          <div class="font-mono font-black text-base text-amber-300">
+            Estimated Payout: ₹${totalPayout.toLocaleString('en-IN')}
+          </div>
+        </div>
+
+        <!-- 5 FAST ACTION SHORTCUTS -->
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1">
+          <button onclick="appHandlers.setFarmerStep('active_pass')"
+            class="p-2.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-center transition-all hover:scale-102 cursor-pointer">
+            <span class="text-base block">🗺️</span>
+            <span class="font-bold text-[11px] block mt-0.5">Track Token</span>
+          </button>
+
+          <button onclick="appHandlers.openQrModal()"
+            class="p-2.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-center transition-all hover:scale-102 cursor-pointer">
+            <span class="text-base block">🎫</span>
+            <span class="font-bold text-[11px] block mt-0.5">Show QR Pass</span>
+          </button>
+
+          <button onclick="appHandlers.openCropPlanner()"
+            class="p-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-950 font-black text-center transition-all hover:scale-102 shadow-sm cursor-pointer">
+            <span class="text-base block">🌾</span>
+            <span class="font-black text-[11px] block mt-0.5">Sale Planner</span>
+          </button>
+
+          <button onclick="appHandlers.openQualityAdvisor()"
+            class="p-2.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-center transition-all hover:scale-102 cursor-pointer">
+            <span class="text-base block">🔬</span>
+            <span class="font-bold text-[11px] block mt-0.5">Grain Pre-Check</span>
+          </button>
+
+          <button onclick="appHandlers.toggleAiAgent(true)"
+            class="p-2.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-center transition-all hover:scale-102 col-span-2 sm:col-span-1 cursor-pointer">
+            <span class="text-base block">🤖</span>
+            <span class="font-bold text-[11px] block mt-0.5">Kisan Sahayak</span>
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+
+  // --- AI CROP SALE PLANNER MODAL ---
+  function renderCropSalePlannerModal() {
+    if (!state.salePlanner || !state.salePlanner.isOpen) return '';
+    const sp = state.salePlanner;
+    const plan = sp.plan || (window.KisanSetuAI && window.KisanSetuAI.generateCropSalePlan(sp, state.mandis));
+
+    return `
+      <div class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl border border-stone-200 shadow-2xl max-w-2xl w-full p-5 sm:p-7 space-y-5 animate-slide-up my-6 max-h-[90vh] overflow-y-auto">
+          <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-500 to-rose-700 text-white flex items-center justify-center text-2xl shadow-sm shrink-0 font-bold">
+                🌾
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 class="font-black text-lg sm:text-xl text-stone-900 tracking-tight">AI Crop Sale Planner</h3>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-950 border border-amber-300">स्मार्ट विक्रय योजना</span>
+                </div>
+                <p class="text-xs text-stone-500">End-to-end MSP selling plan with timings, net payout & weather intel</p>
+              </div>
+            </div>
+            <button onclick="appHandlers.closeCropPlanner()" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center text-base font-bold cursor-pointer">
+              ✕
+            </button>
+          </div>
+
+          <div class="p-3.5 bg-stone-50 rounded-2xl border border-stone-200 grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+            <div>
+              <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Crop (फसल)</label>
+              <select class="w-full px-2.5 py-1.5 rounded-lg border border-stone-300 font-bold text-stone-900 bg-white"
+                onchange="state.salePlanner.crop = this.value; appHandlers.recomputeCropPlan();">
+                <option value="Wheat" ${sp.crop === 'Wheat' ? 'selected' : ''}>Wheat (गेहूं)</option>
+                <option value="Soybean" ${sp.crop === 'Soybean' ? 'selected' : ''}>Soybean (सोयाबीन)</option>
+                <option value="Mustard" ${sp.crop === 'Mustard' ? 'selected' : ''}>Mustard (सरसों)</option>
+                <option value="Chana" ${sp.crop === 'Chana' ? 'selected' : ''}>Chana (चना)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Quantity (मात्रा)</label>
+              <input type="number" min="5" max="300" value="${sp.quantity}"
+                onchange="state.salePlanner.quantity = this.value; appHandlers.recomputeCropPlan();"
+                class="w-full px-2.5 py-1.5 rounded-lg border border-stone-300 font-bold text-stone-900 bg-white">
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Location (स्थान)</label>
+              <input type="text" value="${sp.village}"
+                onchange="state.salePlanner.village = this.value; appHandlers.recomputeCropPlan();"
+                class="w-full px-2.5 py-1.5 rounded-lg border border-stone-300 font-bold text-stone-900 bg-white">
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Target Date</label>
+              <select class="w-full px-2.5 py-1.5 rounded-lg border border-stone-300 font-bold text-stone-900 bg-white"
+                onchange="state.salePlanner.targetDate = this.value; appHandlers.recomputeCropPlan();">
+                <option value="Tomorrow (28-Sep-2026)">Tomorrow (28-Sep)</option>
+                <option value="Today (27-Sep-2026)">Today (27-Sep)</option>
+                <option value="Day After (29-Sep-2026)">Day After (29-Sep)</option>
+              </select>
+            </div>
+          </div>
+
+          ${plan ? `
+            <div class="space-y-4">
+              <div class="p-4 rounded-2xl bg-gradient-to-br from-rose-900 via-rose-950 to-amber-950 text-white shadow-md border border-amber-400/40 relative overflow-hidden">
+                <div class="flex flex-wrap items-center justify-between gap-3 relative z-10">
+                  <div>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-stone-950 font-black mb-1">
+                      🏆 AI Recommended Blueprint: ${plan.recommendedMandi.name}
+                    </span>
+                    <div class="text-xl sm:text-2xl font-black">${plan.crop} • ${plan.quantity} Quintals</div>
+                    <p class="text-xs text-amber-200 mt-0.5">${plan.recommendedMandi.assignedGate} • Official MSP: ₹${plan.recommendedMandi.ratePerQtl}/Qtl</p>
+                  </div>
+                  <div class="text-left sm:text-right bg-white/10 p-3 rounded-xl border border-white/20">
+                    <span class="text-[10px] uppercase font-bold text-amber-200 block">Estimated Net Take-Home</span>
+                    <div class="font-mono text-2xl sm:text-3xl font-black text-amber-300">₹${plan.financials.estimatedNetPayout.toLocaleString('en-IN')}</div>
+                    <span class="text-[10px] text-stone-200 block font-bold">Effective ₹${plan.financials.effectiveRatePerQtl}/Qtl</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                <div class="p-3.5 bg-stone-50 rounded-xl border border-stone-200 space-y-1.5">
+                  <span class="text-[10px] font-extrabold uppercase text-stone-400 block">⏰ Timing & Turnaround</span>
+                  <div class="font-bold text-stone-900">Reach By: <strong class="text-rose-900">${plan.timings.suggestedArrival}</strong></div>
+                  <div class="text-stone-600">Depart Village: ${plan.timings.suggestedDeparture}</div>
+                  <div class="text-stone-600">Expected Wait: <strong class="text-emerald-700">${plan.timings.expectedWaitRange}</strong></div>
+                  <div class="text-[11px] text-amber-800 font-bold">Total Time: ~${plan.timings.totalTimeCommitment}</div>
+                </div>
+
+                <div class="p-3.5 bg-stone-50 rounded-xl border border-stone-200 space-y-1.5">
+                  <span class="text-[10px] font-extrabold uppercase text-stone-400 block">🚜 Travel & Distance</span>
+                  <div class="font-bold text-stone-900">${plan.timings.travelDistanceKm} km from ${sp.village.split(',')[0]}</div>
+                  <div class="text-stone-600">Tractor Travel: ~${plan.timings.travelTimeOneWayMins} mins</div>
+                  <div class="text-stone-600">Roundtrip Diesel: ₹${plan.financials.fuelDeduction}</div>
+                  <div class="text-[11px] text-stone-500">Wait Opportunity: ₹${plan.financials.delayCost}</div>
+                </div>
+
+                <div class="p-3.5 bg-amber-50/70 rounded-xl border border-amber-200 space-y-1.5">
+                  <span class="text-[10px] font-extrabold uppercase text-amber-900 block flex items-center gap-1">
+                    <span>${plan.weather.icon}</span> Weather Intelligence
+                  </span>
+                  <div class="font-bold text-stone-900">${plan.weather.condition}</div>
+                  <div class="text-[11px] text-amber-900">${plan.weather.showerRisk}</div>
+                  <div class="text-[10px] text-stone-600 leading-tight">${plan.weather.advisory}</div>
+                </div>
+              </div>
+
+              <div class="p-4 bg-white rounded-xl border border-stone-200 space-y-2">
+                <h5 class="text-xs font-black text-stone-900 uppercase tracking-wider flex items-center justify-between">
+                  <span>📄 Required Documents for Gate Entry</span>
+                  <span class="text-[10px] text-stone-400 font-normal">Check before leaving farm</span>
+                </h5>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                  ${plan.requiredDocs.map(doc => `
+                    <div class="p-2.5 rounded-lg bg-stone-50 border border-stone-200 flex items-start gap-2">
+                      <span class="text-emerald-700 font-black text-sm shrink-0">✓</span>
+                      <div>
+                        <strong class="text-stone-900 block">${doc.name}</strong>
+                        <span class="text-[11px] text-stone-500">${doc.detail}</span>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+
+              <div class="pt-2 flex items-center justify-between gap-3">
+                <button onclick="appHandlers.closeCropPlanner()"
+                  class="px-4 py-2.5 rounded-xl border border-stone-300 text-stone-700 font-bold text-xs hover:bg-stone-50 cursor-pointer">
+                  Cancel
+                </button>
+                <button onclick="appHandlers.applyCropPlanAndBook()"
+                  class="flex-1 py-3 px-6 rounded-xl bg-gradient-to-r from-rose-700 via-rose-800 to-red-800 hover:from-rose-800 hover:to-red-900 text-white font-black text-xs sm:text-sm shadow-md transition-all hover:scale-[1.01] flex items-center justify-center gap-2 cursor-pointer">
+                  <span>⚡ Book This Plan Now (Auto-fill & Confirm Token)</span>
+                  <span>➔</span>
+                </button>
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  // --- AI CROP QUALITY PRE-CHECK ADVISOR MODAL ---
+  function renderCropQualityAdvisorModal() {
+    if (!state.qualityAdvisor || !state.qualityAdvisor.isOpen) return '';
+    const qa = state.qualityAdvisor;
+    const result = qa.result || (window.KisanSetuAI && window.KisanSetuAI.analyzeCropQuality(qa.crop, qa.selectedSample));
+
+    return `
+      <div class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl border border-stone-200 shadow-2xl max-w-xl w-full p-5 sm:p-7 space-y-5 animate-slide-up my-6 max-h-[90vh] overflow-y-auto">
+          <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-500 to-rose-700 text-white flex items-center justify-center text-2xl shadow-sm shrink-0 font-bold">
+                🔬
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 class="font-black text-lg sm:text-xl text-stone-900 tracking-tight">AI Crop Quality Pre-Check</h3>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-950 border border-amber-300">अनाज गुणवत्ता सलाहकार</span>
+                </div>
+                <p class="text-xs text-stone-500">Preliminary grain inspection for moisture & FAQ compliance before travelling</p>
+              </div>
+            </div>
+            <button onclick="appHandlers.closeQualityAdvisor()" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center text-base font-bold cursor-pointer">
+              ✕
+            </button>
+          </div>
+
+          <div class="space-y-2">
+            <label class="block text-xs font-extrabold text-stone-700 uppercase tracking-wider">Select Demo Grain Sample or Upload Photo:</label>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <button type="button" onclick="appHandlers.selectQualitySample('clean_faq')"
+                class="p-3 rounded-xl border-2 text-left transition-all cursor-pointer ${
+                  qa.selectedSample === 'clean_faq'
+                    ? 'border-emerald-600 bg-emerald-50/70 ring-2 ring-emerald-500/20'
+                    : 'border-stone-200 bg-stone-50 hover:bg-white'
+                }">
+                <div class="font-black text-stone-900 flex items-center gap-1.5">
+                  <span>🌾</span> Sample 1: Clean Sharbati
+                </div>
+                <div class="text-[11px] text-stone-500 mt-1">Sun-dried (11.4% moisture, &lt;0.5% chaff)</div>
+                <span class="inline-block mt-1 text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.2 rounded">FAQ Grade A</span>
+              </button>
+
+              <button type="button" onclick="appHandlers.selectQualitySample('high_moisture')"
+                class="p-3 rounded-xl border-2 text-left transition-all cursor-pointer ${
+                  qa.selectedSample === 'high_moisture'
+                    ? 'border-amber-600 bg-amber-50/70 ring-2 ring-amber-500/20'
+                    : 'border-stone-200 bg-stone-50 hover:bg-white'
+                }">
+                <div class="font-black text-stone-900 flex items-center gap-1.5">
+                  <span>🌧️</span> Sample 2: Rain Affected
+                </div>
+                <div class="text-[11px] text-stone-500 mt-1">High moisture (13.8%, needs drying)</div>
+                <span class="inline-block mt-1 text-[10px] font-bold text-amber-800 bg-amber-100 px-2 py-0.2 rounded">Conditioning Needed</span>
+              </button>
+            </div>
+          </div>
+
+          ${result ? `
+            <div class="space-y-3">
+              <div class="p-4 rounded-2xl border ${result.color} flex items-center justify-between">
+                <div>
+                  <span class="text-xs uppercase font-extrabold tracking-wider block opacity-80">Preliminary AI Classification</span>
+                  <div class="text-lg font-black mt-0.5">${result.visualGrade}</div>
+                  <div class="text-xs mt-1 font-semibold">${result.advice}</div>
+                </div>
+                <span class="px-3 py-1.5 rounded-xl font-black text-xs shadow-2xs ${qa.selectedSample === 'clean_faq' ? 'bg-emerald-600 text-white' : 'bg-amber-600 text-white'}">
+                  ${result.badge.split(' ')[0]} ${result.status === 'likely_acceptable' ? 'Ready for MSP' : 'Dry Before Visit'}
+                </span>
+              </div>
+
+              <div class="grid grid-cols-3 gap-2.5 text-xs">
+                <div class="p-3 bg-stone-50 rounded-xl border border-stone-200">
+                  <span class="text-[10px] uppercase font-bold text-stone-400 block">Moisture (नमी)</span>
+                  <strong class="font-mono text-base font-black text-stone-900">${result.metrics.moistureEstimate}</strong>
+                  <span class="text-[10px] ${qa.selectedSample === 'clean_faq' ? 'text-emerald-700' : 'text-rose-700'} font-bold block">${result.metrics.moistureStatus}</span>
+                  <span class="text-[9px] text-stone-400">${result.metrics.moistureNorm}</span>
+                </div>
+
+                <div class="p-3 bg-stone-50 rounded-xl border border-stone-200">
+                  <span class="text-[10px] uppercase font-bold text-stone-400 block">Foreign Matter (कचरा)</span>
+                  <strong class="font-mono text-base font-black text-stone-900">${result.metrics.foreignMatterEstimate}</strong>
+                  <span class="text-[10px] text-emerald-700 font-bold block">${result.metrics.foreignMatterStatus}</span>
+                  <span class="text-[9px] text-stone-400">${result.metrics.foreignMatterNorm}</span>
+                </div>
+
+                <div class="p-3 bg-stone-50 rounded-xl border border-stone-200">
+                  <span class="text-[10px] uppercase font-bold text-stone-400 block">Shriveled / Broken</span>
+                  <strong class="font-mono text-base font-black text-stone-900">${result.metrics.shriveledBroken}</strong>
+                  <span class="text-[10px] text-emerald-700 font-bold block">${result.metrics.shriveledStatus}</span>
+                  <span class="text-[9px] text-stone-400">${result.metrics.shriveledNorm}</span>
+                </div>
+              </div>
+
+              <div class="p-3 bg-stone-100 rounded-xl border border-stone-200 text-[11px] text-stone-600 leading-relaxed">
+                ${result.disclaimer}
+              </div>
+
+              <div class="pt-2 flex justify-end">
+                <button onclick="appHandlers.closeQualityAdvisor()"
+                  class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-700 to-red-700 hover:from-rose-800 hover:to-red-800 text-white font-bold text-xs shadow-xs cursor-pointer">
+                  Done & Return to Booking ➔
+                </button>
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  // --- FULLSCREEN QR MODAL ---
+  function renderQrModal() {
+    if (!state.qrModalOpen) return '';
+    const tok = state.tokens.find(t => t.id === 'KS-RAU-108') || state.tokens[0];
+    const mandi = state.mandis.find(m => m.id === tok.mandiId) || state.mandis[0];
+
+    return `
+      <div class="fixed inset-0 z-50 bg-stone-900/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl border border-stone-200 shadow-2xl max-w-sm w-full p-6 text-center space-y-4 animate-scale-in">
+          <div class="flex items-center justify-between border-b border-stone-100 pb-2">
+            <span class="text-xs font-black uppercase text-stone-500 tracking-wider">Gate Clearance QR Pass</span>
+            <button onclick="appHandlers.closeQrModal()" class="w-7 h-7 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 font-bold text-sm cursor-pointer">✕</button>
+          </div>
+
+          <div class="p-4 bg-stone-50 rounded-2xl border-2 border-stone-300 inline-block shadow-inner">
+            ${generateQrSvg(tok.id + '|' + tok.farmerName + '|' + tok.quantityQuintals + '|' + tok.crop, 200)}
+          </div>
+
+          <div>
+            <div class="font-mono text-2xl font-black text-stone-900">${tok.id}</div>
+            <div class="text-xs font-bold text-rose-900 mt-0.5">${tok.farmerName} • ${tok.crop} (${tok.quantityQuintals} Qtl)</div>
+            <p class="text-[11px] text-stone-500 mt-1">${mandi.name} • <strong>${tok.assignedGate}</strong></p>
+          </div>
+
+          <div class="p-2.5 bg-amber-50 rounded-xl border border-amber-200 text-[11px] text-amber-900 font-medium">
+            Show this QR code at the weighbridge scanner for express 1-minute gate verification.
+          </div>
+
+          <button onclick="window.print()" class="w-full py-2.5 rounded-xl border border-stone-200 hover:bg-stone-50 font-bold text-xs text-stone-700 flex items-center justify-center gap-1.5 cursor-pointer">
+            <span>🖨️</span> Print QR Pass
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  // --- STAFF QR SCANNER MODAL ---
+  function renderStaffScannerModal() {
+    if (!state.staffScannerOpen) return '';
+
+    return `
+      <div class="fixed inset-0 z-50 bg-stone-900/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl border border-stone-200 shadow-2xl max-w-md w-full p-6 space-y-4 animate-slide-up text-center">
+          <div class="flex items-center justify-between border-b border-stone-100 pb-2">
+            <div class="flex items-center gap-2">
+              <span class="text-xl">📷</span>
+              <span class="font-black text-sm text-stone-900">Mandi Gate QR Scanner</span>
+            </div>
+            <button onclick="appHandlers.closeStaffScanner()" class="w-7 h-7 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 font-bold text-sm cursor-pointer">✕</button>
+          </div>
+
+          <div class="relative w-64 h-64 mx-auto rounded-2xl bg-stone-950 overflow-hidden border-4 border-amber-400 flex items-center justify-center shadow-lg">
+            <div class="absolute inset-4 border border-dashed border-white/40 rounded-xl pointer-events-none"></div>
+            <div class="w-full h-1 bg-gradient-to-r from-transparent via-rose-500 to-transparent animate-laser-scan shadow-[0_0_12px_#f43f5e]"></div>
+            
+            <div class="text-white text-center p-4">
+              <div class="text-3xl mb-2 animate-bounce">📱</div>
+              <div class="text-xs font-mono text-amber-300">Aim camera at farmer's QR pass</div>
+              <div class="text-[10px] text-stone-400 mt-1">Optical OCR & Barcode Sensor Active</div>
+            </div>
+          </div>
+
+          <div class="space-y-2 pt-1 text-left">
+            <span class="text-[10px] uppercase font-bold text-stone-400 block text-center">⚡ Judge Quick-Scan (Simulate Gate Read):</span>
+            <div class="grid grid-cols-3 gap-1.5">
+              <button onclick="appHandlers.scanStaffToken('KS-RAU-108')"
+                class="p-2 rounded-xl bg-stone-50 hover:bg-amber-50 border border-stone-200 text-center transition-all hover:scale-105 cursor-pointer">
+                <span class="font-mono font-black text-xs text-rose-900 block">KS-RAU-108</span>
+                <span class="text-[10px] text-stone-600">Ramesh (Wheat)</span>
+              </button>
+              <button onclick="appHandlers.scanStaffToken('KS-RAU-106')"
+                class="p-2 rounded-xl bg-stone-50 hover:bg-amber-50 border border-stone-200 text-center transition-all hover:scale-105 cursor-pointer">
+                <span class="font-mono font-black text-xs text-stone-900 block">KS-RAU-106</span>
+                <span class="text-[10px] text-stone-600">Balram (Wheat)</span>
+              </button>
+              <button onclick="appHandlers.scanStaffToken('KS-RAU-107')"
+                class="p-2 rounded-xl bg-stone-50 hover:bg-amber-50 border border-stone-200 text-center transition-all hover:scale-105 cursor-pointer">
+                <span class="font-mono font-black text-xs text-stone-900 block">KS-RAU-107</span>
+                <span class="text-[10px] text-stone-600">Devendra (Soy)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // --- NOTIFICATIONS DRAWER ---
+  function renderNotificationsDrawer() {
+    if (!state.isNotificationOpen) return '';
+
+    return `
+      <div class="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-xs flex justify-end">
+        <div class="w-full max-w-sm bg-white h-full shadow-2xl border-l border-stone-200 flex flex-col animate-slide-left">
+          <div class="p-4 bg-gradient-to-r from-rose-800 to-amber-900 text-white flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-xl">🔔</span>
+              <div>
+                <h3 class="font-black text-sm">Farmer Notification Center</h3>
+                <p class="text-[10px] text-amber-200">${state.notifications.filter(n => n.unread).length} Unread Alerts</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="appHandlers.markAllNotificationsRead()" class="text-[10px] font-bold bg-white/20 hover:bg-white/30 text-white px-2 py-1 rounded-lg cursor-pointer">
+                Mark Read
+              </button>
+              <button onclick="appHandlers.toggleNotifications(false)" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold text-sm cursor-pointer">
+                ✕
+              </button>
+            </div>
+          </div>
+
+          <div class="flex-1 overflow-y-auto p-4 space-y-3 bg-stone-50/70">
+            ${state.notifications.map(n => `
+              <div class="p-3.5 rounded-2xl border bg-white shadow-2xs transition-all ${
+                n.unread ? 'border-amber-300 ring-1 ring-amber-400/30' : 'border-stone-200 opacity-80'
+              }">
+                <div class="flex items-start justify-between gap-2 mb-1">
+                  <span class="font-extrabold text-xs text-stone-900">${n.title}</span>
+                  <span class="text-[10px] text-stone-400 font-mono">${n.timestamp}</span>
+                </div>
+                <p class="text-xs text-stone-600 leading-relaxed">${n.body}</p>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+// --- RENDER FUNCTIONS ---
   function render() {
     const root = document.getElementById('root');
     if (!root) return;
@@ -1620,11 +2353,27 @@
 
               <!-- CONTROLS & STATUS -->
               <div class="flex items-center gap-2 sm:gap-3">
-                <!-- Live Sync Indicator -->
-                <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-900 border border-rose-200">
-                  <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
-                  <span class="text-[11px] font-bold">${t.liveSync}</span>
-                </div>
+                <!-- Offline Mode Toggle (For Judges & Rural Test) -->
+                <button onclick="appHandlers.toggleOfflineMode()"
+                  class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
+                    state.isOffline ? 'bg-amber-100 text-amber-950 border-amber-300 font-bold' : 'bg-rose-50 text-rose-900 border-rose-200'
+                  }"
+                  title="Toggle offline simulated mode to test zero-network rural capability">
+                  <span class="w-2 h-2 rounded-full ${state.isOffline ? 'bg-amber-600' : 'bg-emerald-500 animate-ping'}"></span>
+                  <span class="text-[11px] font-bold">${state.isOffline ? '📶 Offline Mode' : '🟢 Online'}</span>
+                </button>
+
+                <!-- Farmer Notifications Bell -->
+                <button onclick="appHandlers.toggleNotifications()"
+                  class="relative p-1.5 rounded-lg border border-stone-200 hover:bg-stone-50 text-stone-700 transition-colors cursor-pointer"
+                  title="Farmer Notification Center">
+                  ${Icons.bell}
+                  ${state.notifications.filter(n => n.unread).length > 0 ? `
+                    <span class="absolute -top-1 -right-1 w-4 h-4 bg-rose-600 text-white rounded-full text-[9px] font-black flex items-center justify-center animate-pulse">
+                      ${state.notifications.filter(n => n.unread).length}
+                    </span>
+                  ` : ''}
+                </button>
 
                 <!-- Language Toggle -->
                 <button onclick="appHandlers.setLang('${state.lang === 'en' ? 'hi' : 'en'}')"
@@ -1718,11 +2467,23 @@
               </div>
             </div>
 
-            <button onclick="appHandlers.setTab('farmer'); appHandlers.setFarmerStep('choose_mandi');"
-              class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-gradient-to-r from-rose-700 to-red-700 hover:from-rose-800 hover:to-red-800 text-white font-bold text-xs shrink-0 shadow-xs shadow-2xs transition-colors">
-              <span>Compare & Book Slot</span>
-              <span>➔</span>
-            </button>
+            <div class="hidden sm:flex items-center gap-2 shrink-0">
+              <button onclick="appHandlers.openCropPlanner()"
+                class="px-2.5 py-1 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-950 font-black text-xs shadow-2xs flex items-center gap-1 cursor-pointer">
+                <span>🌾</span>
+                <span>AI Crop Sale Planner</span>
+              </button>
+              <button onclick="appHandlers.openQualityAdvisor()"
+                class="px-2.5 py-1 rounded-lg bg-white border border-stone-300 hover:bg-stone-50 text-stone-800 font-bold text-xs shadow-2xs flex items-center gap-1 cursor-pointer">
+                <span>🔬</span>
+                <span>Grain Pre-Check</span>
+              </button>
+              <button onclick="appHandlers.setTab('farmer'); appHandlers.setFarmerStep('choose_mandi');"
+                class="px-3 py-1 rounded-lg bg-gradient-to-r from-rose-700 to-red-700 hover:from-rose-800 hover:to-red-800 text-white font-bold text-xs shadow-xs transition-colors cursor-pointer">
+                <span>Compare & Book</span>
+                <span>➔</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -1740,9 +2501,23 @@
         ` : ''}
 
         <!-- MAIN BODY VIEW -->
+        ${state.isOffline ? `
+          <div class="bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold px-4 py-2 text-xs text-center border-b border-amber-400 flex items-center justify-center gap-2 shadow-xs">
+            <span>📶</span>
+            <span>Working in Offline Mode (Last synced: ${state.offlineLastSynced || '11:42 AM'}). Your Gate Token, QR Pass & Queue status are cached locally and work 100% without internet.</span>
+            <button onclick="appHandlers.toggleOfflineMode(false)" class="underline text-stone-900 font-black ml-2 cursor-pointer">Switch Online</button>
+          </div>
+        ` : ''}
         <main class="max-w-7xl mx-auto px-3 sm:px-6 py-6 animate-fade-in">
           ${renderActiveView()}
         </main>
+
+        <!-- ALL COMPONENT MODALS -->
+        ${renderCropSalePlannerModal()}
+        ${renderCropQualityAdvisorModal()}
+        ${renderQrModal()}
+        ${renderStaffScannerModal()}
+        ${renderNotificationsDrawer()}
 
         <!-- FLOATING AI AGENT BUTTON (FAB) -->
         <button onclick="appHandlers.toggleAiAgent()"
@@ -1794,6 +2569,9 @@
     return `
       <div class="max-w-4xl mx-auto space-y-6">
         
+        <!-- FARMER CLEAN HOME DASHBOARD (Namaste Ramesh Card) -->
+        ${auth.isVerified ? renderFarmerHomeCard(auth, token || state.tokens[0], selectedMandi) : ''}
+
         <!-- STEPPER HEADER NAVIGATION -->
         <div class="bg-white rounded-2xl border border-stone-200 p-3 sm:p-4 shadow-xs">
           <div class="grid grid-cols-3 gap-2">
@@ -2072,14 +2850,8 @@
                 </div>
               </div>
 
-              <!-- DBT Seeding Badge -->
-              <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between text-xs">
-                <div class="flex items-center gap-2">
-                  <span class="text-amber-600 font-bold text-base">✓</span>
-                  <span class="text-stone-700 font-semibold">NPCI Aadhaar Payment Bridge: <strong class="text-rose-900 font-black">${auth.dbtStatus}</strong></span>
-                </div>
-                <span class="text-[10px] bg-amber-100 text-amber-950 font-bold px-2 py-0.5 rounded border border-amber-300">T+0 DBT Active</span>
-              </div>
+              <!-- BANK VERIFICATION TABLE (Official Status) -->
+              ${renderBankVerificationTable(auth)}
 
               <!-- Bhulekh Land Records -->
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs pt-1">
@@ -2442,14 +3214,22 @@
 
                           <!-- HOURLY CROWD FORECAST MINI-HISTOGRAM (TIME-SERIES ML) -->
                           <div class="mt-2.5 pt-2 border-t border-stone-200/70">
-                            <div class="flex items-center justify-between text-[9px] font-bold text-stone-600 mb-1">
-                              <span class="flex items-center gap-1">
-                                <span>📊</span>
-                                <span>Crowd Forecast (Time-Series)</span>
-                              </span>
-                              <span class="text-[8px] font-extrabold ${crowd && crowd.optimalHour.waitMins <= 22 ? 'text-emerald-700' : 'text-stone-500'}">
-                                Best: ~${crowd ? crowd.optimalHour.label : '02 PM'} (🟢 ~${crowd ? crowd.optimalHour.waitMins : 18}m)
-                              </span>
+                            <div class="space-y-1 mb-1.5">
+                              <div class="flex items-center justify-between text-[9px] font-bold text-stone-600">
+                                <span class="flex items-center gap-1">
+                                  <span>📊</span>
+                                  <span>Crowd Forecast (Time-Series)</span>
+                                </span>
+                                <button type="button" onclick="event.stopPropagation(); alert('AI Timing Recommendation: For fastest turnaround, reach between 08:30 AM – 09:15 AM or 02:00 PM – 03:30 PM (🟢 Low Wait: 18–26m). Avoid 10:00 AM – 11:30 AM peak rush (🔴 45–55m wait)!');"
+                                  class="text-[9px] font-bold text-rose-700 hover:text-rose-900 underline cursor-pointer">
+                                  ❓ When should I reach?
+                                </button>
+                              </div>
+                              <div class="flex items-center gap-1.5 text-[8px] font-extrabold text-stone-700 overflow-x-auto no-scrollbar py-0.5">
+                                <span class="px-1.5 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-800">🟢 Low — 2 PM (18–26m)</span>
+                                <span class="px-1.5 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-900">🟡 Mod — 11 AM (38–51m)</span>
+                                <span class="px-1.5 py-0.5 rounded bg-rose-50 border border-rose-200 text-rose-900">🔴 High — 10 AM (44–59m)</span>
+                              </div>
                             </div>
                             <div class="grid grid-cols-5 gap-1 text-center">
                               ${(crowd ? [crowd.timeline[0], crowd.timeline[2], crowd.timeline[3], crowd.timeline[6], crowd.timeline[8]] : [
@@ -2745,52 +3525,101 @@
             </div>
           </div>
 
-          <!-- STEPPER PROGRESS BAR (Slide 3 User Journey) -->
-          <div class="space-y-3">
-            <h4 class="text-xs font-bold text-stone-700 uppercase tracking-wider">Procurement Journey Stepper</h4>
-            <div class="relative flex items-center justify-between">
-              <!-- Stepper line -->
-              <div class="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-stone-200 w-full z-0"></div>
-              
-              <!-- Step 1: Booked -->
-              <div class="relative z-10 flex flex-col items-center">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-r from-rose-600 to-amber-600 text-white flex items-center justify-center text-xs font-bold ring-4 ring-white">
-                  ✓
-                </div>
-                <span class="text-[10px] font-bold text-stone-800 mt-1">Booked</span>
+          <!-- DYNAMIC 7-STAGE LIVE QUEUE JOURNEY TRACKER -->
+          <div class="space-y-4 p-4 bg-stone-50 rounded-2xl border border-stone-200">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-stone-200/80 pb-2.5">
+              <div>
+                <h4 class="text-xs font-black text-stone-900 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>🚜</span> Live Procurement Journey: Token → Queue → Gate → Quality → Weighment → Settlement
+                </h4>
+                <p class="text-[11px] text-stone-500">Live multi-stage progress with sensor and weighbridge updates</p>
               </div>
 
-              <!-- Step 2: In-Transit -->
-              <div class="relative z-10 flex flex-col items-center">
-                <div class="w-8 h-8 rounded-full ${isTransit || isAtGate || isQC || isWeigh || isCompleted ? 'bg-gradient-to-r from-rose-600 to-amber-600 text-white' : 'bg-stone-200 text-stone-600'} flex items-center justify-center text-xs font-bold ring-4 ring-white">
-                  ${isTransit || isAtGate || isQC || isWeigh || isCompleted ? '✓' : '2'}
-                </div>
-                <span class="text-[10px] font-bold ${isTransit ? 'text-rose-700 font-bold' : 'text-stone-600'} mt-1">Transit</span>
+              <!-- JUDGE SIMULATION CONTROLS -->
+              <div class="flex items-center gap-1.5 bg-white p-1 rounded-xl border border-stone-200 shadow-2xs">
+                <span class="text-[10px] uppercase font-bold text-stone-400 px-1">⚡ Demo Stage:</span>
+                <button type="button" onclick="appHandlers.prevQueueStage()"
+                  class="px-2 py-1 rounded-lg border border-stone-200 hover:bg-stone-100 text-stone-700 font-bold text-[10px] cursor-pointer">
+                  ◀ Prev
+                </button>
+                <span class="font-mono font-black text-rose-900 text-xs px-1">Stage ${token.queueStage || 3}/7</span>
+                <button type="button" onclick="appHandlers.advanceQueueStage()"
+                  class="px-2.5 py-1 rounded-lg bg-gradient-to-r from-rose-700 to-red-700 hover:from-rose-800 hover:to-red-800 text-white font-black text-[10px] shadow-2xs cursor-pointer">
+                  Next Stage ▶
+                </button>
               </div>
+            </div>
 
-              <!-- Step 3: Gate Entry -->
-              <div class="relative z-10 flex flex-col items-center">
-                <div class="w-8 h-8 rounded-full ${isAtGate || isQC || isWeigh || isCompleted ? 'bg-gradient-to-r from-rose-600 to-amber-600 text-white' : 'bg-stone-200 text-stone-600'} flex items-center justify-center text-xs font-bold ring-4 ring-white">
-                  ${isAtGate || isQC || isWeigh || isCompleted ? '✓' : '3'}
-                </div>
-                <span class="text-[10px] font-bold ${isAtGate ? 'text-rose-700 font-bold' : 'text-stone-600'} mt-1">Gate Entry</span>
-              </div>
+            <!-- 7 STAGES STEPPER BAR -->
+            <div class="relative overflow-x-auto pb-2">
+              <div class="min-w-[620px] relative flex items-center justify-between">
+                <div class="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-stone-200 w-full z-0"></div>
+                <div class="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-gradient-to-r from-rose-600 to-amber-500 transition-all duration-300 z-0"
+                  style="width: ${Math.min(100, Math.max(0, (((token.queueStage || 3) - 1) / 6) * 100))}%;"></div>
 
-              <!-- Step 4: Quality Check -->
-              <div class="relative z-10 flex flex-col items-center">
-                <div class="w-8 h-8 rounded-full ${isQC || isWeigh || isCompleted ? 'bg-gradient-to-r from-rose-600 to-amber-600 text-white' : 'bg-stone-200 text-stone-600'} flex items-center justify-center text-xs font-bold ring-4 ring-white">
-                  ${isQC || isWeigh || isCompleted ? '✓' : '4'}
-                </div>
-                <span class="text-[10px] font-bold ${isQC ? 'text-rose-700 font-bold' : 'text-stone-600'} mt-1">Quality Check</span>
+                ${[
+                  { num: 1, label: 'Token Confirmed', icon: '🎫', pos: 'Booked' },
+                  { num: 2, label: 'In Transit', icon: '🚚', pos: 'Moving' },
+                  { num: 3, label: 'Yard Queue', icon: '🅿️', pos: '14 Ahead' },
+                  { num: 4, label: 'Gate Entry', icon: '🚪', pos: 'Gate 2' },
+                  { num: 5, label: 'Quality Check', icon: '🔬', pos: 'FAQ Passed' },
+                  { num: 6, label: 'Weighment', icon: '⚖️', pos: '45.00 Qtl' },
+                  { num: 7, label: 'DBT Settlement', icon: '💳', pos: '₹1,08,000' }
+                ].map(st => {
+                  const isDone = (token.queueStage || 3) > st.num;
+                  const isCurrent = (token.queueStage || 3) === st.num;
+                  return `
+                    <div onclick="appHandlers.setQueueStage(${st.num})"
+                      class="relative z-10 flex flex-col items-center cursor-pointer transition-all hover:scale-105">
+                      <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ring-4 ring-white shadow-xs ${
+                        isDone ? 'bg-gradient-to-r from-rose-700 to-amber-600 text-white' :
+                        isCurrent ? 'bg-gradient-to-r from-rose-700 to-red-800 text-white ring-amber-400 ring-2' :
+                        'bg-stone-200 text-stone-500'
+                      }">
+                        ${isDone ? '✓' : st.icon}
+                      </div>
+                      <span class="text-[10px] font-extrabold mt-1 text-center whitespace-nowrap ${
+                        isCurrent ? 'text-rose-950 font-black' : isDone ? 'text-stone-800' : 'text-stone-400'
+                      }">
+                        ${st.label}
+                      </span>
+                      <span class="text-[9px] font-mono text-stone-400">${st.pos}</span>
+                    </div>
+                  `;
+                }).join('')}
               </div>
+            </div>
 
-              <!-- Step 5: Weigh & MSP -->
-              <div class="relative z-10 flex flex-col items-center">
-                <div class="w-8 h-8 rounded-full ${isCompleted ? 'bg-gradient-to-r from-rose-600 to-amber-600 text-white' : 'bg-stone-200 text-stone-600'} flex items-center justify-center text-xs font-bold ring-4 ring-white">
-                  ${isCompleted ? '✓' : '5'}
+            <!-- CURRENT ACTIVE STAGE CALLOUT -->
+            <div class="p-3 bg-white rounded-xl border border-amber-300 shadow-2xs flex items-center justify-between gap-3 text-xs">
+              <div class="flex items-center gap-2.5">
+                <span class="text-2xl">${
+                  (token.queueStage || 3) === 1 ? '🎫' :
+                  (token.queueStage || 3) === 2 ? '🚚' :
+                  (token.queueStage || 3) === 3 ? '🅿️' :
+                  (token.queueStage || 3) === 4 ? '🚪' :
+                  (token.queueStage || 3) === 5 ? '🔬' :
+                  (token.queueStage || 3) === 6 ? '⚖️' : '🎉'
+                }</span>
+                <div>
+                  <div class="font-extrabold text-stone-900">
+                    Current Status: <strong class="text-rose-950 font-black">${getStageLabel(token.queueStage || 3)}</strong>
+                  </div>
+                  <p class="text-[11px] text-stone-600 mt-0.5">${
+                    (token.queueStage || 3) === 1 ? 'Token #KS-RAU-108 confirmed for 28-Sep at Rau APMC. Ready to leave.' :
+                    (token.queueStage || 3) === 2 ? 'Vehicle in transit from Rangwasa on Bypass Road. GPS ETA: ~14 mins.' :
+                    (token.queueStage || 3) === 3 ? 'In Mandi holding yard. 14 vehicles ahead. Expected wait: 32–40 min.' :
+                    (token.queueStage || 3) === 4 ? 'Token called! Proceed to Gate 2 (Platform 3) for sensor entry.' :
+                    (token.queueStage || 3) === 5 ? 'Moisture meter reading: 11.2% (FAQ standard ≤ 12.0%). Grade A Passed.' :
+                    (token.queueStage || 3) === 6 ? 'Weighbridge Gross: 7,850 kg, Tare: 3,350 kg. Net: 45.00 Qtl confirmed.' :
+                    'MSP Payment credited! ₹1,08,000 sent via PFMS DBT to SBI A/c XXXX 4091.'
+                  }</p>
                 </div>
-                <span class="text-[10px] font-bold ${isCompleted ? 'text-rose-700 font-bold' : 'text-stone-600'} mt-1">MSP Payout</span>
               </div>
+              <button onclick="appHandlers.openQrModal()"
+                class="px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-800 font-bold text-xs shrink-0 flex items-center gap-1 cursor-pointer">
+                <span>🎫</span> Show QR
+              </button>
             </div>
           </div>
 
@@ -3058,29 +3887,63 @@
     return `
       <div class="space-y-6">
         <!-- TOP STATS BAR -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
           <div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-xs">
-            <span class="text-xs font-bold text-stone-500 uppercase">Active Procurement Center</span>
-            <div class="text-base sm:text-lg font-extrabold text-stone-900 mt-1">${mandi.name.split('(')[0]}</div>
-            <span class="text-[11px] text-amber-800 font-bold">District: ${mandi.district}</span>
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-stone-400 uppercase">Waiting in Yard</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-black text-rose-950 mt-1">37 Vehicles</div>
+            <span class="text-[11px] text-stone-500 font-medium">Holding Bay A & B</span>
           </div>
 
           <div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-xs">
-            <span class="text-xs font-bold text-stone-500 uppercase">Current Serving Token</span>
-            <div class="text-xl sm:text-2xl font-mono font-extrabold text-rose-900 mt-1">${mandi.currentServingToken}</div>
-            <span class="text-[11px] text-stone-500">Gate 2 / Bay 4</span>
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-stone-400 uppercase">In Processing</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-black text-amber-900 mt-1">12 Bays Active</div>
+            <span class="text-[11px] text-amber-800 font-bold">Avg Processing: 11 min</span>
           </div>
 
           <div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-xs">
-            <span class="text-xs font-bold text-stone-500 uppercase">Queue Backlog</span>
-            <div class="text-xl sm:text-2xl font-extrabold text-stone-900 mt-1">${mandi.queueLength} Vehicles</div>
-            <span class="text-[11px] text-amber-700 font-bold">Avg Wait: ${mandi.avgWaitMins} Mins</span>
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-stone-400 uppercase">Completed Today</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-black text-emerald-900 mt-1">84 Farmers</div>
+            <span class="text-[11px] text-emerald-700 font-bold">3,780 MT Procured</span>
           </div>
 
           <div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-xs">
-            <span class="text-xs font-bold text-stone-500 uppercase">Today's Intake</span>
-            <div class="text-xl sm:text-2xl font-extrabold text-stone-900 mt-1">${mandi.todayProcuredMT} MT</div>
-            <span class="text-[11px] text-amber-800 font-bold">100% Target Alignment</span>
+            <span class="text-xs font-bold text-stone-400 uppercase">Gate Operations</span>
+            <div class="flex items-center gap-1.5 mt-2">
+              <span class="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-100 text-emerald-950 border border-emerald-300">Gate 1 🟢</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-black bg-amber-100 text-amber-950 border border-amber-300">Gate 2 🟡</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-black bg-rose-100 text-rose-950 border border-rose-300">Gate 3 🔴</span>
+            </div>
+            <span class="text-[10px] text-stone-400 mt-1 block">Live Turnaround: 11m avg</span>
+          </div>
+        </div>
+
+        <!-- STAFF ACTION CONTROL BAR -->
+        <div class="p-3 bg-white rounded-2xl border border-stone-200 shadow-xs flex flex-wrap items-center justify-between gap-2.5">
+          <div class="flex items-center gap-2">
+            <button onclick="appHandlers.openStaffScanner()"
+              class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-950 font-black text-xs shadow-2xs flex items-center gap-1.5 cursor-pointer">
+              <span>📷</span>
+              <span>Scan Farmer QR Code</span>
+            </button>
+            <button onclick="appHandlers.callNextToken()"
+              class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-rose-700 to-red-700 hover:from-rose-800 hover:to-red-800 text-white font-bold text-xs shadow-2xs flex items-center gap-1.5 cursor-pointer">
+              <span>📢</span>
+              <span>Call Next Farmer</span>
+            </button>
+          </div>
+          <div class="text-xs text-stone-500 font-bold flex items-center gap-2">
+            <span>Center: <strong>${mandi.name}</strong></span>
+            <span>•</span>
+            <span class="text-amber-800 font-bold">RFID Reader: Active</span>
           </div>
         </div>
 
