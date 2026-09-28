@@ -5,6 +5,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.ViewGroup
+import android.util.Log
+import android.webkit.ConsoleMessage
 import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
@@ -66,6 +68,8 @@ class MainActivity : ComponentActivity() {
                                     builtInZoomControls = false
                                     allowFileAccess = true
                                     allowContentAccess = true
+                                    allowFileAccessFromFileURLs = true
+                                    allowUniversalAccessFromFileURLs = true
                                     mediaPlaybackRequiresUserGesture = false
                                     mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
                                     cacheMode = WebSettings.LOAD_DEFAULT
@@ -73,6 +77,11 @@ class MainActivity : ComponentActivity() {
                                 webChromeClient = object : WebChromeClient() {
                                     override fun onPermissionRequest(request: PermissionRequest?) {
                                         request?.grant(request.resources)
+                                    }
+
+                                    override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
+                                        Log.d("KisanSetuWeb", "${consoleMessage?.message()} -- line ${consoleMessage?.lineNumber()} of ${consoleMessage?.sourceId()}")
+                                        return true
                                     }
                                 }
                                 webViewClient = object : WebViewClient() {

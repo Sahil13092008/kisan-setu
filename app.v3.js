@@ -436,6 +436,7 @@
     },
     {
       id: 'KS-RAU-108',
+      queueStage: 3,
       mandiId: 'RAU',
       farmerId: 'FARMER-01',
       farmerName: 'Ramesh Kumar',
@@ -505,11 +506,156 @@
     }
   ];
 
+  
+  // --- INITIAL NOTIFICATIONS ---
+  const INITIAL_NOTIFICATIONS = [
+    {
+      id: 'notif-1',
+      timestamp: '2 min ago',
+      title: '🔔 Your turn is approaching',
+      body: '3 farmers ahead of you in Queue. Please move toward Gate 2 (Bay 3).',
+      type: 'alert',
+      unread: true
+    },
+    {
+      id: 'notif-2',
+      timestamp: '18 min ago',
+      title: '⚠️ Queue Delay Detected',
+      body: 'Queue increased by 18 farmers. Expected wait changed from 25 → 47 min. Reschedule suggested.',
+      type: 'warning',
+      unread: true
+    },
+    {
+      id: 'notif-3',
+      timestamp: '1 hr ago',
+      title: '🌾 Moisture Norm Reminder',
+      body: 'Fair Average Quality (FAQ) standard requires moisture ≤ 12.0%. Ensure grain is sun-dried.',
+      type: 'info',
+      unread: false
+    },
+    {
+      id: 'notif-4',
+      timestamp: 'Yesterday',
+      title: '🎫 Gate Pass Confirmed',
+      body: 'Token #KS-RAU-108 generated for 40 Qtl Wheat at Rau APMC Mandi (08:00 AM - 11:00 AM).',
+      type: 'success',
+      unread: false
+    }
+  ];
+
+  // --- OFFLINE / LOW NETWORK PERSISTENCE ---
+  const OFFLINE_STORAGE_KEY = 'kisan_setu_offline_v2';
+  function saveOfflineState() {
+    try {
+      const payload = {
+        savedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        farmerAuth: state.farmerAuth,
+        activeToken: state.tokens.find(t => t.id === 'KS-RAU-108') || state.tokens[0],
+        mandiId: state.bookingForm.mandiId,
+        queuePosition: state.tokens[0]?.queuePosition || 14
+      };
+      localStorage.setItem(OFFLINE_STORAGE_KEY, JSON.stringify(payload));
+    } catch (e) {}
+  }
+
+  function loadOfflineState() {
+    try {
+      const raw = localStorage.getItem(OFFLINE_STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function updateTokenStatusFromStage(tok) {
+    const stage = tok.queueStage || 3;
+    if (stage === 1) {
+      tok.status = 'scheduled';
+      tok.queuePosition = 18;
+      tok.etaMins = 48;
+      tok.predictedWaitRange = '42–52 min';
+      tok.quality = null;
+      tok.weight = null;
+      tok.payout = null;
+    } else if (stage === 2) {
+      tok.status = 'in_transit';
+      tok.queuePosition = 16;
+      tok.etaMins = 38;
+      tok.predictedWaitRange = '35–42 min';
+      tok.quality = null;
+      tok.weight = null;
+      tok.payout = null;
+    } else if (stage === 3) {
+      tok.status = 'in_queue';
+      tok.queuePosition = 14;
+      tok.etaMins = 35;
+      tok.predictedWaitRange = '32–40 min';
+      tok.quality = null;
+      tok.weight = null;
+      tok.payout = null;
+    } else if (stage === 4) {
+      tok.status = 'at_gate';
+      tok.queuePosition = 2;
+      tok.etaMins = 8;
+      tok.predictedWaitRange = '6–10 min';
+      tok.quality = null;
+      tok.weight = null;
+      tok.payout = null;
+    } else if (stage === 5) {
+      tok.status = 'in_quality_check';
+      tok.queuePosition = 1;
+      tok.etaMins = 4;
+      tok.predictedWaitRange = '3–5 min';
+      tok.quality = { moisture: 11.2, foreignMatter: 0.45, grade: 'Grade A (FAQ Standard)', dockPercent: 0 };
+      tok.weight = null;
+      tok.payout = null;
+    } else if (stage === 6) {
+      tok.status = 'at_weighbridge';
+      tok.queuePosition = 0;
+      tok.etaMins = 0;
+      tok.predictedWaitRange = '0 min (Active)';
+      tok.quality = { moisture: 11.2, foreignMatter: 0.45, grade: 'Grade A (FAQ Standard)', dockPercent: 0 };
+      tok.weight = { gross: 7850, tare: 3350, netKg: 4500, netQuintals: 45 };
+      tok.payout = null;
+    } else if (stage === 7) {
+      tok.status = 'completed';
+      tok.queuePosition = 0;
+      tok.etaMins = 0;
+      tok.predictedWaitRange = 'Settled';
+      tok.quality = { moisture: 11.2, foreignMatter: 0.45, grade: 'Grade A (FAQ Standard)', dockPercent: 0 };
+      tok.weight = { gross: 7850, tare: 3350, netKg: 4500, netQuintals: 45 };
+      tok.payout = { mspRate: 2400, totalAmount: 108000, dbtStatus: 'Credited to SBI A/c XXXX 4091', utrNo: 'PFMS202609280041' };
+      if (typeof window.confetti === 'function') {
+        window.confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
+      }
+    }
+  }
+
   // --- APPLICATION STATE ---
   let state = {
     lang: 'en',
     mandiFilter: 'all', // 'all' | 'government' | 'private'
-    activeTab: 'farmer', // 'farmer', 'staff', 'ministry', 'sms', 'tech'
+    activeTab: 'farmer',
+    isOffline: false,
+    offlineLastSynced: '11:42 AM',
+    notifications: JSON.parse(JSON.stringify(INITIAL_NOTIFICATIONS)),
+    isNotificationOpen: false,
+    qrModalOpen: false,
+    staffScannerOpen: false,
+    salePlanner: {
+      isOpen: false,
+      crop: 'Wheat',
+      quantity: 50,
+      village: 'Rangwasa, Indore',
+      targetDate: 'Tomorrow (28-Sep-2026)',
+      plan: null
+    },
+    qualityAdvisor: {
+      isOpen: false,
+      selectedSample: 'clean_faq',
+      crop: 'Wheat',
+      result: null
+    }, // 'farmer', 'staff', 'ministry', 'sms', 'tech'
     simulatedJam: false,
     rescheduleAlert: null,
     aiAgent: {
@@ -1688,6 +1834,13 @@
 
   // --- SVG ICON HELPERS (Clean inline SVGs for zero dependencies) ---
   const Icons = {
+    bell: `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>`,
+    wifi: `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13a10 10 0 0 1 14 0"/><path d="M8.5 16.5a5 5 0 0 1 7 0"/><path d="M12 20h.01"/></svg>`,
+    wifiOff: `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 16.48a5 5 0 0 1 2.58-.29"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>`,
+    scanner: `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="3" y1="12" x2="21" y2="12"/></svg>`,
+    sparkles: `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>`,
+    shield: `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+    document: `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
     tractor: `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m10 11 11 .9a1 1 0 0 1 .8 1.1l-.665 4.158a1 1 0 0 1-.988.842H20"/><path d="M16 18h-5"/><path d="M18 5a1 1 0 0 0-1 1v5.573"/><path d="M3 4h8.129a1 1 0 0 1 .99.863L13 11.246"/><path d="M4 11V4"/><path d="M7 15h.01"/><path d="M8 10.1V4"/><circle cx="18" cy="18" r="2"/><circle cx="7" cy="15" r="5"/></svg>`,
     building: `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 12h4"/><path d="M10 8h4"/><path d="M14 21v-3a2 2 0 0 0-4 0v3"/><path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/><path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/></svg>`,
     chart: `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>`,
